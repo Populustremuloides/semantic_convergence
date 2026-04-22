@@ -1,0 +1,25 @@
+.DS_Store
+
+# Lean / Lake build outputs
+.lake/
+build/
+*.olean
+*.ilean
+*.c
+
+# Python cache
+__pycache__/
+*.pyc
+
+# LaTeX / bibliography build outputs
+*.aux
+*.bbl
+*.blg
+*.fdb_latexmk
+*.fls
+*.log
+*.out
+*.pdf
+*.synctex.gz
+*.toc
+missfont.log

@@ -1,0 +1,6 @@
+name = "AlgorithmicFreeEnergy"
+version = "0.1.0"
+defaultTargets = ["AlgorithmicFreeEnergy"]
+
+[[lean_lib]]
+name = "AlgorithmicFreeEnergy"

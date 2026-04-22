@@ -1,0 +1,166 @@
+\documentclass[11pt]{article}
+
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb,amsthm,mathtools}
+\usepackage{booktabs,tabularx}
+\usepackage[colorlinks=true,allcolors=blue]{hyperref}
+\usepackage{enumitem}
+
+\title{Review of \emph{Toward an Algorithmic Free Energy Principle for Explanatory Programs}}
+\author{Anonymous Reviewer \\ Journal of Artificial Intelligence Research (JAIR)}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+\section*{Recommendation}
+
+\textbf{Major revision.} The manuscript presents a technically correct and occasionally elegant synthesis of the variational free energy principle (FEP) with algorithmic (Solomonoff) priors. Its theoretical contributions are clearly stated and the derivations, with a handful of small caveats noted below, are sound. However, in its present form the paper falls short of the bar I would set for JAIR on three grounds: (i) the novelty of the synthesis is overstated relative to prior work on information-theoretic bounded rationality, universal AI, and Bayesian experimental design; (ii) the paper contains no empirical work of any kind---not even a toy demonstration of the proposed behavioral proxy---despite framing itself partly as a foundation for benchmarking; and (iii) several technical and presentational issues require attention before the manuscript can be considered publication-ready. I believe a revised version could meet JAIR's standards, and I would be willing to re-review.
+
+\section*{Summary of the Paper}
+
+The authors propose combining the variational free energy principle of Friston and colleagues with Solomonoff's universal prior over self-delimiting programs, applied to an interactive (action-conditioned) semimeasure setting. They (a) define an ``algorithmic free energy'' functional $\mathcal{F}_t[q;h_t] = \mathbb{E}_q[L_t(p;h_t)] + \mathrm{KL}(q\|w)$ over posteriors $q$ on programs, with $w$ the normalized Solomonoff prior; (b) prove a variational identity showing that the minimizer is the Bayes/Gibbs posterior under $w$ and that the minimum value is $-\log\bar\xi$, i.e.\ negative log universal interactive mixture evidence; (c) show that collapsing beliefs to a point mass, or extracting a MAP estimate from a scaled Gibbs posterior, reduces exactly to a penalized description-length (MDL/MAP) selection rule with penalty $\lambda = \tau\log 2$; (d) define an expected free energy for action $\mathcal{G}_t(a;h_t)$ and decompose it into action cost, instrumental risk, and mutual information between the hidden program and the next observation; (e) sketch a three-level framework (ideal theory, behavioral proxy, open mechanistic challenge) and argue that current systems can only be evaluated behaviorally.
+
+\section*{Overall Assessment}
+
+The paper's central analytic claims are correct and the exposition is, for the most part, careful. The formalism is an honest extension of Solomonoff/Hutter-style mixtures to an interactive setting combined with the standard variational (Gibbs) decomposition. The organization into ideal theory, proxy, and mechanistic challenge is pedagogically useful.
+
+At the same time, the \emph{mathematical substance} of the synthesis is more modest than the introduction and abstract imply. Theorem 5.1 (``variational identity'') is a direct application of the Gibbs variational principle: for any prior $w$ and likelihood $e^{-L}$, the KL-plus-loss functional is minimized by the normalized posterior $w\cdot e^{-L}/Z$, with minimum value $-\log Z$. The content specific to this paper is the identification of $w$ with the Solomonoff prior and of the loss with interactive history-fit. The MDL/MAP bridge in Section~6 is, similarly, a recasting of well-known relationships between Bayesian MAP under a description-length prior and two-part MDL coding (cf.\ Gr\"unwald 2007, especially chapters on Bayesian interpretations of MDL). The risk-minus-information-gain decomposition in Theorem~7.2 is the standard active-inference decomposition; what is novel here is applying it to a posterior over programs rather than over latent states in a prespecified generative model.
+
+I do not regard this modest novelty as disqualifying---clear, careful synthesis of existing ideas is a legitimate contribution, and JAIR has published such papers. But the contribution should be framed accurately. In its current form, phrases such as ``the present paper supplies the missing synthesis'' and ``three exact results follow'' claim more than the proofs deliver. A revision that foregrounds \emph{what is new about the interactive-semimeasure extension}, engages substantively with the literature on universal AI and bounded rationality noted below, and tempers the novelty claims, would be much stronger.
+
+The absence of any empirical demonstration is the single most significant shortcoming. The paper devotes an entire section (Section~8) to a behavioral proxy, enumerates its design choices in Table~2, and claims that it is ``evaluable on current systems.'' No evaluation is conducted. A toy experiment on the authors' own running example---piecewise modular programs over a finite integer domain, a setting they choose precisely because it is tractable---would substantially strengthen the paper and let reviewers assess whether the proposed proxy measures anything non-trivial.
+
+\section*{Strengths}
+
+\begin{enumerate}[leftmargin=*]
+\item \textbf{Careful formalization.} The treatment of semimeasures, prefix-free program sets, the raw/normalized prior distinction ($\wt{w}$ vs.\ $w$, $\xi$ vs.\ $\bar\xi$), the reference-machine invariance caveat for $K_U$, and the explicit admissibility conditions for $\mathcal{F}_t$ are all handled correctly. The authors clearly know the Solomonoff/Hutter literature well.
+\item \textbf{Honest separation of theoretical levels.} Table~1 (criteria vs.\ level) and Table~2 (ideal objects vs.\ proxy/gap) make the scope of each claim explicit. This is more discipline than one often sees in work combining FEP with outside formalisms.
+\item \textbf{Useful remark on the ``low-temperature slogan.''} The remark following Theorem~6.3 correctly diagnoses the common error that $\tau\to 0$ automatically recovers an MDL penalty. This is a genuinely useful clarification.
+\item \textbf{Correct separation from AIXI.} The Related Work section draws a clean line between reward-maximizing universal agents and the variational/epistemic program pursued here. The distinction is real and worth making.
+\item \textbf{Motivating example.} The piecewise modular program $p^\star$ is chosen with care: the coincidence of outputs across branches near the boundary is a nice illustration of why correct prediction does not imply recovered mechanism.
+\end{enumerate}
+
+\section*{Major Concerns}
+
+\subsection*{1.\ Overstated novelty and incomplete engagement with prior work}
+
+The paper motivates itself as bridging a gap between FEP and algorithmic information theory that, in the authors' words, ``has until now remained separate.'' This is not accurate. A substantial body of work has explored related integrations:
+
+\begin{itemize}[leftmargin=*]
+\item \textbf{Ortega and Braun} (e.g., \emph{Thermodynamics as a theory of decision-making with information-processing costs}, Proc.\ Roy.\ Soc.\ A, 2013; and earlier work on KL-regularized control) derive KL-constrained control and Gibbs posteriors over policies from information-theoretic principles. Their formalism is close in spirit to the present paper's, and they explicitly connect bounded rationality, free energy, and Bayesian inference.
+\item \textbf{Bialek, Nemenman, and Tishby}, and subsequently \textbf{Still, Crutchfield} and others, have developed information-bottleneck and predictive-information frameworks that overlap substantively with epistemic action selection as described here.
+\item \textbf{Leike and Hutter} have studied convergence properties of AIXI and universal prediction, and their asymptotic results are relevant to any claim that the present framework's minimizer is meaningful in an interactive setting. The paper does not discuss any convergence or consistency property of the proposed posterior, and it should.
+\item \textbf{Schmidhuber}'s work on creativity, compression, and curiosity (e.g., \emph{Formal theory of creativity, fun, and intrinsic motivation}, 2010) makes related claims about information gain and algorithmic complexity in an explicitly active setting; the omission is striking.
+\item \textbf{Bayesian experimental design} (Lindley 1956; Chaloner and Verdinelli 1995; MacKay 1992) is the natural antecedent of the ``maximize mutual information net of action cost'' rule in Corollary~7.3. The corollary is in effect a restatement of Lindley's expected information criterion with the prior set to the universal mixture. This literature is not cited.
+\item \textbf{Deutsch}'s notion of ``hard-to-vary'' explanations (\emph{The Beginning of Infinity}, 2011) is the source of criterion~4 in Section~3, but Deutsch is not cited. Given that the paper designates hard-to-vary structure as an open problem and discusses it at length, an explicit citation is owed.
+\end{itemize}
+
+I am not asking the authors to survey the entire literature on information-theoretic control. I am asking them to (a) cite these works where the overlap is substantive, and (b) state precisely what their framework adds beyond what each of these lines already provides. A revision that did this carefully would be materially stronger.
+
+\subsection*{2.\ No empirical content}
+
+The paper promises a behavioral proxy ``evaluable on current systems'' (Section~8) and describes it in sufficient detail---restricted DSL, AST-node complexity surrogate, fixed query penalty, held-out evaluation---that implementation is tractable. The authors do not implement it. This is a serious gap for a paper whose framing relies in part on the practicability of the proxy.
+
+I would ask the authors to include at minimum:
+
+\begin{itemize}[leftmargin=*]
+\item A toy instantiation of the proxy on the running example (piecewise modular programs), comparing (say) a lookup-table baseline, an enumerative DSL search with penalized description length, and---if resources permit---a program-induction learner or LLM-based agent on held-out evaluation.
+\item Quantitative measurements that distinguish prediction from explanation in the sense the paper claims is the distinguishing feature of the framework. If the distinction cannot be operationalized, that itself is a finding worth reporting.
+\item A sensitivity analysis on the complexity surrogate (AST-node count) and the query penalty, to show that the rank ordering of systems is not an artifact of these choices.
+\end{itemize}
+
+Even a negative or modest empirical result would strengthen the paper by showing the proxy is not purely rhetorical.
+
+\subsection*{3.\ ``Principled prior'' claim is stronger than the proof supports}
+
+The paper claims to replace FEP's stipulated prior with one that is ``provably universal.'' This is half-true. The Solomonoff prior dominates every computable prior up to a multiplicative constant---this is the universality theorem the paper implicitly invokes. However:
+
+\begin{itemize}[leftmargin=*]
+\item The prior is reference-machine dependent up to an additive constant on $K_U$ (equivalently, a multiplicative constant on $w$). The paper acknowledges this briefly but then speaks as if universality closes the justification question. It does not. Two different universal machines yield two different priors that can disagree substantially on finite samples, and the invariance constant can be arbitrarily large.
+\item Under the behavioral proxy, the AST-node complexity surrogate is explicitly language-relative (Section~8.1, ``This is an honest limitation''). But the ``language relativity'' at the proxy level is the \emph{same kind} of relativity (up to an additive constant) as at the ideal level. Calling one ``stipulated'' (as in classical FEP) and the other ``principled'' (as in this paper) is not as clean a distinction as the Introduction claims.
+\end{itemize}
+
+The paper should tone down the ``principled/stipulated'' contrast, or alternatively make a precise argument for why machine-dependence is a qualitatively weaker form of stipulation than domain-specific prior design.
+
+\subsection*{4.\ Realizability, consistency, and convergence are not addressed}
+
+The paper states a realizability assumption (an unknown $p^\star \in \mathcal{P}$ generates the data) but never asks whether the posterior $q_t^\star$ concentrates on $p^\star$ or its equivalence class under $\mu$ as $t\to\infty$. The relevant Solomonoff/Hutter consistency results (Blackwell-Dubins; Hutter 2005) should at least be mentioned and their applicability to the interactive-semimeasure setting discussed. In particular:
+
+\begin{itemize}[leftmargin=*]
+\item Does the expected-free-energy action rule induce policies that are sufficient exploration-wise for posterior consistency? The paper defines the objective but does not prove anything about the induced policy's long-run behavior.
+\item Is there a regret bound, a PAC-Bayes statement, or any convergence guarantee tying $\mathcal{F}_t[q_t^\star;h_t]$ to the ideal mixture loss $-\log\bar\xi(o_{1:t}\givena a_{1:t})$? The variational identity gives the \emph{value} of the minimum, but no asymptotic guarantee.
+\end{itemize}
+
+Without at least a discussion of these issues, the claim that the framework is ``normatively complete'' rings hollow.
+
+\subsection*{5.\ The ``open mechanistic challenge'' is a research program, not a contribution}
+
+Section~8.2 identifies what internal access would be needed to evaluate a system against the ideal theory directly: exposing $q_t$, exposing $\mathcal{G}_t(a;h_t)$, and supporting program-neighborhood perturbations. The authors claim that ``identifying this gap precisely is itself a contribution.'' I partly agree, but the section as written reads closer to an opinion piece than a formal contribution. For this material to count as a deliverable on par with the theorems, the authors would need to:
+
+\begin{itemize}[leftmargin=*]
+\item Specify concrete verification protocols that could be applied if a system did expose these quantities (what constitutes a passing score? how much deviation from $q_t^\star$ is acceptable? what is the statistical power of the proposed test?).
+\item Connect to existing interpretability literature (probing, mechanistic interpretability, sparse autoencoders) where partial access to internal states is being developed.
+\item Distinguish their mechanistic challenge from general calls for interpretability, beyond the assertion that theirs is ``more legible.''
+\end{itemize}
+
+\section*{Minor Technical Concerns}
+
+\begin{enumerate}[leftmargin=*]
+\item \textbf{Uniqueness in Theorem~5.1.} The theorem asserts the minimizer is unique. Because $\mathcal{F}_t$ is strictly convex in $q$ on the simplex where it is finite, this is correct, but a one-line justification is warranted. The same applies to the scaled variant in Proposition~6.2.
+
+\item \textbf{Admissibility and zero-support histories.} The admissibility conditions ($\mathbb{E}_q[L_t] < \infty$ and $\mathrm{KL}(q\|w) < \infty$) are clear, but the treatment of histories with $\xi(o_{1:t}\givena a_{1:t}) = 0$ is deferred via the ``standing assumption $\xi > 0$.'' This is a strong assumption in the semimeasure setting, since a single action can cause $\mu_p$ to collapse to zero. The authors should discuss what the framework does in that case (restrict $\mathcal{P}$? redefine $L_t$?).
+
+\item \textbf{Semimeasure-to-distribution transition (Section~7).} Section~4 allows subnormalized kernels; Section~7 requires proper conditionals ``because the entropy, KL, and mutual-information identities used below are identities for probability distributions.'' The proposed remedy---``absorb any missing semimeasure mass into a distinguished termination or null observation''---changes the object being reasoned about. Does this remedy preserve the variational identity of Section~5? A formal statement that the enlarged model is consistent with the earlier definitions would help.
+
+\item \textbf{Proposition 5.2 (decomposition).} The authors correctly flag that $\mathbb{E}_q[\ell(p)] < \infty$ and $H(q) < \infty$ are stronger than admissibility. However, they then use the decomposition freely in Section~6 (Theorem~6.1, ``Substituting into \eqref{eq:fe-decomposition} with scaling $\tau$''). For a point-mass $\delta_p$ the stronger conditions are met trivially, so the proof goes through, but the reader should be told this explicitly.
+
+\item \textbf{MAP ties and existence.} Theorems~6.1 and~6.4 use $\argmin$ and $\argmax$ over a countable set. Existence is not guaranteed unless the objective has a minimum on the set (e.g., because it grows with $|p|$). A brief statement---``a minimum exists because $J_t^\lambda(p;h_t) \to \infty$ as $\ell(p)\to\infty$ whenever $\lambda > 0$''---would resolve this.
+
+\item \textbf{Semantic MDL (Proposition 6.5).} The proof ignores that different realizing programs $p$ with $|p| = K_U(\nu)$ may achieve different $L_t$ values (they must agree on $\mu_p$, hence on $L_t(p;h_t)$). State explicitly that $L_t$ depends only on $\mu_p$, making $L_t + \lambda|p|$ well-defined on semantic equivalence classes.
+
+\item \textbf{Expected free energy and the choice of $\rho_t$.} The preference distribution $\rho_t$ is introduced in Section~7 with minimal motivation. In the FEP literature, $\rho_t$ encodes preferences or goal distributions. The paper's ``flat preference on common feasible set'' choice, which turns $\mathcal{G}_t$ into mutual information net of cost, should be named for what it is: a pure information-seeking regime. The relationship to Bayesian experimental design (Lindley 1956) could be made explicit here.
+
+\item \textbf{Notation inconsistencies.} The symbol $\Qcal_t$ is used both for the joint predictive distribution over $(p,o)$ and for its marginal over $o$, disambiguated only by arguments. This is parseable but not ideal in a formal paper. A subscript or a different symbol for the marginal would help.
+
+\item \textbf{Bibliography hygiene.} The TeX source contains comments indicating the bib file is incomplete (lines 1--18) and a ``NOTE TO AUTHOR: verify these citations'' embedded in Section~3 (line 176). These should be resolved before submission. The author list is also empty, which I assume is for anonymization but should be confirmed.
+
+\item \textbf{Claim of exactness.} The paper repeatedly uses ``exact'' (``exact variational identity,'' ``exact penalized description-length minimization,'' ``three exact results''). The results are correct, but ``exact'' is doing rhetorical work here. A more restrained vocabulary would improve credibility.
+\end{enumerate}
+
+\section*{Detailed Comments by Section}
+
+\paragraph{Abstract.} Condenses three results accurately. The phrase ``the present paper supplies the missing synthesis'' should be softened in light of the prior-work concerns above.
+
+\paragraph{Introduction.} Well-motivated. The running example is effective. The paragraph beginning ``The sharp move in the present paper is to supply that justification'' (p.~3) overstates the novelty; see Major Concern~1.
+
+\paragraph{Section 2 (Motivation and Explanatory Criteria).} Table~1 is excellent. The discussion of hard-to-vary structure should cite Deutsch (2011). The choice to defer reuse and hard-to-vary structure to later levels is appropriate.
+
+\paragraph{Section 3 (Related Work).} As noted, significant omissions. The AIXI discussion is accurate. The FEP discussion correctly identifies the prior-stipulation issue. The MDL discussion is correct. The ``program induction and benchmarks'' paragraph contains a TODO-style comment in the source and a general claim about benchmarks that should be supported by specific citations to, e.g., the ARC benchmark literature post-2020 (Hodel and West; Xu et al.; Opiela et al.), program-synthesis benchmarks (Alur et al.), and DreamCoder (Ellis et al., 2021) which is the most obviously relevant program-induction system and is not cited.
+
+\paragraph{Section 4 (Mathematical Substrate).} Correct. One suggestion: state explicitly that $\mathcal{P}$ is effectively enumerable, since this is used implicitly in sums over $p$.
+
+\paragraph{Section 5 (Algorithmic Free Energy) and Section 6 (Variational Identity, MDL bridge).} Correct. The proofs are clean. See minor comments 1--6 above.
+
+\paragraph{Section 7 (Expected Algorithmic Free Energy).} The ``naive objective'' detour is pedagogically useful. The main decomposition is correct. Relate to Bayesian experimental design more explicitly.
+
+\paragraph{Section 8 (Behavioral Proxy and Open Mechanistic Challenge).} Table~2 is useful but the section needs empirical backing. The mechanistic-challenge subsection reads as aspiration rather than contribution.
+
+\paragraph{Section 9 (Discussion) and Section 10 (Conclusion).} The paragraph on ``hard-to-vary structure as an open formalization problem'' is one of the strongest parts of the paper---it articulates a real, well-posed research target. The conclusion is appropriately measured, with the exception of ``mathematically legible,'' which is imprecise.
+
+\section*{Questions for the Authors}
+
+\begin{enumerate}[leftmargin=*]
+\item Can you provide any convergence or consistency result for $q_t^\star$ in the realizable case? If not, why is the framework ``normatively complete''?
+\item How do you propose to handle the reference-machine dependence of $K_U$ when comparing two candidate explanations whose length difference is within the invariance constant?
+\item Can you demonstrate the behavioral proxy on even a small instance (for example, the running piecewise-modular example)? If not, what is the barrier?
+\item Expected free energy is usually defined via a target distribution over outcomes, not a preference distribution over next observations. Is your $\rho_t$ intended to be consistent with the standard active-inference definition, or is it a distinct object? Please clarify.
+\item In Section~8.2 you ask what systems would need to expose. How does this differ operationally from existing interpretability desiderata (e.g., mechanistic interpretability of circuits, linear probes for latent beliefs)?
+\end{enumerate}
+
+\section*{Recommendation to the Editors}
+
+The manuscript advances a coherent and technically correct position at the intersection of two important traditions. With (i) a substantial literature review and repositioning, (ii) at least a prototype empirical demonstration of the proxy, (iii) a treatment of consistency/convergence, and (iv) resolution of the minor technical items above, I would view this as a plausible candidate for publication in JAIR. As currently written, the paper is closer to a thoughtful position piece with technically correct supporting propositions than to a full research contribution of JAIR caliber. I recommend \emph{major revision}.
+
+\end{document}

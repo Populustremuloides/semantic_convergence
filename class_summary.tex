@@ -1,0 +1,79 @@
+\documentclass[11pt]{article}
+\usepackage[margin=0.9in]{geometry}
+\usepackage{microtype}
+\usepackage{amsmath,amssymb}
+\usepackage[dvipsnames]{xcolor}
+\usepackage{hyperref}
+\hypersetup{colorlinks=true,linkcolor=MidnightBlue,urlcolor=MidnightBlue}
+\usepackage{titlesec}
+\titlespacing*{\section}{0pt}{0.7em}{0.3em}
+\setlength{\parskip}{0.25em}
+\setlength{\parindent}{0pt}
+
+\title{A Loss Function that Converges on the Truth\\[0.2em]
+\large Plain-Language Summary of the Algorithmic Free Energy Project}
+\author{Brian Brown}
+\date{Spring 2026}
+
+\begin{document}
+\maketitle
+
+\section*{The class problem, and a thesis}
+
+The class's recurring complaint was that our metrics for language models almost never measure what we actually mean by ``the model is getting it right.'' Perplexity, accuracy, and their cousins each tell us something about what the model \emph{did}, and almost nothing about what the model \emph{knows}.
+
+My project starts from a thesis: perhaps we have this problem because we haven't yet found a functional whose minimization forces the learner to converge on the truth. If such a functional exists --- a single loss that, when driven down, provably makes the learner's internal world model match the real causal structure of the environment --- then training against it \emph{is} the pursuit of understanding, and evaluating by it \emph{is} measuring what we actually care about rather than fit. The paper accompanying this summary constructs such a functional, proves that its minimization has that property, and traces the limits of the claim with matching negative results. All 106 lemmas, theorems, and corollaries stand in 1-to-1 correspondence with a machine-checked Lean 4 formalization at \url{https://github.com/bcbrown365/algorithmic-free-energy}.
+
+\section*{What ``the truth'' even means here}
+
+The first surprise of the paper is that ``the truth'' is not a single target. For a learner interacting with an unknown computable environment, there are four increasingly-strict things the learner might aim at:
+
+\begin{itemize}
+\item[(1)] The \emph{history target}: programs that could have produced the transcript so far.
+\item[(2)] The \emph{policy target}: programs indistinguishable from the true one under the behaviors the learner happens to use.
+\item[(3)] The \emph{interventional target}: programs that respond identically under every possible intervention.
+\item[(4)] The \emph{syntactic target}: the one true program actually running the environment.
+\end{itemize}
+
+These nest: (4) is strictest, (1) loosest. The paper proves that all three inclusions are strict in general --- there really are interactive problems where you can predict every observation perfectly and still be wrong about what would happen if you did something new. It also proves the ``observable quotient'' theorem: target (4) is unreachable by any history-based learner, because two programs that respond identically to every intervention are indistinguishable by any amount of transcript. Target (3) --- the \emph{interventional semantic class} --- is therefore the honest ceiling, and the paper treats it as the formal definition of ``the learner has understood the world.''
+
+\emph{Analogy.} Two weather models produce identical forecasts for the coming week but disagree about what would happen if you flew a jet engine into the upper atmosphere. No amount of passive weather data will tell them apart. The only way to distinguish them is to do the experiment --- or to train and evaluate against a metric that rewards getting that answer right before the fact.
+
+\section*{The functional, and why three traditions quietly agreed}
+
+The central object is a single variational functional, the \emph{algorithmic free energy}. It has a belief term of the usual Gibbs form and an action term of the expected-free-energy form. The one non-standard ingredient is the reference prior: instead of a stipulated parametric prior, we use the Kolmogorov-complexity-weighted universal interactive prior of Solomonoff and Hutter --- the prior that weights every computable environment by $2^{-\text{program length}}$ and is the canonical starting point when you do not want to bake in any domain assumption.
+
+Two exact unifications fall out. The unique minimizer of the belief term is \emph{exactly} the Bayes/Gibbs posterior --- not an approximation, but identical. Under zero action cost and uniform preferences, the action-term minimizer is \emph{exactly} the information-gain criterion shared by Bayesian experimental design, Schmidhuber's compression-based curiosity, and Friston's active-inference curiosity. So the functional is not a new proposal competing with the existing curiosity traditions; it is the object that reveals them as one thing. The paper calls the resulting package the \emph{algorithmic free energy principle}.
+
+\section*{The negative result: generic curiosity does not converge}
+
+The natural move would be to declare victory: minimize this functional, converge on the truth. The paper proves this is \emph{false}. For every horizon $T$ and every prior mass $\alpha_0\in(0,\tfrac12)$, there is a concrete interactive problem on which the algorithmic free energy principle's posterior mass on the interventional class freezes at exactly $\alpha_0$ for all $t\le T$. Under the correct prior, the canonical belief rule, and the action rule that three existing traditions agree on, the learner can make no progress at all, for arbitrarily long.
+
+This is not a bug in any particular implementation. Because the action rule is exactly the rule three existing traditions agree on, the failure is a failure of \emph{generic information-seeking itself}: any learner that maximizes entropy reduction, mutual information, or any of the standard curiosity surrogates --- without being specifically steered toward what needs to be separated --- can be stuck this way. Information in aggregate is not knowledge on the question you care about.
+
+\section*{The positive result: one condition that closes the gap}
+
+The paper's main theorem --- the \emph{separating-support convergence theorem} --- says there is one concrete, additional condition on the learner's action rule under which convergence to the interventional truth is guaranteed. The condition is that the learner's policy must place divergent cumulative mass on \emph{separating actions}: actions that probabilistically distinguish the true interventional class from everything outside it. Under this condition, plus the universal prior and Bayes/Gibbs belief, the posterior mass on the interventional semantic class converges almost surely to one, with explicit finite-time high-probability lower bounds under bounded log-likelihood ratios.
+
+The condition is essentially tight. The paper proves two matching converses: zero separating mass rules out any uniform recovery theorem, and even \emph{summable} separating mass still admits failure with positive probability. So this is not a sufficient-but-conservative condition; it sits at the real dividing line between learners that converge on the truth and learners that provably do not.
+
+Three concrete realizations attain the condition, in increasing order of ML-relevance: a class-against-complement \emph{selector} that at every step picks the action most separating the current class hypothesis from the rest; an \emph{exact Gibbs kernel lift}, the unique minimizer of the functional's action term, which satisfies the separating-support condition automatically and extends to compact metric action spaces; and a \emph{differentiable surrogate loss} over a finite latent world model that a modern ML system can train by gradient descent. Under three explicit assumptions about what the trained model has learned --- a nonvanishing target latent class, a uniform region of high learned score, and soundness of that score for real separation --- minimizing the surrogate certifies the separating-support condition and inherits the convergence guarantee. The third realization is the bridge from theorem to real systems: the master theorem becomes a statement about a loss a modern ML stack can in principle train.
+
+\section*{Why this is a metric, and why it is human-centered}
+
+Now the bold claim. The algorithmic free energy, together with the separating-support condition, gives us two things at once:
+
+\begin{enumerate}
+\item A \textbf{loss function.} Train a learner against the differentiable surrogate and, to the extent that the three explicit assumptions are met, the learner is provably moving toward the interventional truth of its environment. The loss rewards exactly what ``understanding'' is defined to mean.
+\item A \textbf{benchmark.} Evaluate any interactive learner by whether its realized policy, in the deployment environment it faces, satisfies the separating-support condition. If yes, the learner is guaranteed to converge on the interventional truth; if no, the metric has located exactly the gap.
+\end{enumerate}
+
+The reason this is a \emph{human-centered} metric, and not just a technical one, is that in an interactive system --- a coding assistant, a research agent, a companion AI --- the ``environment'' the learner is embedded in includes the user's preferences, goals, and needs. The interventional semantic class of that world is the set of environments that respond identically to every way the user might poke the AI --- which is, formally, the specification of \emph{what the user wants and needs under every intervention}. So under the paper's assumptions, an AI minimizing the algorithmic free energy with a separating-support action rule is, in a rigorous sense, \textbf{bound to figure out what you want and need}, because that is literally what converging to the interventional class means in an interactive setting.
+
+The assumptions are strong --- bounded log-likelihood ratios, finite latent class, measurable causal adaptation --- and the paper makes no empirical claim that any LLM today satisfies them. What the paper claims is sharper: for any interactive learner, classical or modern, the question ``is this model aimed at understanding me?'' reduces to a single checkable criterion, divergent cumulative policy mass on separating actions, and both the criterion and the functional that rewards it are now written down, proven correct, and ready to be used as a training objective or as an evaluation metric.
+
+\section*{Why I am willing to be bold about this}
+
+Mathematical claims deserve better than peer review alone. Every one of the 106 manuscript items is written out in Lean 4 with no \texttt{sorry} at the paper's abstract interface and compiles line by line (\url{https://github.com/bcbrown365/algorithmic-free-energy}), with reduction to a concrete foundational stack in progress. Whatever critique survives of this project, it is not that the theorems are wrong as written. The class's recurring complaint was that our metrics measure training artifacts, not understanding; this project proposes a functional whose minimization \emph{is} the pursuit of understanding, where ``understanding'' is given a precise, interventional, machine-checked meaning that corresponds --- in any interactive setting --- to what the user actually wants from the AI. The negative result is the warning: generic curiosity losses provably miss the target. The positive result is the repair: one checkable condition on the action rule, realized by a differentiable surrogate a modern ML system can train. The paper claims to provide both the loss and the benchmark that this class has been asking for, and backs the claim with 106 machine-verified theorems.
+
+\end{document}

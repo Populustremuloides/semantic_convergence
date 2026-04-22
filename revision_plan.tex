@@ -1,0 +1,311 @@
+\documentclass[11pt]{article}
+
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb}
+\usepackage{booktabs,tabularx}
+\usepackage[colorlinks=true,allcolors=blue]{hyperref}
+\usepackage{enumitem}
+
+\title{Phased Revision Plan\\
+\large Toward an ``Accept with Honors'' Submission of\\ \emph{Toward an Algorithmic Free Energy Principle for Explanatory Programs}}
+\author{Working plan, Brian Brown}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+\section*{Purpose of This Document}
+
+This document lays out a phased work plan for revising the JAIR submission in response to the reviewer report (see \texttt{JAIR\_review.tex}). The plan is designed to be a living reference: each phase has a clearly defined goal, a bounded scope, an enumerated task list, and an explicit done-criterion. Phases are numbered so that commits, branches, or draft versions can be tagged against them.
+
+Empirical work (reviewer Major Concern~2) is treated as a separate track and deferred; a placeholder phase (Phase~E) reserves its place in the plan and specifies the interface the theory side must expose to the empirical side.
+
+The intended reading workflow is: open this file, pick a phase, complete its tasks, check them off, then move to the next phase. Cross-references to the reviewer's major concerns (MC1--MC5) and minor items (T1--T10) are included so the traceability between plan and review is unambiguous.
+
+\section{Summary Table of Phases}
+
+\begin{table}[h]
+\centering
+\renewcommand{\arraystretch}{1.15}
+\begin{tabularx}{\textwidth}{@{}llXl@{}}
+\toprule
+\textbf{Phase} & \textbf{Focus} & \textbf{Primary Reviewer Items Addressed} & \textbf{Rel.\ effort} \\
+\midrule
+Phase 0 & Hygiene and housekeeping & Bibliography, author, TODOs, ``exact'' overuse (T9, T10) & small \\
+Phase 1 & Literature repositioning & MC1; Deutsch, program-induction citations & medium \\
+Phase 2 & Technical tightening & T1--T8; admissibility, uniqueness, semimeasures & medium \\
+Phase 3 & Consistency and machine invariance & MC3, MC4; convergence, reference-machine dependence & medium--large \\
+Phase 4 & Mechanistic challenge hardening & MC5; concrete verification protocols, interpretability ties & medium \\
+Phase E & Empirical demonstration (deferred) & MC2; behavioral proxy toy study & large \\
+Phase 5 & Framing, abstract, discussion rewrite & Novelty claims, ``legibility,'' reviewer questions & medium \\
+Phase 6 & Final polish and reviewer-response letter & Closes the loop; produces response letter & small \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+The recommended execution order is 0 $\to$ 1 $\to$ 2 $\to$ 3 $\to$ 4 $\to$ (E in parallel once available) $\to$ 5 $\to$ 6. Phases 2 and 3 share some dependencies (admissibility discussion and convergence results both touch Section 5/6); Phase 3 should begin only after Phase 2 has stabilized the technical statements it depends on.
+
+\section{Phase 0 --- Hygiene and Housekeeping}
+\label{sec:phase0}
+
+\paragraph{Goal.} Eliminate all purely editorial defects so that subsequent phases work against a clean base text. Nothing in this phase changes the substance of the paper; everything it touches would be caught by a copy editor.
+
+\paragraph{Tasks.}
+\begin{enumerate}[leftmargin=*]
+\item Resolve the bibliography. Create \texttt{algorithmic\_free\_energy\_principle.bib} with all entries currently listed in the header comments (lines 1--18 of the source), plus any new references introduced in Phases 1--4. Remove the header comment block once done.
+\item Fill or confirm the author list. If anonymization is intended for review, leave empty with an explicit comment stating so; otherwise insert authors.
+\item Remove the in-text TODO comment in Section 3 (source line 176--181) and replace with the final citations selected in Phase 1.
+\item Audit the paper for ``exact'' and similar rhetorical intensifiers (``missing synthesis,'' ``principled,'' ``normatively complete,'' ``mathematically legible''). Mark each with a comment; defer the final rewording to Phase 5. This pass only produces a list.
+\item Fix notation overload. The symbol $\mathcal{Q}_t$ is used for the joint predictive law and for its observation marginal. Adopt distinct symbols, e.g.\ $\mathcal{Q}_t^{PO}$ for the joint and $\mathcal{Q}_t^O$ for the marginal, or the more standard $\mathcal{Q}_t(p,o\mid\cdot)$ vs.\ $\mathcal{Q}_t(o\mid\cdot)$ with a footnote naming the overload.
+\item Fix small typographical issues: ensure \texttt{natbib} citation forms (\texttt{citep}/\texttt{citet}) are used consistently; resolve any hanging hyphens or line-break oddities in display equations.
+\end{enumerate}
+
+\paragraph{Done criterion.}
+\begin{itemize}[leftmargin=*]
+\item The file compiles cleanly with all references resolved (no \verb|??| markers).
+\item No TODO/NOTE/VERIFY comments remain in the body text.
+\item \texttt{grep -n "exact" *.tex} returns only instances that have been deliberately vetted (the rest are tagged for Phase 5 via a special marker, e.g.\ \texttt{\%RHETORIC}).
+\item Notation for $\mathcal{Q}_t$ is disambiguated throughout.
+\end{itemize}
+
+\section{Phase 1 --- Literature Repositioning}
+\label{sec:phase1}
+
+\paragraph{Goal.} Close the major gap in related work (MC1). The reviewer's central criticism is that the paper frames itself as bridging a gap that others have already partially addressed, and omits substantively relevant literatures. The output of this phase is a revised Section~3 and an updated Introduction that name what others have done and state precisely what this paper adds \emph{beyond} each of them.
+
+\paragraph{Tasks.}
+\begin{enumerate}[leftmargin=*]
+\item \textbf{Read and summarize (one paragraph each) the following bodies of work:}
+\begin{itemize}[leftmargin=*]
+\item Ortega \& Braun on information-theoretic bounded rationality and KL-regularized control (\emph{Proc.\ Roy.\ Soc.\ A}, 2013; and earlier KL-control papers).
+\item Bayesian experimental design: Lindley (1956); Chaloner \& Verdinelli (\emph{Statistical Science}, 1995); MacKay (1992).
+\item Schmidhuber on compression-based curiosity and creativity (2010 formal theory paper; earlier 1991 papers on artificial curiosity).
+\item Leike \& Hutter on universal prediction convergence and the consistency of Bayes mixtures.
+\item Bialek, Nemenman, Tishby on predictive information and the information bottleneck.
+\item Deutsch (\emph{The Beginning of Infinity}, 2011, chapter on hard-to-vary explanations).
+\item DreamCoder (Ellis et al., 2021) and related program-induction systems.
+\item ARC benchmark literature post-2020 (Hodel \& West; Xu et al.; Opi\k{e}{\l}a et al.).
+\item Program-synthesis benchmarks more broadly (SyGuS / Alur et al.).
+\end{itemize}
+\item \textbf{Draft a ``What this paper adds beyond each'' matrix.} For each cited line of work, write one or two sentences identifying the precise delta. The matrix should be explicit and falsifiable. A rough template:
+\begin{itemize}[leftmargin=*]
+\item Ortega \& Braun: KL-regularized control with information-processing costs, but prior over policies/environments is generic; this paper makes the prior over hidden causes \emph{Solomonoff-universal over interactive programs}.
+\item Lindley / Chaloner-Verdinelli: expected information gain for experimental design, but prior is problem-specific; here the prior is the universal mixture, and the ``experiment'' is an interactive query in an action-conditioned semimeasure.
+\item Schmidhuber: compression-as-curiosity, but the formalism is asymptotic and behavioral; this paper gives a variational functional whose minimizer coincides exactly with the Bayes posterior under the universal prior.
+\item And so on for each.
+\end{itemize}
+\item \textbf{Rewrite Section~3 (Related Work).} Reorganize into four paragraphs: (a) Solomonoff/AIXI, (b) FEP and active inference, (c) Information-theoretic bounded rationality and experimental design (\emph{new}), (d) Program induction and benchmarks. Each paragraph ends with a one-sentence statement of the delta.
+\item \textbf{Insert citation to Deutsch} at the point where hard-to-vary structure is introduced (Section~2, criterion 4). A single-sentence footnote is acceptable; a one-paragraph discussion in the Discussion section is better.
+\item \textbf{Update Section~1 (Introduction)} to temper the novelty claim. Replace ``the present paper supplies the missing synthesis'' with language like ``the present paper develops a synthesis that, in contrast to $X$, preserves $Y$ while deriving $Z$.''
+\item \textbf{Optional but recommended:} add a short ``Positioning'' subsection at the end of Section~3 whose explicit job is to answer the reviewer's implicit question: given all of the above, what is new?
+\end{enumerate}
+
+\paragraph{Done criterion.}
+\begin{itemize}[leftmargin=*]
+\item All nine reference clusters above appear in the bibliography and are discussed (not merely cited) in the body.
+\item Section~3 contains an explicit delta statement for each.
+\item Novelty claims in the Abstract and Introduction are consistent with the deltas in Section~3.
+\item The ``what this paper adds beyond each'' matrix exists as a revision artifact (internal note or appendix) and can be referenced during reviewer response.
+\end{itemize}
+
+\section{Phase 2 --- Technical Tightening}
+\label{sec:phase2}
+
+\paragraph{Goal.} Address every minor technical item the reviewer flagged (T1--T8) so that the mathematical core is above reproach. None of these changes alters the main results; they sharpen the statements and make the proofs explicit where they currently rely on reader charity.
+
+\paragraph{Tasks.}
+\begin{enumerate}[leftmargin=*]
+\item \textbf{(T1) Uniqueness in Theorems 5.1 and 6.2.} Add a one-line remark after each uniqueness claim: ``Uniqueness follows from strict convexity of $q \mapsto \mathrm{KL}(q\|q^\star)$ on its effective domain.''
+\item \textbf{(T2) Admissibility and zero-support histories.} In Section~4, after defining $\xi$, add a short paragraph stating: the standing assumption $\xi(o_{1:t}\givena a_{1:t}) > 0$ is generic in the realizable case because $\wt w(p^\star) > 0$; however, for non-realizable or adversarial histories the admissible set may be empty, in which case the variational problem is vacuous and no belief state is well-defined. State what the framework does in that case (e.g., reject the history or restrict $\mathcal{P}$).
+\item \textbf{(T3) Semimeasure-to-distribution transition.} At the start of Section~7, add a lemma (``Semimeasure completion'') formalizing the claim that absorbing missing mass into a distinguished null observation $\bot$ yields a proper conditional distribution whose marginal on non-$\bot$ outcomes agrees with the original semimeasure. Prove (or cite) that all results of Sections~5 and~6 transfer to the completed model.
+\item \textbf{(T4) Decomposition under stronger conditions.} In Section~6 (Theorem~6.1 and proof), add a sentence: ``For $q = \delta_p$ with $L_t(p;h_t)<\infty$, we have $\mathbb{E}_q[\ell(p)] = \ell(p) < \infty$ and $H(q) = 0$, so the decomposition of Proposition~5.2 applies.''
+\item \textbf{(T5) Existence of MAP.} In Theorem~6.4 and the point-mass theorem, add: ``A minimizer exists because $J_t^\lambda(p;h_t) \ge \lambda \ell(p) \to \infty$ as $\ell(p) \to \infty$, so the set of $p$ with $J_t^\lambda(p;h_t) \le c$ is finite for every $c$.'' Address ties by writing $\argmin$ as a set and noting that the MAP rule selects any element.
+\item \textbf{(T6) Semantic MDL well-definedness.} In Proposition~6.5, insert: ``Because $L_t(p;h_t)$ depends on $p$ only through $\mu_p$, the objective $L_t + \lambda\cdot(\cdot)$ is well-defined on semantic equivalence classes; the minimum over $\mathcal{P}$ equals the minimum over semimeasures $\nu$ representable by some program.''
+\item \textbf{(T7) Preference distribution $\rho_t$.} In Section~7.2, before the definition of $\mathcal{G}_t$, add a paragraph: ``The preference distribution $\rho_t$ is the goal/target distribution in the sense of standard active inference (Parr \& Friston 2019). We highlight two specializations: (a) the \emph{pure information-seeking regime} with $\rho_t$ uniform on a common feasible observation set, under which Corollary~7.3 applies and $\mathcal{G}_t$ reduces to mutual information net of cost; (b) the \emph{preferred-outcome regime} with $\rho_t$ concentrated on target observations, which recovers risk-sensitive FEP objectives. The current paper analyzes (a); (b) is supported by Theorem~7.2 without modification.''
+\item \textbf{(T8) Effective enumerability of $\mathcal{P}$.} In Section~4, after defining $\mathcal{P}$, add one sentence: ``$\mathcal{P}$ is effectively enumerable (because the prefix-free domain of a universal machine is).''
+\end{enumerate}
+
+\paragraph{Done criterion.}
+\begin{itemize}[leftmargin=*]
+\item All eight technical items above are addressed with explicit textual additions (one line to one paragraph each, as appropriate).
+\item The Semimeasure-completion lemma is stated and either proven in-text or deferred to a short appendix.
+\item A close read of Sections~4--7 finds no statement that silently depends on conditions not in force.
+\end{itemize}
+
+\section{Phase 3 --- Consistency, Convergence, and Machine Invariance}
+\label{sec:phase3}
+
+\paragraph{Goal.} Address MC3 (``principled prior'' claim) and MC4 (no consistency/convergence discussion). The reviewer's concern is that ``normatively complete'' is a strong claim when neither posterior consistency nor reference-machine dependence are treated. This phase adds the discussion (and, where feasible, the results) that back up the normative claim.
+
+\paragraph{Tasks.}
+\begin{enumerate}[leftmargin=*]
+\item \textbf{Subsection: Reference-machine invariance.} Insert, probably as a new subsection in Section~4 or 9, a careful discussion of what the invariance theorem does and does not buy. Key points:
+\begin{itemize}[leftmargin=*]
+\item State the invariance theorem precisely: for any two universal prefix machines $U, V$, there is a constant $c_{U,V}$ such that $|K_U(\nu) - K_V(\nu)| \le c_{U,V}$ for all representable $\nu$.
+\item State the corresponding multiplicative bound on the priors.
+\item Acknowledge that $c_{U,V}$ can be large on any finite sample and that invariance is an asymptotic claim.
+\item Distinguish the kind of stipulation involved in choosing a universal machine from the kind involved in choosing a domain-specific FEP prior. One reasonable line: the former is stipulative only in a parameter that vanishes asymptotically; the latter is stipulative in a way that affects \emph{every} finite-sample inference.
+\item Explicitly soften the Introduction's ``principled vs.\ stipulated'' framing in light of this discussion.
+\end{itemize}
+\item \textbf{Subsection: Posterior consistency in the realizable case.} Add a new subsection (probably in Section~5 or Section~9) discussing:
+\begin{itemize}[leftmargin=*]
+\item Blackwell-Dubins merging of opinions in the absolutely-continuous case.
+\item Hutter's consistency results for the Solomonoff mixture in the sequence-prediction setting.
+\item What is known (or conjectured) about consistency when the prior is the universal mixture and the data is generated by a fixed interactive semimeasure $p^\star \in \mathcal{P}$.
+\item What additional assumptions (on the policy, on the identifiability of $p^\star$ under the action sequence generated) would be sufficient.
+\end{itemize}
+If a full theorem is not feasible within the revision, present the discussion as a \emph{conjecture with evidence}: state the claim precisely, sketch what a proof would require, and cite the Solomonoff-sequence analogue.
+\item \textbf{Subsection: Exploration under the expected-free-energy rule.} Discuss whether the policy induced by minimizing $\mathcal{G}_t$ guarantees that every informative action is eventually tried often enough to support posterior consistency. The natural template here is the optimism-under-uncertainty / information-theoretic bandit literature. At minimum, identify the exploration hypothesis needed and state it explicitly. A result of the form ``under assumption X, the expected-free-energy policy is sufficient for consistency'' is a high-value addition if attainable.
+\item \textbf{Update normative claims.} Wherever the paper calls the ideal theory ``normatively complete,'' replace with language appropriate to what has actually been proven. Plausible alternatives: ``normatively specified,'' ``exact at the variational level,'' ``completely determines the optimal belief state and action rule at each finite history.''
+\end{enumerate}
+
+\paragraph{Done criterion.}
+\begin{itemize}[leftmargin=*]
+\item The reader of a revised Section~4 or 9 comes away understanding precisely what reference-machine invariance does and does not guarantee.
+\item At least one of the three convergence subsections above contains a formal statement (theorem, proposition, or precisely stated conjecture) rather than only prose.
+\item ``Normative completeness'' is either backed by a proved claim or rephrased.
+\end{itemize}
+
+\section{Phase 4 --- Mechanistic Challenge Hardening}
+\label{sec:phase4}
+
+\paragraph{Goal.} Address MC5. Turn Section~8.2 from an aspirational section into a contribution with actionable content, so that readers have a sense of what a compliance check would look like and how the framework's requirements differ from generic calls for interpretability.
+
+\paragraph{Tasks.}
+\begin{enumerate}[leftmargin=*]
+\item \textbf{Specify a verification protocol for each required internal quantity:}
+\begin{itemize}[leftmargin=*]
+\item \emph{Belief distribution $q_t$.} Given a system that exposes a distribution over candidate programs at each step, the verification test compares the exposed $q_t$ to the ideal $q_t^\star$ via KL divergence (or total variation) and accepts when the deviation is within a specified tolerance. Specify what ``exposing $q_t$'' would mean operationally (explicit enumeration over a finite candidate set; a sampled ensemble; a probabilistic program the evaluator can query).
+\item \emph{Action-value $\mathcal{G}_t(a;h_t)$.} Given exposed $q_t$ and exposed $\mu_p$ for each candidate $p$, the evaluator can compute $\mathcal{G}_t(a;h_t)$ for every $a$ and compare to the system's action distribution. Accept when the system's policy has non-trivial correlation (Kendall $\tau$, ranking agreement) with the ideal ranking.
+\item \emph{Perturbation test for hard-to-vary structure.} Given a committed explanation $\hat p$, perturb $\hat p$ in program space (edit distance in the DSL, syntax-tree operations). Measure held-out performance as a function of perturbation distance. Quantitatively define ``hard-to-vary'' as a minimum performance decay rate.
+\end{itemize}
+\item \textbf{Define a statistical power / sample complexity story.} For each test, state how much interaction data and how many perturbation trials are required to reject the null hypothesis of ``random agreement.''
+\item \textbf{Connect to existing interpretability literature.}
+\begin{itemize}[leftmargin=*]
+\item Linear probes and representational probing (Alain \& Bengio; Belinkov \& Glass).
+\item Mechanistic interpretability / circuits work (Anthropic interpretability series; Olsson et al.\ on induction heads).
+\item Sparse autoencoders (Cunningham et al.; Templeton et al.).
+\item Causal interventions on internal states (Meng et al.\ on ROME; Wang et al.\ on circuit analysis).
+\end{itemize}
+Explain which of these, if any, could be reused as a substrate for exposing $q_t$, and which fall short.
+\item \textbf{Distinguish from general interpretability.} Write a short paragraph stating what the mechanistic challenge adds beyond ``make models interpretable.'' Key points: (a) the challenge specifies which internal quantities matter and why; (b) the acceptance test is a quantitative variational-identity check, not a human-legibility check; (c) compliance is compositional---partial exposure of $q_t$ but not $\mathcal{G}_t$ permits a partial test.
+\item \textbf{Table of mechanistic-challenge requirements.} Produce a new table listing, per internal quantity, the required access mode, the verification test, and the currently available substrate (if any). This table parallels Table~2 in structure.
+\end{enumerate}
+
+\paragraph{Done criterion.}
+\begin{itemize}[leftmargin=*]
+\item Each of the three required internal quantities ($q_t$, $\mathcal{G}_t$, perturbation neighborhood) has a named verification test with a decision rule.
+\item Section~8.2 cites at least three interpretability papers and explicitly discusses reuse/gaps.
+\item A reader can answer the reviewer's question ``how does this differ from a general call for interpretability?'' from the revised text alone.
+\end{itemize}
+
+\section{Phase E --- Empirical Demonstration (Deferred Track)}
+\label{sec:phaseE}
+
+\paragraph{Status.} Deferred. Placeholder in the plan; executed on a separate track and merged into the main revision when results are available.
+
+\paragraph{Interface with other phases.} The theory revision should not block on empirical work, but should leave hooks that empirical results can fill. Concretely:
+\begin{enumerate}[leftmargin=*]
+\item Section~8.1 should present the behavioral-proxy design with all parameters named ($\lambda$, query-penalty $c$, DSL, held-out size), so that the empirical section can simply report values for these parameters.
+\item Table~2 (proxy map) should remain stable; empirical results populate a new column or a follow-up table.
+\item The running example (piecewise modular program) should be carried through as the first test case, so the empirical section has a concrete baseline from the outset.
+\end{enumerate}
+
+\paragraph{Target empirical scope (for reference when the track activates).}
+\begin{itemize}[leftmargin=*]
+\item At least one tractable baseline (e.g., enumerative DSL search with penalized description length) on piecewise modular programs over a finite integer domain.
+\item At least one learned baseline (e.g., a program-induction model or LLM-based agent with a compiler-in-the-loop) on the same family.
+\item A held-out evaluation split that tests reuse outside the discovery context.
+\item A sensitivity analysis on $\lambda$ and the query penalty, showing that rank orderings are robust.
+\item Optional: a first attempt at the perturbation test from Phase~4 on a handful of committed programs.
+\end{itemize}
+
+\section{Phase 5 --- Framing, Abstract, and Discussion Rewrite}
+\label{sec:phase5}
+
+\paragraph{Goal.} Once Phases 1--4 have stabilized the content, rewrite the Abstract, Introduction framing, and Discussion so that the rhetorical register matches what the paper now actually delivers.
+
+\paragraph{Tasks.}
+\begin{enumerate}[leftmargin=*]
+\item \textbf{Rewrite Abstract.} The existing abstract claims ``the missing synthesis'' and ``three exact results.'' Replace with language that names (a) the specific variational identity under the universal prior, (b) the MDL/MAP bridge as a corollary at point-mass restriction, (c) the risk-minus-information-gain decomposition as applied to a posterior over programs, and (d) the three-level framework. Avoid ``missing,'' ``exact'' (unqualified), and ``principled'' (unqualified).
+\item \textbf{Rewrite the ``sharp move'' paragraph in the Introduction.} Replace triumphal framing with a statement of the synthesis in terms of its position relative to Ortega-Braun, Schmidhuber, Hutter, and the FEP canon (now available from Phase~1).
+\item \textbf{Rewrite the ``three exact results'' sentence.} Use ``three main results'' or ``three analytic results.''
+\item \textbf{Rewrite the Conclusion.} Replace ``mathematically legible'' with specific claims; drop or rephrase any remaining rhetorical intensifiers flagged in Phase~0.
+\item \textbf{Answer the reviewer's five questions.} Each answer should be reflected somewhere in the revised paper (consistency question $\to$ Phase~3 subsection; machine-dependence question $\to$ Phase~3 subsection; proxy demonstration $\to$ Phase~E; $\rho_t$ and active-inference alignment $\to$ Phase~2, T7; interpretability distinction $\to$ Phase~4). Mark the answer locations so they can be pointed to in the response letter.
+\end{enumerate}
+
+\paragraph{Done criterion.}
+\begin{itemize}[leftmargin=*]
+\item Abstract and Introduction pass a ``mirror test'': the claims they make are each backed by a specific result or section of the revised paper.
+\item The ``\%RHETORIC'' markers from Phase~0 are all resolved.
+\item Each reviewer question is answered somewhere in the revised text, with a pointer recorded for the response letter.
+\end{itemize}
+
+\section{Phase 6 --- Final Polish and Response Letter}
+\label{sec:phase6}
+
+\paragraph{Goal.} Produce the final revision package for resubmission.
+
+\paragraph{Tasks.}
+\begin{enumerate}[leftmargin=*]
+\item Proofread the full paper end to end. Prefer reading on paper or in a distinct reader.
+\item Regenerate any figures/tables whose layout is affected by text changes.
+\item Produce a response letter that enumerates reviewer comments and, for each, points to the specific section or line of the revised paper where it is addressed.
+\item Produce a diff-view or marked-up version of the paper if the journal requests it.
+\item Final bibliography audit: every cited work appears in the bib file, and every entry in the bib file is cited.
+\end{enumerate}
+
+\paragraph{Done criterion.}
+\begin{itemize}[leftmargin=*]
+\item Paper compiles without warnings.
+\item Response letter covers every reviewer item (MC1--MC5, T1--T10, the five questions, and the detailed by-section comments).
+\item No TODO markers remain anywhere.
+\end{itemize}
+
+\section{Traceability: Reviewer Items to Phases}
+
+\begin{table}[h]
+\centering
+\renewcommand{\arraystretch}{1.1}
+\begin{tabularx}{\textwidth}{@{}lXl@{}}
+\toprule
+\textbf{Reviewer item} & \textbf{Description (abridged)} & \textbf{Phase} \\
+\midrule
+MC1 & Novelty overstated; literature omissions & 1, 5 \\
+MC2 & No empirical content & E \\
+MC3 & ``Principled prior'' claim too strong & 3 \\
+MC4 & No consistency / convergence / realizability discussion & 3 \\
+MC5 & Mechanistic challenge is aspirational & 4 \\
+T1 & Uniqueness justification in Thm 5.1, Prop 6.2 & 2 \\
+T2 & Admissibility and zero-support histories & 2 \\
+T3 & Semimeasure-to-distribution transition in Section 7 & 2 \\
+T4 & Decomposition stronger-conditions flagging in Section 6 & 2 \\
+T5 & MAP ties and existence & 2 \\
+T6 & Semantic MDL well-definedness & 2 \\
+T7 & Preference distribution $\rho_t$ motivation and AIF alignment & 2 \\
+T8 & $\mathcal{Q}_t$ notation overload & 0 \\
+T9 & Bibliography hygiene, empty author list, TODOs & 0 \\
+T10 & Overuse of ``exact'' and similar & 0 (flag), 5 (resolve) \\
+Q1 & Convergence/consistency result? & 3 \\
+Q2 & Machine-dependence in finite samples? & 3 \\
+Q3 & Proxy demonstration? & E \\
+Q4 & $\rho_t$ vs.\ standard AIF target distribution? & 2 (T7) \\
+Q5 & Mechanistic challenge vs.\ general interpretability? & 4 \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\section{How to Use This Document}
+
+\begin{enumerate}[leftmargin=*]
+\item At the start of each work session, open this file and pick the next unfinished phase (or the next unchecked task within the current phase).
+\item Before starting a task, re-read the corresponding reviewer item in \texttt{JAIR\_review.tex} so the revision stays honest to the critique rather than to a cached memory of it.
+\item When a task is complete, mark it done in a lightweight way (e.g., strike-through in a working copy, or a checklist file).
+\item When a phase is complete, update the phase summary table at the top of this document with a ``done'' marker and a pointer to the revision tag.
+\item Phase E (empirical) updates out of band; merge into the paper when results arrive and update Phases 5 and 6 accordingly.
+\end{enumerate}
+
+Revisit this document at the start of Phase 5 (framing rewrite) and again at Phase 6 (final polish). By that stage, the list of open tasks should be short and the response letter should almost write itself.
+
+\end{document}

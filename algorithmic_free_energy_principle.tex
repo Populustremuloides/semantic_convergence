@@ -1,0 +1,1225 @@
+% Revised version addressing JAIR reviewer report.
+% Phases 0-6 of revision_plan.tex have been applied.
+% Empirical content (Phase E) is deferred and will be added when results are available.
+
+\documentclass[11pt]{article}
+
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb,amsthm,mathtools}
+\usepackage{booktabs,tabularx}
+\usepackage[authoryear]{natbib}
+\usepackage[colorlinks=true,allcolors=blue]{hyperref}
+
+\newtheorem{definition}{Definition}[section]
+\newtheorem{proposition}[definition]{Proposition}
+\newtheorem{theorem}[definition]{Theorem}
+\newtheorem{corollary}[definition]{Corollary}
+\newtheorem{lemma}[definition]{Lemma}
+\theoremstyle{remark}
+\newtheorem{remark}[definition]{Remark}
+
+\newcommand{\Acal}{\mathcal{A}}
+\newcommand{\Ocal}{\mathcal{O}}
+\newcommand{\Pcal}{\mathcal{P}}
+\newcommand{\Fcal}{\mathcal{F}}
+\newcommand{\Gcal}{\mathcal{G}}
+\newcommand{\Qcal}{\mathcal{Q}}
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\KL}{\mathrm{KL}}
+\newcommand{\I}{\mathrm{I}}
+\newcommand{\Hh}{\mathrm{H}}
+\newcommand{\argmin}{\mathop{\mathrm{arg\,min}}}
+\newcommand{\argmax}{\mathop{\mathrm{arg\,max}}}
+\newcommand{\givena}{\,\|\,}
+\newcommand{\ellp}{\ell}
+\newcommand{\wt}{\widetilde}
+\newcommand{\barxi}{\bar{\xi}}
+
+\title{Toward an Algorithmic Free Energy Principle for Explanatory Programs}
+% Author list intentionally blank for anonymized review.
+\author{}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+Accurate prediction and genuine explanation are not the same thing. A system may predict correctly by memorizing observed inputs, constructing a lookup table, or fitting a transcript-dependent shortcut that fails the moment the discovery context changes. A compact executable explanation, by contrast, generalizes to unseen inputs, supports efficient querying, and remains correct outside the context in which it was found. This paper develops a formal theory of explanatory inference that makes this distinction precise.
+
+The construction combines two traditions that have remained partially separate. The free energy principle provides a variational inference framework with a principled epistemic action criterion, but leaves the prior over hidden causes under-justified. Solomonoff induction provides a universal prior grounded in self-delimiting description length, but in its classical form is passive rather than variational. Several lines of work---information-theoretic bounded rationality \citep{OrtegaBraun2013}, compression-based curiosity \citep{Schmidhuber2010}, and Bayesian experimental design \citep{Lindley1956,ChalonerVerdinelli1995}---have connected pieces of this picture; the contribution of this paper is a specific synthesis in which hidden causes are interactive explanatory programs, the prior over those programs is the Solomonoff universal measure (fixed relative to a chosen universal prefix machine, and therefore unique only up to an additive invariance constant), and the resulting free-energy functional is variational, algorithmically grounded, and action-aware.
+
+We establish five analytic results. First, minimizing the algorithmic free-energy functional over admissible posteriors yields the negative log universal interactive mixture evidence, with the unique minimizer being the Bayes posterior under the universal prior. Second, when beliefs are collapsed to a single committed explanation---by point-mass restriction or MAP extraction---the selection rule reduces exactly to penalized description-length minimization, making the bridge to MDL precise. Third, the expected algorithmic free energy of an action decomposes into instrumental risk minus information gain about the hidden explanation program; under deterministic discovery with flat outcome preferences, optimal actions maximize mutual information net of query cost, recovering the Lindley-style information-gain criterion of Bayesian experimental design. Fourth, in the realizable interactive case, the posterior predictive law merges to the true completed kernel under any history-adapted policy. Fifth, under cumulative aggregate R\'enyi-\(\frac12\) separation between the true semantic class and the posterior false-mixture predictive law, the posterior concentrates almost surely on the true semantic class; we also give explicit exploration-style sufficient conditions, including an \(\epsilon\)-mixed expected-free-energy corollary.
+
+The paper further identifies three levels at which the theory operates: the ideal theory, which is variationally specified at every finite history, supplemented by conditional asymptotic results in the realizable interactive case, and still incomputable in the Solomonoff sense; a behavioral proxy, which evaluates systems by outputs consistent with free energy minimization without requiring access to internal belief states; and an open mechanistic challenge, which specifies the internal quantities and verification tests a system would need to expose in order to be evaluated against the ideal theory directly rather than behaviorally. We state the mechanistic challenge as a concrete compliance protocol rather than as an aspiration.
+\end{abstract}
+
+\section{Introduction}
+
+Prediction is not the same thing as explanation, and benchmarks that reward only accurate prediction cannot distinguish the two. To see why the difference matters, consider a small hidden program over a finite integer domain:
+\[
+p^\star(x) =
+\begin{cases}
+x \bmod 3 & \text{if } x < 8, \\
+0 & \text{otherwise.}
+\end{cases}
+\]
+A system querying this program at arbitrary inputs can, with enough observations, construct a lookup table that agrees with every queried point. Near the branch boundary, the situation is worse: when \(x = 6\), both branches return \(0\), so a system can be right about that case for entirely the wrong reason. The lookup table predicts correctly but has recovered nothing. It cannot say why \(p^\star(7) = 1\) while \(p^\star(9) = 0\), and it will fail on any input outside the queried set.
+
+A compact executable explanation does something the lookup table cannot. A system that recovers the branching structure and the modular rule can answer correctly on inputs it has never seen, identify the boundary, and recognize why inputs on either side behave differently. This is the sense in which explanation is stronger than prediction: the explanation generalizes because it has identified the mechanism, not merely catalogued its outputs.
+
+Active querying makes this difference tangible. A query at \(x = 7\) followed by \(x = 9\) directly exposes the branch transition; the two observations together are enough to locate the boundary and test both sides of it. A scatter of ten queries away from the boundary---say, \(x \in \{1, 2, 3, 4, 5, 10, 11, 12, 13, 14\}\)---leaves both the boundary location and the modular structure underdetermined. Informative queries are not merely efficient; they are qualitatively different in what they make knowable. A theory of explanatory reasoning therefore needs three things simultaneously: a prior that rewards compact structure, an inference mechanism that maintains a belief state over candidate explanations, and an action criterion that selects queries for their capacity to distinguish among remaining candidates.
+
+Two prior research programs come close to providing this picture, and a third contributes structural components that we reuse. The first is the algorithmic information tradition, culminating in Solomonoff induction and Hutter's AIXI \citep{Solomonoff1964a,Solomonoff1964b,Kolmogorov1965,Chaitin1975,Solomonoff1978,Hutter2005}. This program provides a universal prior over computable hypotheses, grounded in self-delimiting description length, and extends it to action-taking agents. AIXI is universal and action-aware, but is organized around reward maximization rather than variational inference: it does not maintain a free-energy functional over a belief distribution, and it does not decompose action value into instrumental risk and information gain about a hidden generating cause.
+
+The second is the free energy principle and active inference \citep{Friston2010,FristonEtAl2017Process,FristonEtAl2017Curiosity,ParrFriston2019}. This program provides the variational structure AIXI lacks: a functional over posterior beliefs, a variational identity connecting belief optimization to evidence, and an expected free energy for action that decomposes naturally into instrumental and epistemic terms. What it does not supply is a derivation of the prior over hidden causes from outside the domain of application; the prior is typically stipulated, and the framework's epistemic status has been noted to be correspondingly opaque \citep{ColombWright2021}.
+
+The third---and here our framing departs from earlier drafts of this manuscript---is a family of information-theoretic approaches that already connect bounded rationality, compression, and information gain. \citet{OrtegaBraun2013} derive KL-regularized control from thermodynamic principles and give a clean variational account of bounded-rational agents. \citet{Schmidhuber2010} develops a compression-based theory of curiosity in which intrinsic reward is the improvement of a world model, explicitly linking algorithmic complexity to active exploration. Bayesian experimental design \citep{Lindley1956,ChalonerVerdinelli1995,MacKay1992} supplies the mutual-information-net-of-cost objective for query selection. \citet{BialekNemenmanTishby2001} and subsequent information-bottleneck work formalize predictive information as the quantity the agent is trying to extract. None of these lines does the specific thing this paper does---set the prior over hidden causes to the Solomonoff universal measure over interactive programs, inside a free-energy functional, with an action rule that maximizes information gain about the hidden program---but each supplies a component of the picture and constrains what it would mean for a new synthesis to be genuinely new.
+
+Against that background, the contribution of the present paper is modest but specific. We adopt the variational and active structure of the free energy principle, replace its stipulated prior by the Solomonoff universal prior over interactive explanatory programs, and trace the consequences: an exact variational identity, an exact MDL/MAP bridge, an expected-free-energy decomposition into risk minus information gain about the hidden program, and a conditional asymptotic theory for realizable interaction. In Section~\ref{sec:invariance} we prove predictive merging under any history-adapted policy and semantic-class posterior concentration under an explicit aggregate-separation hypothesis, together with exploration-style sufficient conditions. Minimum description length \citep{Rissanen1978,WallaceBoulton1968,Grunwald2007} emerges as a consequence---the selection rule when beliefs collapse to a single committed explanation---rather than as a competing framework. We are careful not to claim that the synthesis is ``the'' missing link; it is one particular assembly of components that have been circulating separately, with specific analytic and methodological payoffs.
+
+The paper is organized around three levels of analysis. The first is the ideal theory: a variationally specified account of algorithmic free energy, variational inference over explanatory programs, epistemic action, and conditional asymptotics for realizable interaction, developed in Sections~\ref{sec:substrate}--\ref{sec:invariance}. The finite-history identities are exact; the asymptotic results require explicit separation and exploration hypotheses. The theory is nevertheless incomputable in the Solomonoff sense, and its reference-machine dependence is discussed in Section~\ref{sec:invariance}. The second is the behavioral proxy: how the ideal theory can be evaluated against real systems by measuring outputs consistent with free energy minimization, without requiring access to internal belief states, addressed in Section~\ref{sec:proxy}. The third is the open mechanistic challenge, developed in Section~\ref{sec:mechanistic}. There we specify, quantity by quantity, what a system would need to expose and what verification test would be applied; this turns the mechanistic challenge into a compliance protocol rather than a generic call for interpretability.
+
+The main contributions are as follows.
+\begin{enumerate}
+\item We define an algorithmic free-energy functional over posterior beliefs on explanatory programs and show that its minimizer is the Bayes/Gibbs posterior induced by the universal prior over self-delimiting programs; its minimum is negative log universal interactive mixture evidence, so the formalism is an exact variational identity rather than a metaphorical analogy (Sections~\ref{sec:fe}--\ref{sec:variational}).
+\item We show that when one explanation must be committed to---either by restricting to point masses or by MAP extraction from the scaled posterior---the selection rule is penalized description-length minimization, connecting the variational framework to MDL (Section~\ref{sec:mdl}).
+\item We define an expected algorithmic free energy for action and prove that it decomposes into instrumental risk minus information gain about the hidden generating explanation (Section~\ref{sec:action}). The deterministic-discovery specialization recovers the information-gain criterion of Bayesian experimental design \citep{Lindley1956} with the prior set to the universal mixture.
+\item We prove realizable-case predictive merging of the universal interactive posterior to the true completed kernel under any history-adapted policy (Section~\ref{sec:invariance}).
+\item We prove that any fixed false program loses posterior odds under cumulative R\'enyi-\(\frac12\) separation, and upgrade this to posterior concentration on the true semantic class under cumulative aggregate false-mixture separation (Section~\ref{sec:invariance}).
+\item We give an explicit exploration-style sufficient condition for the aggregate-separation hypothesis and show that an \(\epsilon\)-mixed expected-free-energy policy inherits semantic consistency under the same structural separation premise (Section~\ref{sec:invariance}).
+\item We describe a behavioral proxy (Section~\ref{sec:proxy}) together with a concrete mechanistic-challenge compliance protocol (Section~\ref{sec:mechanistic}).
+\end{enumerate}
+
+\section{Motivation and Explanatory Criteria}
+\label{sec:motivation}
+
+The framework developed in this paper is organized around three properties that a candidate explanation should satisfy.
+
+\begin{enumerate}
+\item \textbf{Executability.} The explanation should be a runnable object whose outputs can be checked against observations, not a verbal description that merely sounds consistent with them.
+\item \textbf{Compactness.} It should encode the regularity underlying many observations in a structure small enough to be preferred over alternatives that merely memorize.
+\item \textbf{Reuse.} It should continue to perform correctly on inputs outside the context in which it was discovered---including inputs the agent never queried.
+\end{enumerate}
+
+These three criteria do not all enter the theory at the same level, and conflating them is a source of confusion about what the framework does and does not deliver. Table~\ref{tab:criteria-levels} makes the mapping explicit.
+
+\begin{table}[h]
+\centering
+\caption{The three explanatory criteria and the level of the framework at which each is operative.}
+\label{tab:criteria-levels}
+\begin{tabularx}{\textwidth}{@{}p{0.22\textwidth}p{0.26\textwidth}X@{}}
+\toprule
+\textbf{Criterion} & \textbf{Framework level} & \textbf{How it enters} \\
+\midrule
+Executability & Ideal theory & Hidden causes are defined as interactive programs; the observation model is their execution trace under a given action sequence. \\
+Compactness & Ideal theory & The universal prior assigns weight \(2^{-|p|}\) to program \(p\); shorter programs receive greater prior mass. \\
+Reuse & Behavioral proxy & Evaluated by testing the committed explanation on held-out inputs not available during the interaction phase. \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+Executability and compactness are constitutive of what the hidden causes are and how the prior is defined. The variational core of the paper---the free-energy functional, its minimizer, and the expected free energy for action---is built directly on them. Reuse is a property of a single committed explanation, evaluated after inference is complete; it can be tested behaviorally on held-out inputs and is discussed as such in Section~\ref{sec:proxy}.
+
+\subsection{A running example}
+
+To keep the notation concrete, we carry a single illustrative example throughout the paper, drawn from the benchmark-native class of piecewise modular programs over finite integer domains. The hidden cause is the program
+\[
+p^\star(x) =
+\begin{cases}
+x \bmod 3 & \text{if } x < 8, \\
+0 & \text{otherwise,}
+\end{cases}
+\]
+and an action is a query asking for the value of \(p^\star\) at a chosen input \(x \in \mathbb{Z}\). This example is more demanding than a linear rule. The program has branching structure, a nontrivial boundary, and a modular component whose period is not immediately obvious from a small sample. Crucially, the value \(0\) appears in both branches---when \(x \bmod 3 = 0\) inside the branch, and everywhere outside it---so a system can agree with observed outputs near the boundary without having recovered either the branch location or the modular rule.
+
+\section{Related Work}
+\label{sec:related}
+
+We organize related work into four clusters and end each cluster with an explicit statement of what the present paper contributes beyond it.
+
+\paragraph{Algorithmic information theory and AIXI.}
+
+Solomonoff's theory of inductive inference \citep{Solomonoff1964a,Solomonoff1964b,Solomonoff1978} establishes that a universal prior over computable hypotheses, weighted by self-delimiting description length, is the optimal predictor for any computable sequence in a precise convergence sense. Kolmogorov complexity \citep{Kolmogorov1965} and Chaitin's refinements \citep{Chaitin1975} ground the same prior in the theory of prefix-free codes, making the connection between compression and probability exact up to an additive machine-dependent constant. \citet{BlackwellDubins1962} provides the corresponding classical result on merging of opinions. \citet{Hutter2005} extends Solomonoff induction to the reinforcement learning setting, combining the universal mixture with sequential decision theory; \citet{LeikeHutter2015,LeikeEtAl2016} and \citet{Leike2016} analyze computability and asymptotic optimality for variants of AIXI.
+
+\textit{Delta.} We inherit the universal prior, the incomputability caveats, and the semimeasure machinery for interactive environments from this tradition. Where AIXI combines the Solomonoff prior with reward maximization, we combine it with a variational functional over belief states and an action rule defined in terms of information gain about the hidden program rather than expected reward. The belief state is a first-class object in our framework and is not present in AIXI. Section~\ref{sec:invariance} also proves a conditional consistency theorem for interactive semimeasures. It requires explicit separation and exploration hypotheses, because the action stream is endogenous and can fail to visit distinguishing interventions; passive Blackwell--Dubins and Solomonoff merging results do not by themselves cover this case.
+
+\paragraph{Free energy principle and active inference.}
+
+The free energy principle \citep{Friston2010} proposes that self-organizing systems minimize a variational free energy functional, which upper-bounds surprise under a generative model. The active inference extension \citep{FristonEtAl2017Process,FristonEtAl2017Curiosity,ParrFriston2019} adds an expected free energy for action that decomposes naturally into instrumental value and epistemic value---expected information gain about hidden states. \citet{ColombWright2021} note that the justificatory structure of the FEP is less transparent than its formal apparatus, in part because the prior over hidden causes is typically stipulated.
+
+\textit{Delta.} We preserve the variational functional and the risk-plus-information-gain decomposition, but apply them to a posterior over interactive programs rather than over latent states in a prespecified generative model. The prior is not stipulated but inherited from self-delimiting description length. This does not eliminate stipulation---a universal prefix machine must still be chosen---but it reduces the stipulation to a choice whose effect is bounded up to an additive invariance constant (Section~\ref{sec:invariance}).
+
+\paragraph{Information-theoretic bounded rationality and Bayesian experimental design.}
+
+\citet{OrtegaBraun2013} derive KL-regularized control from information-theoretic first principles, giving a variational account of bounded-rational decision-making with information-processing costs; related work \citep{OrtegaBraun2011,Tishby2011} frames choice as a trade-off between expected utility and a KL cost relative to a baseline policy. \citet{Schmidhuber2010,Schmidhuber1991} develops a compression-based theory of creativity and intrinsic motivation, in which curiosity is reward for improvements in a world model. Bayesian experimental design \citep{Lindley1956,ChalonerVerdinelli1995,MacKay1992} supplies the canonical result that expected information gain about a latent parameter is the appropriate utility for experiment selection. \citet{BialekNemenmanTishby2001}, \citet{TishbyPereiraBialek1999}, and \citet{StillCrutchfield2007} develop the information bottleneck and predictive-information viewpoints.
+
+\textit{Delta.} Each of these lines captures a component of the picture this paper assembles, and one of them can be positioned with more precision than ``generic prior, we specialize it.'' The Ortega--Braun functional has the form \(\E_q[L] + \tau \KL(q \| q_0)\) for a reference policy or prior \(q_0\) and an information-processing cost coefficient \(\tau\). Our scaled functional \(\Fcal_t^\tau\) of Section~\ref{sec:mdl} is exactly of that form under the identification \(q_0 \leftrightarrow w\) and the same cost coefficient \(\tau\); the free-energy minimizer \(q_t^{\star,\tau}\) is the corresponding Gibbs solution. The substantive difference is therefore not the variational form itself but the specific reference: where Ortega--Braun typically take \(q_0\) as a reference policy or domain prior that is problem-specific, we take it as the universal prior over self-delimiting interactive programs, fixed once per choice of universal prefix machine. Schmidhuber links compression to curiosity at an operational level; we obtain the same link as a consequence of the variational identity under the algorithmic prior. Lindley / Chaloner--Verdinelli give the information-gain criterion for experimental design; we recover it in the deterministic-discovery specialization of Corollary~\ref{cor:deterministic}, with the prior set to the universal mixture and the ``experiment'' being an interactive query in an action-conditioned semimeasure. Section~\ref{sec:invariance} then adds a theorem-level link from persistent access to separating queries to semantic posterior consistency, a statement none of these lines supplies on its own in the interactive program setting.
+
+\paragraph{Program induction.}
+
+Classical program induction \citep{Angluin1987,Muggleton1991} studies learnability in the limit from positive examples. More recent work evaluates neural and hybrid systems on structured rule-recovery tasks \citep{LakeEtAl2015,BalogEtAl2017DeepCoder}, library-learning program induction \citep{EllisEtAl2021DreamCoder}, program synthesis frameworks \citep{AlurEtAl2013SyGuS}, and abstract reasoning over symbolic domains \citep{CholletARC2019,Chollet2024ARC}. Large language models combined with compiler-in-the-loop verification have recently been used to discover novel mathematical programs \citep{RomeraParedesEtAl2024FunSearch}.
+
+\textit{Delta.} These systems share the prediction-versus-explanation tension identified in Section~\ref{sec:motivation}. They do not, however, provide a formal criterion grounded in algorithmic probability that separates the two objectives, nor an action criterion that penalizes queries by their cost and rewards them by their information gain about the hidden program. The variational framework developed here supplies both, and Section~\ref{sec:proxy} describes a behavioral proxy designed to be evaluable on this class of systems.
+
+\subsection{Positioning statement}
+\label{sec:positioning}
+
+Given the clusters above, the position of this paper can be stated compactly. We do not claim to bridge a gap nobody had noticed: the link between compression, universal priors, and active exploration has been explored from multiple directions. What is new is the specific assembly together with a genuinely interactive asymptotic layer. We define an algorithmic free-energy functional over posteriors on interactive programs; we prove the exact variational identity whose minimum is the universal mixture evidence; we prove an exact MDL bridge via point-mass restriction and MAP extraction; we specialize the expected-free-energy decomposition to the case where the hidden parameter is a program and the prior is Solomonoff; and, in the realizable interactive case, we prove predictive merging plus semantic-class posterior consistency under explicit aggregate-separation and exploration conditions. The asymptotic step is specifically interactive: because actions are endogenous, distinguishability depends on which interventions the policy actually visits, so the theorem is stated against the posterior false-mixture predictive law rather than imported unchanged from passive merging results. None of these steps is individually unprecedented, but the combination yields a theory that makes prediction and explanation mathematically distinguishable and, under explicit conditions, asymptotically recoverable up to semantic equivalence. The mechanistic-challenge protocol of Section~\ref{sec:mechanistic} then gives the framework operational teeth.
+
+\section{Mathematical Substrate}
+\label{sec:substrate}
+
+We now formalize the variational core. The goal of this section is modest but essential: fix the mathematical objects once so that later sections can ask precise questions about belief, evidence, compression, and action.
+
+\subsection{Interaction histories and interventions}
+
+Let \(\Acal\) be a finite or countable action alphabet and \(\Ocal\) a finite or countable observation alphabet. Time is discrete, indexed by \(t = 1,2,\dots\). At time \(t\), the agent emits an action \(a_t \in \Acal\), and the environment returns an observation \(o_t \in \Ocal\). For each horizon \(t\), write
+\[
+a_{1:t} = (a_1,\dots,a_t), \qquad o_{1:t} = (o_1,\dots,o_t),
+\]
+and define the interaction history
+\[
+h_t = (a_1,o_1,\dots,a_t,o_t),
+\]
+with empty history \(h_0 = \varepsilon\). A policy is any rule of the form \(\pi_t(a_t \mid h_{t-1})\), deterministic or stochastic. The essential modeling choice is that actions are treated as interventions and observations as evidence. Accordingly, the environment model is conditioned on the realized action sequence rather than asked to explain why the agent chose it.
+
+\subsection{Explanatory programs and interactive semimeasures}
+
+Fix a universal prefix machine \(U\) over finite binary strings. Let \(\Pcal\) denote the countable set of binary programs \(p\) in the prefix-free domain of \(U\) that induce an interactive environment model. The set \(\Pcal\) is effectively enumerable, because the prefix-free domain of a universal machine is. Each \(p \in \Pcal\) defines an action-conditioned chronological semimeasure
+\[
+\mu_p(o_{1:t} \givena a_{1:t})
+= \prod_{i=1}^{t} \mu_p(o_i \mid h_{i-1}, a_i),
+\]
+with one-step kernels satisfying
+\[
+\sum_{o_t \in \Ocal} \mu_p(o_t \mid h_{t-1}, a_t) \le 1.
+\]
+Equality recovers the ordinary probabilistic case; strict inequality permits semimeasures, which are standard in Solomonoff-style settings \citep{Solomonoff1964a,Solomonoff1964b}.
+
+The ideal realizable case assumes an unknown external generator \(p^\star \in \Pcal\) such that, under policy \(\pi\),
+\[
+a_t \sim \pi_t(\cdot \mid h_{t-1}),
+\qquad
+o_t \sim \mu_{p^\star}(\cdot \mid h_{t-1}, a_t).
+\]
+Write \(p \equiv p'\) when \(\mu_p = \mu_{p'}\) as interactive semimeasures, and let
+\[
+[p] = \{\, p' \in \Pcal : p' \equiv p \,\}
+\]
+denote the semantic equivalence class of \(p\). Because different programs may realize the same semimeasure, the asymptotically identifiable object in the realizable case is the class \([p^\star]\), not the literal syntax of one chosen representative.
+
+\subsection{Program length, semantic complexity, and the universal prior}
+
+For a concrete program \(p\), let \(\ellp(p) = |p|\) denote syntactic code length. Different programs may induce the same semimeasure. For an interactive semimeasure \(\nu\) representable by some \(p \in \Pcal\), define semantic complexity relative to \(U\) by
+\[
+K_U(\nu) = \min \{\, |p| : \mu_p = \nu \,\}.
+\]
+As usual, \(K_U\) is reference-machine dependent up to an additive constant \citep{Kolmogorov1965,Chaitin1975}. Section~\ref{sec:invariance} discusses the scope and limits of the resulting invariance claim.
+
+Define raw Solomonoff weights by \(\wt{w}(p) = 2^{-\ellp(p)}\), so that prefix-freeness implies \(Z = \sum_{p} \wt{w}(p) \le 1\). Whenever a normalized prior is convenient, set \(w(p) = \wt{w}(p)/Z\). The raw universal interactive mixture is
+\[
+\xi(o_{1:t} \givena a_{1:t})
+= \sum_{p \in \Pcal} \wt{w}(p)\,\mu_p(o_{1:t} \givena a_{1:t}),
+\]
+and the normalized mixture is \(\barxi(o_{1:t} \givena a_{1:t}) = Z^{-1}\xi(o_{1:t} \givena a_{1:t})\).
+
+\section{Algorithmic Free Energy}
+\label{sec:fe}
+
+Fix a realized history \(h_t = (a_1,o_1,\dots,a_t,o_t)\). For each explanation program \(p\), define cumulative history-fit loss by
+\[
+L_t(p;h_t) = -\log \mu_p(o_{1:t} \givena a_{1:t}),
+\]
+with \(L_t(p;h_t)=+\infty\) whenever \(\mu_p(o_{1:t}\givena a_{1:t})=0\).
+
+\begin{definition}[Admissibility]
+A posterior \(q \in \Delta(\Pcal)\) is \emph{admissible} for history \(h_t\) if
+\[
+\E_q[L_t(p;h_t)] < \infty
+\qquad\text{and}\qquad
+\KL(q \| w) < \infty.
+\]
+\end{definition}
+
+These conditions exclude posterior candidates that place positive mass on explanations incompatible with the realized history or that sit at infinite relative entropy from the universal prior. Whenever the universal mixture itself assigns zero probability to the realized history (i.e., \(\xi(o_{1:t}\givena a_{1:t})=0\)), the admissible set is empty and the variational problem is vacuous. In the realizable case \(p^\star \in \Pcal\) with \(\wt w(p^\star) > 0\), this does not occur; in non-realizable or adversarial settings one may either restrict \(\Pcal\) to programs compatible with the history or treat the history as rejected and halt. Throughout Sections~\ref{sec:fe}--\ref{sec:mdl} we operate under the standing assumption that \(\xi(o_{1:t}\givena a_{1:t}) > 0\).
+
+\begin{definition}[Algorithmic free energy]
+For any admissible \(q \in \Delta(\Pcal)\), define
+\[
+\Fcal_t[q;h_t] = \E_q[L_t(p;h_t)] + \KL(q \| w).
+\]
+\end{definition}
+
+This is a functional of beliefs over hidden explanations, not a score on one selected explanation. Write \(\Hh(q) = -\sum_p q(p)\log q(p)\) for the Shannon entropy when the sum is finite. The KL form above is the primary definition. The next proposition expands that KL term into separate complexity and entropy contributions; because those components can diverge individually on a countable program class even when \(\KL(q\|w)\) is finite, the decomposition is stated under stronger integrability conditions.
+
+\begin{proposition}[Decomposition under the universal prior]
+For every admissible \(q \in \Delta(\Pcal)\) satisfying \(\E_q[\ellp(p)] < \infty\) and \(\Hh(q) < \infty\),
+\begin{equation}
+\Fcal_t[q;h_t]
+= \E_q[L_t(p;h_t)]
++ (\log 2)\,\E_q[\ellp(p)]
+- \Hh(q)
++ \log Z.
+\label{eq:fe-decomposition}
+\end{equation}
+\end{proposition}
+
+\begin{proof}
+Since \(w(p)=Z^{-1}2^{-\ellp(p)}\), we have \(-\log w(p) = (\log 2)\,\ellp(p) + \log Z\). Substituting this into \(\KL(q\|w)\) yields \(\KL(q\|w) = -\Hh(q) + (\log 2)\,\E_q[\ellp(p)] + \log Z\), and adding the data-fit term proves \eqref{eq:fe-decomposition}.
+\end{proof}
+
+Under the stronger integrability conditions, equation \eqref{eq:fe-decomposition} makes the three-way structure explicit: fit pushes the posterior toward programs that predict well, complexity pushes it toward shorter programs, and entropy resists overconfident concentration. For a point mass \(q = \delta_p\) with \(L_t(p;h_t) < \infty\), both stronger conditions hold trivially (\(\E_q[\ellp(p)]=\ellp(p)<\infty\) and \(\Hh(\delta_p)=0\)), so the decomposition applies in the specializations used in Section~\ref{sec:mdl}.
+
+\section{Variational Identity}
+\label{sec:variational}
+
+This section proves the central result: minimizing the functional over admissible posteriors recovers universal mixture evidence, and the minimizer is the Bayes/Gibbs posterior induced by \(w\).
+
+Assume \(\xi(o_{1:t} \givena a_{1:t}) > 0\). Define the Bayes/Gibbs posterior over explanation programs by
+\begin{equation}
+q_t^\star(p \mid h_t)
+= \frac{\wt{w}(p)\,\mu_p(o_{1:t} \givena a_{1:t})}
+{\xi(o_{1:t} \givena a_{1:t})}
+= \frac{w(p)\,\mu_p(o_{1:t} \givena a_{1:t})}
+{\barxi(o_{1:t} \givena a_{1:t})}.
+\label{eq:gibbs-posterior}
+\end{equation}
+This is admissible: \(\KL(q_t^\star\|w)\le -\log \barxi(o_{1:t}\givena a_{1:t})<\infty\), and
+\[
+\E_{q_t^\star}[L_t(\cdot;h_t)]
+\le \frac{1}{e\,\barxi(o_{1:t}\givena a_{1:t})},
+\]
+using \(x(-\log x)\le e^{-1}\) on \([0,1]\).
+
+\begin{theorem}[Variational identity]
+\label{thm:variational-identity}
+For every admissible \(q \in \Delta(\Pcal)\),
+\begin{equation}
+\Fcal_t[q;h_t]
+= \KL\!\bigl(q \,\|\, q_t^\star(\cdot \mid h_t)\bigr)
+- \log \barxi(o_{1:t} \givena a_{1:t}).
+\label{eq:variational-identity}
+\end{equation}
+Consequently,
+\[
+\min_{\substack{q \in \Delta(\Pcal)\\ q\ \mathrm{admissible\ for}\ h_t}} \Fcal_t[q;h_t]
+= -\log \barxi(o_{1:t} \givena a_{1:t}),
+\]
+attained uniquely at \(q_t^\star(\cdot \mid h_t)\).
+\end{theorem}
+
+\begin{proof}
+Starting from the definition of \(\Fcal_t\),
+\[
+\Fcal_t[q;h_t]
+= \sum_p q(p)\log\frac{q(p)}{w(p)\mu_p(o_{1:t}\givena a_{1:t})}
+= \sum_p q(p)\log\frac{q(p)}
+{q_t^\star(p\mid h_t)\,\barxi(o_{1:t}\givena a_{1:t})},
+\]
+which is exactly \eqref{eq:variational-identity}. Uniqueness of the minimizer follows from strict convexity of \(q \mapsto \KL(q\|q_t^\star(\cdot\mid h_t))\) on its effective domain, together with the nonnegativity of KL divergence.
+\end{proof}
+
+\begin{remark}[Raw-weight form]
+If one works directly with the raw weights \(\wt{w}(p)=2^{-\ellp(p)}\), then the corresponding unnormalized functional differs from \(\Fcal_t\) by the additive constant \(\log Z\), and its minimum is \(-\log \xi(o_{1:t}\givena a_{1:t})\).
+\end{remark}
+
+In this sense, free-energy minimization and Bayesian updating under the algorithmic prior are two descriptions of the same thing.
+
+\section{From Variational Beliefs to One Committed Explanation}
+\label{sec:mdl}
+
+The free-energy minimizer is a distribution over explanations. Benchmarks and scientific use, by contrast, often require one committed explanation. This section shows that the relevant selection rule is penalized description-length minimization.
+
+For \(\tau>0\) and admissible \(q\), define the scaled free-energy family
+\[
+\Fcal_t^\tau[q;h_t]
+= \E_q[L_t(p;h_t)] + \tau\,\KL(q\|w),
+\]
+and let \(\lambda = \tau \log 2\). Define the single-explanation objective
+\[
+J_t^\lambda(p;h_t) = L_t(p;h_t) + \lambda\,\ellp(p).
+\]
+For \(\lambda > 0\), \(J_t^\lambda(p;h_t) \ge \lambda \ell(p) \to \infty\) as \(\ell(p) \to \infty\), so the sub-level sets \(\{p : J_t^\lambda(p;h_t) \le c\}\) are finite for every \(c\) and a minimizer always exists. Ties are possible, in which case we interpret \(\argmin\) as a nonempty set.
+
+\begin{theorem}[Point-mass reduction]
+For every \(\tau>0\), every \(p\in\Pcal\) satisfying \(L_t(p;h_t)<\infty\), and \(\lambda=\tau\log 2\),
+\[
+\Fcal_t^\tau[\delta_p;h_t] = J_t^\lambda(p;h_t) + \tau \log Z.
+\]
+Hence
+\[
+\argmin_{\substack{p \in \Pcal\\ L_t(p;h_t)<\infty}} \Fcal_t^\tau[\delta_p;h_t]
+= \argmin_{p \in \Pcal} J_t^\lambda(p;h_t).
+\]
+\end{theorem}
+
+\begin{proof}
+If \(L_t(p;h_t)<\infty\), then \(\delta_p\) is admissible (because \(w(p)>0\) for every \(p\in\Pcal\)) and satisfies the stronger integrability conditions of Proposition~\ref{sec:fe}.3: \(\E_{\delta_p}[\ell(p)]=\ell(p)<\infty\) and \(\Hh(\delta_p)=0\). Substituting into \eqref{eq:fe-decomposition} with scaling \(\tau\) yields
+\(
+\Fcal_t^\tau[\delta_p;h_t]
+= L_t(p;h_t) + \tau(\log 2)\,\ellp(p) + \tau \log Z
+= J_t^\lambda(p;h_t) + \tau \log Z.
+\)
+\end{proof}
+
+Point-mass restriction is one exact bridge. The second bridge starts from full variational inference and then extracts one explanation by MAP.
+
+\begin{definition}[Scaled Gibbs posterior]
+For \(\tau>0\), define
+\[
+q_t^{\star,\tau}(p \mid h_t)
+= \frac{w(p)\exp(-L_t(p;h_t)/\tau)}
+{C_t^\tau(h_t)},
+\quad
+C_t^\tau(h_t)
+= \sum_{p \in \Pcal} w(p)\exp(-L_t(p;h_t)/\tau).
+\]
+Under the standing assumption \(\xi(o_{1:t}\givena a_{1:t})>0\), \(C_t^\tau(h_t)>0\) for every \(\tau>0\). The resulting \(q_t^{\star,\tau}\) is admissible by the same argument as for \(q_t^\star\).
+\end{definition}
+
+\begin{proposition}[Scaled variational identity]
+For every \(\tau>0\) and every admissible \(q \in \Delta(\Pcal)\),
+\[
+\Fcal_t^\tau[q;h_t]
+= \tau\,\KL\!\bigl(q \,\|\, q_t^{\star,\tau}(\cdot \mid h_t)\bigr)
+- \tau \log C_t^\tau(h_t).
+\]
+Consequently, \(\inf \Fcal_t^\tau = - \tau \log C_t^\tau(h_t)\), attained uniquely at \(q_t^{\star,\tau}(\cdot\mid h_t)\) by strict convexity of KL on its effective domain.
+\end{proposition}
+
+\begin{proof}
+Divide \(\Fcal_t^\tau\) by \(\tau\), repeat the algebra of Theorem~\ref{thm:variational-identity} with \(L_t/\tau\) in place of \(L_t\), and multiply back by \(\tau\).
+\end{proof}
+
+\begin{theorem}[MAP extraction yields MDL selection]
+Let
+\(
+p_t^{\mathrm{MAP}} \in \argmax_{p \in \Pcal} q_t^{\star,\tau}(p \mid h_t).
+\)
+Then \(p_t^{\mathrm{MAP}} \in \argmin_{p \in \Pcal} J_t^\lambda(p;h_t)\), where \(\lambda=\tau\log 2\).
+\end{theorem}
+
+\begin{proof}
+Because \(C_t^\tau(h_t)\) is independent of \(p\),
+\[
+\argmax_p q_t^{\star,\tau}(p\mid h_t)
+= \argmin_p \bigl[L_t(p;h_t) + \tau\log Z + \lambda\,\ellp(p)\bigr]
+= \argmin_p J_t^\lambda(p;h_t).
+\]
+\end{proof}
+
+\begin{proposition}[Semantic MDL objective]
+Because \(L_t(p;h_t)\) depends on \(p\) only through \(\mu_p\), the objective \(L_t(p;h_t) + \lambda \ell(p)\) is well-defined on semantic equivalence classes. Let \(\nu\) range over interactive semimeasures representable by some \(p\in\Pcal\), and define
+\[
+J_{t,\mathrm{sem}}^\lambda(\nu;h_t)
+= -\log \nu(o_{1:t}\givena a_{1:t}) + \lambda K_U(\nu).
+\]
+Then \(\min_{p \in \Pcal} J_t^\lambda(p;h_t) = \min_{\nu} J_{t,\mathrm{sem}}^\lambda(\nu;h_t)\).
+\end{proposition}
+
+\begin{proof}
+For any program \(p\), let \(\nu_p=\mu_p\). Then \(|p|\ge K_U(\nu_p)\), so \(J_t^\lambda(p;h_t)\ge J_{t,\mathrm{sem}}^\lambda(\nu_p;h_t)\). Conversely, every representable \(\nu\) has a realizing program \(p_\nu\) with \(|p_\nu|=K_U(\nu)\), giving equality.
+\end{proof}
+
+\begin{remark}[What the low-temperature slogan misses]
+A common intuition holds that taking \(\tau \to 0\) in a temperature-parametrized posterior automatically recovers an MDL-style selection rule. This is imprecise. A bare \(\tau \to 0\) limit of the scaled posterior does not by itself produce a fixed nonzero description-length penalty, since complexity acts at scale \(\tau\log 2\), which vanishes with \(\tau\). The bridge to \(L_t+\lambda|p|\) for a fixed \(\lambda > 0\) is obtained either by point-mass restriction at fixed \(\tau\), or by MAP extraction from the scaled posterior at fixed \(\tau > 0\).
+\end{remark}
+
+\section{Expected Algorithmic Free Energy and Epistemic Action}
+\label{sec:action}
+
+We first establish a normalization needed throughout this section, then show that a natural Friston-like objective is not the correct epistemic criterion, and finally define the expected algorithmic free energy and prove its decomposition into risk minus information gain about the hidden program.
+
+\subsection{Normalization via semimeasure completion}
+
+The mutual-information and entropy identities used below are identities for probability distributions, not for subnormalized semimeasures. We therefore complete each semimeasure to a proper distribution.
+
+\begin{lemma}[Semimeasure completion]
+\label{lem:completion}
+Let \(\Ocal^+ = \Ocal \cup \{\bot\}\) where \(\bot \notin \Ocal\). For every semimeasure kernel \(\mu_p(\cdot\mid h_t,a)\) on \(\Ocal\), define
+\[
+\hat\mu_p(o \mid h_t, a) =
+\begin{cases}
+\mu_p(o \mid h_t, a) & o \in \Ocal,\\
+1 - \sum_{o' \in \Ocal} \mu_p(o'\mid h_t, a) & o = \bot.
+\end{cases}
+\]
+Then \(\hat\mu_p(\cdot\mid h_t,a)\) is a proper conditional distribution on \(\Ocal^+\), and its restriction to \(\Ocal\) agrees with \(\mu_p(\cdot\mid h_t,a)\). All results of Sections~\ref{sec:fe}--\ref{sec:mdl} transfer to the completed model under the reinterpretation \(\Ocal \rightsquigarrow \Ocal^+\).
+\end{lemma}
+
+\begin{proof}
+\(\hat\mu_p\) is nonnegative and sums to 1 over \(\Ocal^+\). The universal mixture over completed kernels equals the completion of the mixture, and the KL and evidence identities go through verbatim, since we have only added an extra atom whose probability is a deterministic function of the existing distribution.
+\end{proof}
+
+For the remainder of this section we work with completed kernels and write \(\mu_p\) for brevity. Assume also that, for every candidate action \(a\), the entropy, expected-log-preference, KL, ambiguity, and mutual-information terms used below are finite---guaranteed, e.g., when the observation alphabet is finite and \(\rho_t > 0\) on the support of the predictive distribution.
+
+\subsection{Notation for joint and marginal predictive laws}
+
+We write \(\Qcal_t^{PO}(p,o\mid h_t,a)\) for the joint predictive law over hidden program and next observation and \(\Qcal_t^O(o\mid h_t,a)\) for its marginal over observations. The two are related by \(\Qcal_t^O(o\mid h_t,a) = \sum_p \Qcal_t^{PO}(p,o\mid h_t,a)\).
+
+\subsection{The naive future-free-energy objective is not enough}
+
+Let the current posterior over explanations be \(q_t^\star(\cdot\mid h_t)\), and fix a candidate next action \(a\in\Acal\). Define the predictive joint law
+\[
+\Qcal_t^{PO}(p,o \mid h_t,a)
+= q_t^\star(p\mid h_t)\,\mu_p(o\mid h_t,a),
+\]
+with observation marginal \(\Qcal_t^O(o \mid h_t,a)\) as above. One tempting action objective is
+\[
+\Gcal_t^{\mathrm{naive}}(a;h_t)
+= c_t(a;h_t)
++ \E_{o\sim \Qcal_t^O(\cdot\mid h_t,a)}
+\Bigl[\min_{q\ \mathrm{admissible}} \Fcal_{t+1}[q;h_t,a,o]\Bigr].
+\]
+
+\begin{proposition}[Naive objective]
+Up to an action-independent constant,
+\(
+\Gcal_t^{\mathrm{naive}}(a;h_t)
+= c_t(a;h_t) + \Hh\bigl[\Qcal_t^O(\cdot\mid h_t,a)\bigr].
+\)
+\end{proposition}
+
+\begin{proof}
+By Theorem~\ref{thm:variational-identity}, the inner minimum equals \(-\log \barxi(o_{1:t+1}\givena a_{1:t+1})\). Because the past is fixed, \(\barxi(o_{1:t+1}\givena a_{1:t+1}) = \barxi(o_{1:t}\givena a_{1:t})\,\Qcal_t^O(o\mid h_t,a)\). Taking expectation over \(o\sim \Qcal_t^O(\cdot\mid h_t,a)\) yields an action-independent constant plus predictive entropy.
+\end{proof}
+
+Minimizing predictive entropy favors easy-to-predict actions, not informative ones. A distinct action functional is required.
+
+\subsection{Definition and decomposition}
+
+Let \(\rho_t(o\mid h_t,a)\) be a preference distribution over next observations satisfying \(\rho_t > 0\) on the support of \(\Qcal_t^O(\cdot\mid h_t,a)\). Following \citet{ParrFriston2019}, \(\rho_t\) plays the role of the goal/target distribution in active inference. We highlight two specializations. In the \emph{pure information-seeking regime}, \(\rho_t\) is uniform on a common feasible observation set across candidate actions; the ``risk'' term becomes an action-independent constant and \(\Gcal_t\) reduces to mutual information net of cost (Corollary~\ref{cor:deterministic} below). In the \emph{preferred-outcome regime}, \(\rho_t\) is concentrated on desired observations, recovering risk-sensitive FEP objectives. The main decomposition (Theorem~\ref{thm:risk-minus-ig}) holds in both regimes.
+
+\begin{definition}[Expected algorithmic free energy]
+The one-step expected algorithmic free energy of action \(a\) at history \(h_t\) is
+\begin{equation}
+\Gcal_t(a;h_t)
+= c_t(a;h_t)
++ \E_{\Qcal_t^{PO}(p,o\mid h_t,a)}
+\Bigl[
+\log q_t^\star(p\mid h_t)
+- \log q_{t+1}^\star(p\mid h_t,a,o)
+- \log \rho_t(o\mid h_t,a)
+\Bigr].
+\label{eq:expected-afe}
+\end{equation}
+\end{definition}
+
+\begin{theorem}[Risk minus information gain]
+\label{thm:risk-minus-ig}
+For every history \(h_t\) and action \(a\),
+\begin{equation}
+\Gcal_t(a;h_t)
+= c_t(a;h_t)
++ \E_{o\sim \Qcal_t^O(\cdot\mid h_t,a)}
+\bigl[-\log \rho_t(o\mid h_t,a)\bigr]
+- \I_{\Qcal_t^{PO}}(P;O\mid h_t,a).
+\label{eq:risk-minus-ig}
+\end{equation}
+\end{theorem}
+
+\begin{proof}
+Expand \eqref{eq:expected-afe}. The \(\rho_t\) term depends only on \(O\). The remaining term is the negative of the mutual information identity \(\I(P;O\mid h_t,a) = \E[\log q_{t+1}^\star(P\mid h_t,a,O) - \log q_t^\star(P\mid h_t)]\).
+\end{proof}
+
+The instrumental term measures expected deviation from the agent's outcome preferences. The epistemic term measures expected reduction in uncertainty about the hidden program.
+
+Define predictive entropy and ambiguity
+\[
+\Hh_t^{\mathrm{pred}}(a;h_t)
+= \Hh\bigl[\Qcal_t^O(\cdot\mid h_t,a)\bigr],
+\qquad
+A_t(a;h_t)
+= \E_{p\sim q_t^\star(\cdot\mid h_t)}
+\Bigl[
+-\sum_{o} \mu_p(o\mid h_t,a)\log \mu_p(o\mid h_t,a)
+\Bigr].
+\]
+
+\begin{theorem}[Preference divergence plus ambiguity]
+For every history \(h_t\) and action \(a\),
+\begin{equation}
+\Gcal_t(a;h_t)
+= c_t(a;h_t)
++ \KL\!\bigl(\Qcal_t^O(\cdot\mid h_t,a)\,\|\,\rho_t(\cdot\mid h_t,a)\bigr)
++ A_t(a;h_t).
+\label{eq:preference-ambiguity}
+\end{equation}
+\end{theorem}
+
+\begin{proof}
+Use \(\I(P;O\mid h_t,a) = \Hh_t^{\mathrm{pred}}(a;h_t) - A_t(a;h_t)\) and \(\E_o[-\log \rho_t] = \KL(\Qcal_t^O\|\rho_t) + \Hh_t^{\mathrm{pred}}(a;h_t)\), then substitute into \eqref{eq:risk-minus-ig}.
+\end{proof}
+
+\begin{corollary}[Deterministic discovery; Lindley-style selection]
+\label{cor:deterministic}
+Suppose every candidate explanation is deterministic at the next step, so that \(\mu_p(o\mid h_t,a)\in\{0,1\}\) for all \(p,o,a,h_t\). Then \(A_t(a;h_t)=0\). If, in addition, there exists a common finite observation set \(\Ocal_t^{\mathrm{feas}}(h_t)\subseteq\Ocal\) on which both \(\Qcal_t^O\) and \(\rho_t\) are supported and \(\rho_t\) is uniform, then minimizing \(\Gcal_t\) is equivalent to
+\[
+\min_a \bigl[c_t(a;h_t) - \I_{\Qcal_t^{PO}}(P;O\mid h_t,a)\bigr],
+\]
+i.e.\ maximizing mutual information net of action cost.
+\end{corollary}
+
+\begin{proof}
+Determinism gives \(A_t=0\); uniform \(\rho_t\) on a common feasible set makes the risk term action-independent.
+\end{proof}
+
+Corollary~\ref{cor:deterministic} is the deterministic-discovery specialization of the expected-free-energy objective. Two equivalent readings are worth naming. Under the substitution \(q_t^\star \leftrightarrow\) posterior and \(\mu_p \leftrightarrow\) likelihood, it is the information-gain criterion of Bayesian experimental design \citep{Lindley1956,ChalonerVerdinelli1995,MacKay1992}. Under the substitution \(q_t^\star \leftrightarrow\) world model and query cost \(\leftrightarrow\) control cost, it is the compression-reward criterion of \citet{Schmidhuber2010}. In that restricted regime, the action criterion recovers a familiar objective. The synthesis-specific gain is that the latent object is not a generic parameter but an interactive executable program under a universal code prior, so the same variational-and-epistemic machinery can be paired in Section~\ref{sec:invariance} with semantic-class posterior concentration under explicit separation and exploration conditions. Ortega--Braun, Lindley, and Schmidhuber supply pieces of the geometry; they do not by themselves yield this semantic recovery target for interactive programs.
+
+\begin{remark}[Multi-step control]
+The one-step action rule embeds in a longer-horizon problem via \(V_t(h_t) = \min\{\mathrm{stop\_value}(h_t), \min_a[\Gcal_t(a;h_t) + \E_{o}V_{t+1}(h_t,a,o)]\}\). The present paper does not require the full recursion.
+\end{remark}
+
+\section{Reference-Machine Invariance, Posterior Consistency, and Exploration}
+\label{sec:invariance}
+
+The ideal theory depends on a choice of universal prefix machine \(U\). This section states precisely what reference-machine invariance does and does not deliver, fixes the asymptotic target in the realizable interactive case, proves predictive merging, fixed-program elimination, and semantic-class consistency under aggregate separation, and isolates explicit policy-side sufficient conditions for that consistency result. What remains open is to weaken those policy-side conditions and derive them from more intrinsic properties of the exact expected-free-energy rule.
+
+\subsection{Reference-machine invariance}
+
+\begin{proposition}[Invariance up to additive constant]
+For any two universal prefix machines \(U\) and \(V\), there is a constant \(c_{U,V}\) depending only on \(U, V\) such that \(|K_U(\nu) - K_V(\nu)| \le c_{U,V}\) for every representable semimeasure \(\nu\). Correspondingly, the priors \(w_U\) and \(w_V\) satisfy \(2^{-c_{U,V}}\,w_V(p) \le w_U(p) \le 2^{c_{U,V}}\,w_V(p)\) for every \(p \in \Pcal\).
+\end{proposition}
+
+\begin{proof}
+Standard; see \citet{Kolmogorov1965,Chaitin1975} and the exposition in \citet[Chapter 2]{Hutter2005}.
+\end{proof}
+
+The invariance is asymptotic: \(c_{U,V}\) can be arbitrarily large on any fixed finite-sample problem, and two different universal machines can yield posteriors that disagree substantially at any given horizon. It is important not to overstate what this buys. Replacing a stipulated FEP prior with the Solomonoff universal prior does not eliminate stipulation; it replaces a domain-specific stipulation (the choice of prior over hidden states in a particular generative model) with a single global stipulation (the choice of universal machine) whose effect is bounded on every representable hypothesis simultaneously. Whether that substitution counts as ``principled'' depends on how much one values universality-up-to-constant over domain fit. We therefore speak of the algorithmic prior as universal up to an additive invariance constant, not as uniquely determined.
+
+\subsection{Posterior consistency in the realizable case}
+
+In the sequence-prediction setting, classical results \citep{BlackwellDubins1962,Leike2016} and \citet[Chapter 3]{Hutter2005} establish that Solomonoff-style mixtures concentrate on the true generator in an appropriate mode of convergence, provided the true generator is in the hypothesis class with positive prior. In the interactive setting, the asymptotic claim must be stated more carefully. Two clarifications matter. First, because multiple programs may induce the same semimeasure, the correct target is concentration on the semantic class \([p^\star]\), not on one syntactic representative. Second, the KL divergences used below are understood for the completed one-step kernels of Lemma~\ref{lem:completion}, so every predictive comparison is between proper distributions.
+
+\begin{remark}[Asymptotic target in the realizable case]
+Let \(p^\star \in \Pcal\) with \(\wt w(p^\star) > 0\), and let data be generated by \(p^\star\) under a history-adapted policy \(\pi\). The primary asymptotic target is \emph{semantic posterior consistency}:
+\[
+q_t^\star([p^\star]\mid h_t) \to 1
+\qquad\text{almost surely as } t\to\infty.
+\]
+The secondary predictive target is one-step merging of the posterior predictive with the true completed kernel along the realized action stream, for example
+\[
+\KL\bigl(\mu_{p^\star}(\cdot\mid h_t,a_{t+1}) \,\|\, \Qcal_t^O(\cdot\mid h_t,a_{t+1})\bigr) \to 0
+\quad\text{almost surely,}
+\]
+or at least convergence to zero in expectation. The posterior-mass statement is the primary identification claim; the predictive-KL statement is its observable consequence.
+\end{remark}
+
+\begin{theorem}[Predictive merging from mixture dominance]
+\label{thm:predictive-merging}
+Assume the realizable case with \(p^\star \in \Pcal\), and let the history be generated by \(p^\star\) under any history-adapted policy \(\pi\). Then for every horizon \(T \ge 1\),
+\[
+\sum_{t=0}^{T-1}
+\E\Bigl[
+\KL\bigl(
+\mu_{p^\star}(\cdot\mid h_t,a_{t+1})
+\;\|\;
+\Qcal_t^O(\cdot\mid h_t,a_{t+1})
+\bigr)
+\Bigr]
+\le -\log w(p^\star).
+\]
+Consequently,
+\[
+\sum_{t=0}^{\infty}
+\KL\bigl(
+\mu_{p^\star}(\cdot\mid h_t,a_{t+1})
+\;\|\;
+\Qcal_t^O(\cdot\mid h_t,a_{t+1})
+\bigr)
+< \infty
+\qquad\text{almost surely,}
+\]
+and in particular
+\[
+\KL\bigl(
+\mu_{p^\star}(\cdot\mid h_t,a_{t+1})
+\;\|\;
+\Qcal_t^O(\cdot\mid h_t,a_{t+1})
+\bigr)
+\to 0
+\]
+almost surely and in \(L^1\).
+\end{theorem}
+
+\begin{proof}
+All expectations are taken under the joint law induced by \(p^\star\) and \(\pi\). By definition of the normalized universal mixture,
+\[
+\barxi(o_{1:T}\givena a_{1:T})
+= \sum_{p \in \Pcal} w(p)\,\mu_p(o_{1:T}\givena a_{1:T})
+\ge w(p^\star)\,\mu_{p^\star}(o_{1:T}\givena a_{1:T}),
+\]
+so
+\[
+\log \frac{\mu_{p^\star}(o_{1:T}\givena a_{1:T})}
+{\barxi(o_{1:T}\givena a_{1:T})}
+\le -\log w(p^\star).
+\]
+Taking expectation yields
+\[
+\E\!\left[
+\log \frac{\mu_{p^\star}(o_{1:T}\givena a_{1:T})}
+{\barxi(o_{1:T}\givena a_{1:T})}
+\right]
+\le -\log w(p^\star).
+\]
+The true kernel factorizes sequentially as
+\[
+\mu_{p^\star}(o_{1:T}\givena a_{1:T})
+= \prod_{t=0}^{T-1} \mu_{p^\star}(o_{t+1}\mid h_t,a_{t+1}).
+\]
+Likewise, by repeated use of
+\(
+\barxi(o_{1:t+1}\givena a_{1:t+1})
+= \barxi(o_{1:t}\givena a_{1:t})\,\Qcal_t^O(o_{t+1}\mid h_t,a_{t+1}),
+\)
+we have
+\[
+\barxi(o_{1:T}\givena a_{1:T})
+= \prod_{t=0}^{T-1} \Qcal_t^O(o_{t+1}\mid h_t,a_{t+1}).
+\]
+Therefore
+\[
+\log \frac{\mu_{p^\star}(o_{1:T}\givena a_{1:T})}
+{\barxi(o_{1:T}\givena a_{1:T})}
+= \sum_{t=0}^{T-1}
+\log
+\frac{\mu_{p^\star}(o_{t+1}\mid h_t,a_{t+1})}
+{\Qcal_t^O(o_{t+1}\mid h_t,a_{t+1})}.
+\]
+Applying the tower property and using that
+\(
+o_{t+1}\sim \mu_{p^\star}(\cdot\mid h_t,a_{t+1})
+\)
+under the true law,
+\[
+\E\!\left[
+\log
+\frac{\mu_{p^\star}(o_{t+1}\mid h_t,a_{t+1})}
+{\Qcal_t^O(o_{t+1}\mid h_t,a_{t+1})}
+\Bigm| h_t,a_{t+1}
+\right]
+=
+\KL\bigl(
+\mu_{p^\star}(\cdot\mid h_t,a_{t+1})
+\;\|\;
+\Qcal_t^O(\cdot\mid h_t,a_{t+1})
+\bigr).
+\]
+Summing over \(t\) gives the finite-horizon bound. Since the summands are nonnegative, monotone convergence yields
+\[
+\E\!\left[
+\sum_{t=0}^{\infty}
+\KL\bigl(
+\mu_{p^\star}(\cdot\mid h_t,a_{t+1})
+\;\|\;
+\Qcal_t^O(\cdot\mid h_t,a_{t+1})
+\bigr)
+\right]
+\le -\log w(p^\star)<\infty.
+\]
+Hence the infinite sum is finite almost surely, which implies termwise convergence to zero almost surely. The \(L^1\) conclusion follows because summability of the nonnegative expectations implies
+\(
+\E[\KL(\mu_{p^\star}(\cdot\mid h_t,a_{t+1})\|\Qcal_t^O(\cdot\mid h_t,a_{t+1}))]\to 0.
+\)
+\end{proof}
+
+Theorem~\ref{thm:predictive-merging} proves the predictive-merging half of the asymptotic target without any exploration assumption. Lemma~\ref{lem:fixed-false-program} gives pointwise elimination of any fixed false program under cumulative R\'enyi-\(\frac12\) separation, and Theorem~\ref{thm:semantic-consistency} upgrades this to full semantic-class concentration under aggregate false-mixture separation. Proposition~\ref{prop:exploration-sufficient} then gives one explicit exploration-style sufficient condition for that aggregate separation. What remains open is to weaken that policy-side condition and derive it from more intrinsic properties of the expected-free-energy rule itself.
+
+\subsection{Quantitative separation and exploration}
+
+\begin{definition}[One-step KL separation]
+For a false program \(p \notin [p^\star]\), define its one-step separation from the truth at time \(t+1\) by
+\[
+d_{t+1}(p)
+= \KL\bigl(
+\mu_{p^\star}(\cdot\mid h_t,a_{t+1})
+\;\|\;
+\mu_p(\cdot\mid h_t,a_{t+1})
+\bigr).
+\]
+We say that the realized action process is \emph{cumulatively separating} if, with probability one,
+\[
+\sum_{t=0}^{\infty} d_{t+1}(p) = \infty
+\qquad\text{for every } p \notin [p^\star] \text{ with } w(p)>0.
+\]
+\end{definition}
+
+\begin{definition}[One-step R\'enyi-\(\frac12\) separation]
+\label{def:renyi-separation}
+For a false program \(p \notin [p^\star]\), define
+\[
+b_{t+1}(p)
+= -\log \sum_{o \in \Ocal^+}
+\sqrt{
+\mu_{p^\star}(o\mid h_t,a_{t+1})
+\mu_p(o\mid h_t,a_{t+1})
+}.
+\]
+Equivalently, \(2b_{t+1}(p)\) is the one-step R\'enyi divergence of order \(\frac12\) between the completed kernels of \(p^\star\) and \(p\). We say that the realized action process is \emph{cumulatively separating against \(p\) in the R\'enyi-\(\frac12\) sense} if
+\[
+\sum_{t=0}^{\infty} b_{t+1}(p) = \infty
+\qquad\text{almost surely.}
+\]
+\end{definition}
+
+\begin{lemma}[Fixed false programs lose posterior odds]
+\label{lem:fixed-false-program}
+Fix \(p \notin [p^\star]\), and define the likelihood ratio
+\[
+R_t(p)
+= \frac{\mu_p(o_{1:t}\givena a_{1:t})}
+{\mu_{p^\star}(o_{1:t}\givena a_{1:t})},
+\qquad
+R_0(p)=1.
+\]
+If the realized action process is cumulatively separating against \(p\) in the R\'enyi-\(\frac12\) sense, then
+\[
+R_t(p) \to 0
+\qquad\text{almost surely.}
+\]
+Consequently, if \(w([p^\star]) := \sum_{p' \in [p^\star]} w(p')\), then
+\[
+\frac{q_t^\star(p\mid h_t)}{q_t^\star([p^\star]\mid h_t)}
+= \frac{w(p)}{w([p^\star])}\,R_t(p)
+\to 0
+\qquad\text{almost surely,}
+\]
+and hence \(q_t^\star(p\mid h_t) \to 0\) almost surely.
+\end{lemma}
+
+\begin{proof}
+Let
+\[
+S_t(p) = \sum_{i=0}^{t-1} b_{i+1}(p),
+\qquad
+M_t(p) = e^{S_t(p)}\sqrt{R_t(p)}.
+\]
+All kernels are the completed kernels of Lemma~\ref{lem:completion}. Conditional on \(h_t\) and the realized next action \(a_{t+1}\),
+\begin{align*}
+\E\bigl[\sqrt{R_{t+1}(p)} \mid h_t,a_{t+1}\bigr]
+&=
+\sum_{\substack{o \in \Ocal^+\\
+\mu_{p^\star}(o\mid h_t,a_{t+1})>0}}
+\mu_{p^\star}(o\mid h_t,a_{t+1})
+\sqrt{
+\frac{\mu_p(o_{1:t+1}\givena a_{1:t+1})}
+{\mu_{p^\star}(o_{1:t+1}\givena a_{1:t+1})}
+} \\
+&=
+\sum_{o \in \Ocal^+}
+\sqrt{
+\mu_{p^\star}(o\mid h_t,a_{t+1})
+\frac{
+\mu_p(o_{1:t}\givena a_{1:t})
+\mu_p(o\mid h_t,a_{t+1})
+}{
+\mu_{p^\star}(o_{1:t}\givena a_{1:t})
+}
+} \\
+&=
+\sqrt{R_t(p)}
+\sum_{o \in \Ocal^+}
+\sqrt{
+\mu_{p^\star}(o\mid h_t,a_{t+1})
+\mu_p(o\mid h_t,a_{t+1})
+} \\
+&=
+e^{-b_{t+1}(p)}\sqrt{R_t(p)}.
+\end{align*}
+Therefore
+\[
+\E\bigl[M_{t+1}(p)\mid h_t,a_{t+1}\bigr]
+= M_t(p),
+\]
+and hence \(\{M_t(p)\}_{t\ge0}\) is a nonnegative martingale under the joint law induced by \(p^\star\) and \(\pi\). By martingale convergence, \(M_t(p)\to M_\infty(p)<\infty\) almost surely. On the event
+\(
+\sum_{t=0}^{\infty} b_{t+1}(p)=\infty,
+\)
+we have \(S_t(p)\to\infty\), so
+\[
+\sqrt{R_t(p)} = M_t(p)e^{-S_t(p)} \to 0
+\qquad\text{almost surely.}
+\]
+Thus \(R_t(p)\to 0\) almost surely.
+
+For the posterior odds, every program in \([p^\star]\) induces the same semimeasure as \(p^\star\), so
+\[
+q_t^\star([p^\star]\mid h_t)
+=
+\frac{
+\sum_{p' \in [p^\star]} w(p')\,\mu_{p^\star}(o_{1:t}\givena a_{1:t})
+}{
+\barxi(o_{1:t}\givena a_{1:t})
+}
+=
+\frac{
+w([p^\star])\,\mu_{p^\star}(o_{1:t}\givena a_{1:t})
+}{
+\barxi(o_{1:t}\givena a_{1:t})
+}.
+\]
+Dividing the formula for \(q_t^\star(p\mid h_t)\) by this expression gives the stated ratio identity. Since \(q_t^\star([p^\star]\mid h_t)\le 1\), vanishing of the posterior odds implies \(q_t^\star(p\mid h_t)\to 0\) almost surely.
+\end{proof}
+
+\begin{theorem}[Semantic consistency under aggregate false-mixture separation]
+\label{thm:semantic-consistency}
+Define the posterior odds of the false semantic complement by
+\[
+R_t^-
+:=
+\frac{q_t^\star([p^\star]^c\mid h_t)}
+{q_t^\star([p^\star]\mid h_t)}.
+\]
+When \(q_t^\star([p^\star]^c\mid h_t)>0\), define the false-mixture predictive law
+\[
+\Qcal_t^-(o\mid h_t,a)
+:=
+\frac{
+\sum_{p \notin [p^\star]} q_t^\star(p\mid h_t)\,\mu_p(o\mid h_t,a)
+}{
+q_t^\star([p^\star]^c\mid h_t)
+}.
+\]
+When \(q_t^\star([p^\star]^c\mid h_t)=0\), set \(\Qcal_t^-(\cdot\mid h_t,a)=\mu_{p^\star}(\cdot\mid h_t,a)\). Define the aggregate one-step separation
+\[
+b_{t+1}^-
+=
+-\log \sum_{o \in \Ocal^+}
+\sqrt{
+\mu_{p^\star}(o\mid h_t,a_{t+1})
+\Qcal_t^-(o\mid h_t,a_{t+1})
+}.
+\]
+If
+\[
+\sum_{t=0}^{\infty} b_{t+1}^- = \infty
+\qquad\text{almost surely,}
+\]
+then
+\[
+q_t^\star([p^\star]\mid h_t)\to 1
+\qquad\text{and}\qquad
+q_t^\star([p^\star]^c\mid h_t)\to 0
+\]
+almost surely.
+\end{theorem}
+
+\begin{proof}
+Because \(p^\star \in [p^\star]\) and \(w(p^\star)>0\), we have \(w([p^\star])>0\), so the denominator in \(R_t^-\) is always positive. Write
+\[
+N_t^- = \sum_{p \notin [p^\star]} w(p)\,\mu_p(o_{1:t}\givena a_{1:t}),
+\qquad
+D_t^\star = w([p^\star])\,\mu_{p^\star}(o_{1:t}\givena a_{1:t}),
+\]
+so that \(R_t^- = N_t^- / D_t^\star\). If \(N_t^-=0\), then \(R_t^-=0\) and \(N_{t+1}^-=0\) as well. Suppose instead that \(N_t^->0\). Since
+\[
+q_t^\star(p\mid h_t)
+=
+\frac{
+w(p)\,\mu_p(o_{1:t}\givena a_{1:t})
+}{
+\barxi(o_{1:t}\givena a_{1:t})
+},
+\]
+we obtain
+\[
+\sum_{p \notin [p^\star]} q_t^\star(p\mid h_t)\,\mu_p(o\mid h_t,a)
+=
+\frac{
+\sum_{p \notin [p^\star]} w(p)\,\mu_p(o_{1:t+1}\givena a_{1:t+1})
+}{
+\barxi(o_{1:t}\givena a_{1:t})
+},
+\]
+and dividing by \(q_t^\star([p^\star]^c\mid h_t)=N_t^- / \barxi(o_{1:t}\givena a_{1:t})\) shows that
+\[
+N_{t+1}^- = N_t^-\,\Qcal_t^-(o_{t+1}\mid h_t,a_{t+1}).
+\]
+Likewise,
+\[
+D_{t+1}^\star = D_t^\star\,\mu_{p^\star}(o_{t+1}\mid h_t,a_{t+1}).
+\]
+Therefore, on the event \(N_t^->0\) and \(\mu_{p^\star}(o_{t+1}\mid h_t,a_{t+1})>0\),
+\[
+R_{t+1}^-
+=
+R_t^-\,
+\frac{\Qcal_t^-(o_{t+1}\mid h_t,a_{t+1})}
+{\mu_{p^\star}(o_{t+1}\mid h_t,a_{t+1})},
+\]
+while \(R_{t+1}^-=0\) whenever \(R_t^-=0\). Under the true law, the displayed event holds almost surely on \(\{R_t^->0\}\).
+
+Let
+\[
+B_t^- = \sum_{i=0}^{t-1} b_{i+1}^-,
+\qquad
+M_t^- = e^{B_t^-}\sqrt{R_t^-}.
+\]
+Conditional on \(h_t\) and the realized next action \(a_{t+1}\),
+\begin{align*}
+\E\bigl[\sqrt{R_{t+1}^-}\mid h_t,a_{t+1}\bigr]
+&=
+\sum_{\substack{o \in \Ocal^+\\
+\mu_{p^\star}(o\mid h_t,a_{t+1})>0}}
+\mu_{p^\star}(o\mid h_t,a_{t+1})
+\sqrt{\frac{N_t^-\,\Qcal_t^-(o\mid h_t,a_{t+1})}
+{D_t^\star\,\mu_{p^\star}(o\mid h_t,a_{t+1})}} \\
+&=
+\sum_{o \in \Ocal^+}
+\sqrt{
+\mu_{p^\star}(o\mid h_t,a_{t+1})
+\frac{N_t^-\,\Qcal_t^-(o\mid h_t,a_{t+1})}
+{D_t^\star}
+} \\
+&=
+\sqrt{R_t^-}
+\sum_{o \in \Ocal^+}
+\sqrt{
+\mu_{p^\star}(o\mid h_t,a_{t+1})
+\Qcal_t^-(o\mid h_t,a_{t+1})
+} \\
+&=
+e^{-b_{t+1}^-}\sqrt{R_t^-}.
+\end{align*}
+Hence
+\[
+\E\bigl[M_{t+1}^-\mid h_t,a_{t+1}\bigr] = M_t^-,
+\]
+so \(\{M_t^-\}_{t\ge0}\) is a nonnegative martingale under the true law. By martingale convergence, \(M_t^- \to M_\infty^- < \infty\) almost surely. On the event \(\sum_{t=0}^{\infty} b_{t+1}^- = \infty\), we have \(B_t^- \to \infty\), hence
+\[
+\sqrt{R_t^-} = M_t^- e^{-B_t^-} \to 0
+\qquad\text{almost surely.}
+\]
+Thus \(R_t^- \to 0\) almost surely. Since
+\[
+q_t^\star([p^\star]\mid h_t)
+=
+\frac{1}{1+R_t^-},
+\qquad
+q_t^\star([p^\star]^c\mid h_t)
+=
+\frac{R_t^-}{1+R_t^-},
+\]
+the claimed semantic concentration follows.
+\end{proof}
+
+\begin{remark}[KL versus R\'enyi-\(\frac12\) separation]
+The predictive-merging theorem above is naturally stated in KL because KL is the observable predictive regret. The fixed-program elimination lemma is cleaner in the R\'enyi-\(\frac12\) metric because it yields the exact martingale transform used in the proof. Pointwise one has \(2b_{t+1}(p) \le d_{t+1}(p)\), but divergence of the KL sum alone does not automatically force divergence of the R\'enyi-\(\frac12\) sum. Any full semantic-consistency theorem must therefore either work directly with the R\'enyi-\(\frac12\) quantity, or add a structural condition that compares the two cumulative separations on the relevant program class.
+\end{remark}
+
+\begin{remark}[Why infinite discrimination is not enough]
+Say that action \(a\) at history \(h_t\) \emph{discriminates} programs \(p, p' \in \Pcal\) if \(\mu_p(\cdot\mid h_t,a) \ne \mu_{p'}(\cdot\mid h_t,a)\). Infinite discrimination is a useful intuition, but by itself it is not a theorem-grade assumption: it records only non-equality of kernels, not the amount of evidence accumulated against a false program. The quantity that naturally enters a likelihood-ratio or martingale proof is the cumulative divergence above. Infinite discrimination becomes sufficient only under an additional quantitative lower bound ensuring that each discriminating visit contributes non-negligible separation.
+\end{remark}
+
+\begin{proposition}[Uniform exploratory access to separating actions]
+\label{prop:exploration-sufficient}
+For a candidate action \(a\) at history \(h_t\), define the aggregate action-conditioned separation
+\[
+\beta_t(a;h_t)
+=
+-\log \sum_{o \in \Ocal^+}
+\sqrt{
+\mu_{p^\star}(o\mid h_t,a)
+\Qcal_t^-(o\mid h_t,a)
+}.
+\]
+Assume there exist constants \(\epsilon,\eta>0\) and an \(h_t\)-measurable selector \(a_t^{\mathrm{sep}}\in\Acal\) such that, almost surely, whenever \(q_t^\star([p^\star]^c\mid h_t)>0\),
+\[
+\beta_t(a_t^{\mathrm{sep}};h_t)\ge \eta
+\qquad\text{and}\qquad
+\pi_{t+1}(a_t^{\mathrm{sep}}\mid h_t)\ge \epsilon.
+\]
+Then
+\[
+\sum_{t=0}^{\infty} b_{t+1}^- = \infty
+\qquad\text{almost surely on the event } \{q_t^\star([p^\star]^c\mid h_t)>0 \text{ i.o.}\},
+\]
+and consequently
+\[
+q_t^\star([p^\star]\mid h_t)\to 1
+\qquad\text{almost surely.}
+\]
+\end{proposition}
+
+\begin{proof}
+If \(q_t^\star([p^\star]^c\mid h_t)=0\) eventually, the conclusion is immediate. Otherwise let
+\[
+E_t = \{q_t^\star([p^\star]^c\mid h_t)>0\},
+\qquad
+B_{t+1} = E_t \cap \{a_{t+1}=a_t^{\mathrm{sep}}\}.
+\]
+Because \(E_t\) is \(h_t\)-measurable, the hypothesis gives
+\[
+\P(B_{t+1}\mid h_t)
+=
+\mathbf{1}_{E_t}\,\pi_{t+1}(a_t^{\mathrm{sep}}\mid h_t)
+\ge
+\epsilon\,\mathbf{1}_{E_t}.
+\]
+Hence, on the event \(E_t\ \text{i.o.}\),
+\[
+\sum_{t=0}^{\infty} \P(B_{t+1}\mid h_t) = \infty.
+\]
+By the conditional Borel--Cantelli lemma, \(B_{t+1}\) occurs infinitely often almost surely on \(E_t\ \text{i.o.}\). On \(B_{t+1}\),
+\[
+b_{t+1}^- = \beta_t(a_t^{\mathrm{sep}};h_t)\ge \eta.
+\]
+Therefore
+\[
+\sum_{t=0}^{\infty} b_{t+1}^- \ge \eta \sum_{t=0}^{\infty} \mathbf{1}_{B_{t+1}} = \infty
+\]
+almost surely on \(E_t\ \text{i.o.}\). Theorem~\ref{thm:semantic-consistency} then yields \(q_t^\star([p^\star]\mid h_t)\to 1\) almost surely.
+\end{proof}
+
+\begin{corollary}[\(\epsilon\)-mixed expected-free-energy control]
+\label{cor:gcal-mixed}
+Assume the action set \(\Acal\) is finite. Let \(u_t(\cdot\mid h_t)\) be an exploratory policy with full support on \(\Acal\), and assume there is a constant \(u_{\min}>0\) such that
+\[
+u_t(a\mid h_t)\ge u_{\min}
+\qquad\text{for every } a\in\Acal \text{ and every } h_t.
+\]
+For a fixed \(\epsilon\in(0,1]\), define the \(\epsilon\)-mixed expected-free-energy policy
+\[
+\pi_{t+1}^{\Gcal,\epsilon}(a\mid h_t)
+=
+(1-\epsilon)\,\sigma_t^{\Gcal}(a\mid h_t)
+\;+\;
+\epsilon\,u_t(a\mid h_t),
+\]
+where \(\sigma_t^{\Gcal}(\cdot\mid h_t)\) is any policy supported on \(\argmin_{a'} \Gcal_t(a';h_t)\). If there exists an \(h_t\)-measurable selector \(a_t^{\mathrm{sep}}\in\Acal\) and a constant \(\eta>0\) such that, almost surely, whenever \(q_t^\star([p^\star]^c\mid h_t)>0\),
+\[
+\beta_t(a_t^{\mathrm{sep}};h_t)\ge \eta,
+\]
+then the policy \(\pi^{\Gcal,\epsilon}\) satisfies the hypothesis of Proposition~\ref{prop:exploration-sufficient} with lower bound \(\epsilon u_{\min}\). Consequently,
+\[
+q_t^\star([p^\star]\mid h_t)\to 1
+\qquad\text{almost surely.}
+\]
+\end{corollary}
+
+\begin{proof}
+For every history \(h_t\),
+\[
+\pi_{t+1}^{\Gcal,\epsilon}(a_t^{\mathrm{sep}}\mid h_t)
+\ge
+\epsilon\,u_t(a_t^{\mathrm{sep}}\mid h_t)
+\ge
+\epsilon u_{\min}.
+\]
+The separation premise is exactly the remaining hypothesis of Proposition~\ref{prop:exploration-sufficient}, so the conclusion follows immediately.
+\end{proof}
+
+\begin{remark}[Connection to softened exploration]
+Proposition~\ref{prop:exploration-sufficient} and Corollary~\ref{cor:gcal-mixed} separate two issues that are easy to conflate. The posterior theorem needs only a lower bound on the probability of some separating action, not a full characterization of the action rule. The corollary shows one clean way to obtain that probability floor from the expected-free-energy objective: mix a \(\Gcal_t\)-minimizing policy with a full-support exploratory component. The substantive modeling burden then shifts to the structural side: verifying that whenever false posterior mass remains, there is a currently available action whose aggregate separation from the false-mixture predictive law is bounded below by a nonvanishing constant. Boltzmann-softened policies are another natural route when they admit a uniform probability floor of the same kind.
+\end{remark}
+
+\section{Behavioral Proxy}
+\label{sec:proxy}
+
+The ideal theory developed in Sections~\ref{sec:substrate}--\ref{sec:action} is variationally specified: at every finite history it names the optimal belief state, the optimal committed explanation under point-mass restriction or MAP extraction, and the action whose outcome is expected to yield the largest information gain about the hidden program. The theory is, however, incomputable in the Solomonoff sense.
+
+\subsection{The behavioral proxy approach}
+
+The appropriate response to incomputability is not to abandon the ideal theory but to measure outputs that are consistent with having minimized algorithmic free energy, without requiring access to the internal belief state that produced them. A behavioral proxy for the ideal theory preserves the following structure. Hidden causes are executable programs drawn from a restricted but expressive class. The agent interacts with the environment through an action-conditioned interface, issuing queries and receiving responses. At the end of interaction, the agent commits to a single explanation program. That program is evaluated on held-out inputs not available during the interaction phase. A complexity surrogate (such as AST node count in a restricted DSL) stands in for self-delimiting code length, and a fixed query penalty stands in for action cost.
+
+Table~\ref{tab:proxy-map} maps the principal objects of the ideal theory to their behavioral proxy counterparts.
+
+\begin{table}[t]
+\centering
+\caption{Principal objects of the ideal theory and their behavioral proxy counterparts.}
+\begin{tabularx}{\textwidth}{@{}p{0.28\textwidth}p{0.22\textwidth}X@{}}
+\toprule
+\textbf{Ideal object} & \textbf{Status} & \textbf{Proxy or gap} \\
+\midrule
+Hidden cause \(p^\star \in \Pcal\) & Exact & Hidden program drawn from a restricted executable class \\
+Observation model \(\mu_p(o_{1:t}\givena a_{1:t})\) & Exact & Deterministic execution of the hidden program on queried inputs \\
+History-fit loss \(-\log \mu_p(o_{1:t}\givena a_{1:t})\) & Surrogate & Held-out execution error on inputs withheld during interaction \\
+Program complexity \(K_U(\nu)\) & Surrogate & AST node count; computable and canonical but language-relative \\
+Action cost \(c_t(a;h_t)\) & Surrogate & Fixed linear query penalty; does not vary with information content \\
+Posterior \(q_t^\star(p \mid h_t)\) & Open gap & Internal to the evaluated system; not computed or observed by the evaluator \\
+Expected algorithmic free energy \(\Gcal_t(a;h_t)\) & Open gap & Not computed; informative querying can only be induced behaviorally \\
+Reuse criterion & Partial & Testable by held-out evaluation; requires withheld inputs to be genuinely novel \\
+\bottomrule
+\end{tabularx}
+\label{tab:proxy-map}
+\end{table}
+
+The complexity surrogate is language-relative in a way that \(K_U\) is not. This is an honest limitation of the proxy approach: any computable complexity measure will be language-relative, and the same kind of language-relativity applies at the ideal level through the choice of universal machine (Section~\ref{sec:invariance}). The question is whether the chosen surrogate preserves the ordinal relationships that matter for explanation selection. We defer empirical assessment to future work.
+
+\section{The Open Mechanistic Challenge}
+\label{sec:mechanistic}
+
+Behavioral proxies score the consequence of whatever inference a system performs internally. They do not verify the internal dynamics. A mechanistic evaluation of the ideal theory requires the system to expose specific internal quantities and submit them to specific verification tests. This section turns that desideratum into a concrete compliance protocol.
+
+\subsection{Required internal quantities and their verification tests}
+
+We specify two internal quantities a compliant system would need to expose, together with the test that would be applied to each.
+
+\paragraph{(i) Belief distribution \(q_t\).} A compliant system exposes, at every step \(t\), a distribution over a finite candidate program set \(\mathcal{P}_t \subseteq \Pcal\) (either by explicit enumeration or by a sampled ensemble sufficient to estimate pointwise probabilities). The evaluator, given the same \(\mathcal{P}_t\) and the semimeasures \(\mu_p\) for \(p \in \mathcal{P}_t\), computes the ideal posterior \(q_t^\star\) restricted to \(\mathcal{P}_t\). The verification test accepts when \(\KL(q_t \| q_t^\star)\) lies below a tolerance \(\varepsilon_q\). Reporting the tolerance at which acceptance first fails as a function of \(t\) yields a consistency check rather than a binary verdict.
+
+\paragraph{(ii) Expected algorithmic free energy \(\Gcal_t(a;h_t)\).} A compliant system exposes its ranking of candidate actions by \(\Gcal_t\), or equivalently its action distribution. The evaluator computes the ideal \(\Gcal_t\) ranking from the exposed \(q_t\) and the \(\mu_p\), and measures rank agreement (Kendall's \(\tau\) or top-\(k\) overlap) between the system's ranking and the ideal one. The verification test accepts when rank agreement exceeds a threshold \(\tau_\Gcal\).
+
+\subsection{Statistical power}
+
+Each test admits a statistical-power analysis under the null of random agreement. Sample-size requirements scale as \(O(|\mathcal{P}_t|/\varepsilon_q^2)\) for (i) and as \(O(1/\tau_\Gcal^2)\) per action pair for (ii). Full derivations are omitted; the point is that these are statistical tests with explicit power, not heuristics.
+
+\subsection{Interpretability substrate}
+
+The two required exposures are orthogonal to, but connected with, several existing interpretability programs. The specific question to ask of each is whether it can be adapted to expose either a distribution over a prespecified candidate program set or a ranking of candidate actions by an internal quantity compatible with \(\Gcal_t\). Linear probes \citep{AlainBengio2017,BelinkovGlass2019} are trained readouts from frozen internal representations; they already expose scalar or low-dimensional latent quantities, and extending them to produce a calibrated distribution over a fixed finite program set is a natural parameterization question rather than a new research problem. Mechanistic interpretability work on transformer circuits \citep{OlssonEtAl2022InductionHeads,WangEtAl2023Circuits} identifies named computational subroutines (for example induction heads and indirect-object identification circuits) whose activity is measurable across inputs; such subroutine-activity signals provide a substrate that could be mapped to posterior weight on a corresponding candidate program, though the mapping itself is not supplied by the circuits literature. Sparse-autoencoder work \citep{CunninghamEtAl2023SAE,TempletonEtAl2024Scaling} decomposes hidden states into sparse feature directions, some of which correspond to interpretable concepts; where a candidate program set factors along features that SAEs isolate, the feature activations give a principled starting point for estimating \(q_t\). Targeted parameter edits such as ROME \citep{MengEtAl2022ROME} and activation-patching techniques provide the causal manipulations that would allow an evaluator to probe whether an exposed \(q_t\) or \(\Gcal_t\)-ranking is dispositional rather than a post-hoc readout.
+
+None of these tools, taken off the shelf, currently exposes \(q_t\) or \(\Gcal_t\) in the form our compliance protocol requires. They do, however, individually supply the substrates---readouts, identifiable subroutines, feature-level decompositions, and targeted causal interventions---that a compliant system would combine.
+
+\subsection{Compliance is compositional}
+
+A system need not expose both quantities to pass a useful fraction of the protocol. A system that exposes \(q_t\) but not \(\Gcal_t\) can still be tested for variational-identity compliance; a system that exposes a \(\Gcal_t\)-ranking over candidate actions together with the \(q_t\) it used to compute it can be tested jointly for both. This compositionality is what distinguishes the mechanistic challenge from generic calls for interpretability. Generic interpretability asks for human-understandable explanations of model behavior; our mechanistic challenge specifies which internal quantities matter, what relationships they must satisfy, and how to measure deviation from each.
+
+\subsection{Table of requirements}
+
+\begin{table}[h]
+\centering
+\caption{Mechanistic-challenge compliance requirements.}
+\begin{tabularx}{\textwidth}{@{}p{0.22\textwidth}p{0.24\textwidth}Xl@{}}
+\toprule
+\textbf{Internal quantity} & \textbf{Required access} & \textbf{Verification test} & \textbf{Tolerance} \\
+\midrule
+\(q_t(\cdot)\) & Distribution over finite \(\mathcal{P}_t\) & \(\KL(q_t\|q_t^\star) \le \varepsilon_q\) & \(\varepsilon_q\) \\
+\(\Gcal_t(a;h_t)\) & Action ranking & Kendall \(\tau \ge \tau_\Gcal\) & \(\tau_\Gcal\) \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+This table operationalizes what ``evaluating a system against the ideal theory directly'' would mean. The tolerances \(\varepsilon_q\) and \(\tau_\Gcal\) are research choices that can be tuned to the deployment context.
+
+\section{Discussion}
+
+\subsection{What the framework contributes to each tradition}
+
+\paragraph{Free energy principle and active inference.}
+The hidden causes remain distinct from observations, free energy is a functional over beliefs, and action selection is governed by an expected free-energy quantity that decomposes into instrumental and epistemic terms \citep{Friston2010,FristonEtAl2017Process,ParrFriston2019}. The variational and active structure of the FEP is preserved. What is added is a universal algorithmic prior in place of a stipulated generative prior, with invariance up to an additive machine constant.
+
+\paragraph{Solomonoff induction and Kolmogorov--Chaitin complexity.}
+Complexity is defined relative to a fixed universal prefix machine, self-delimiting codes are used explicitly, and the invariance and incomputability caveats are stated and respected throughout \citep{Solomonoff1964a,Solomonoff1964b,Kolmogorov1965,Chaitin1975}. The contribution relative to the classical AIT setting is the extension to interactive semimeasures and the embedding inside a variational free-energy functional.
+
+\paragraph{Information-theoretic bounded rationality and experimental design.}
+Corollary~\ref{cor:deterministic} identifies the deterministic-discovery case of our action rule with the information-gain criterion of \citet{Lindley1956} and \citet{ChalonerVerdinelli1995} and with the compression-curiosity objective of \citet{Schmidhuber2010}. The contribution of the synthesis is not merely that identification. Once the prior is the Solomonoff universal measure over interactive programs, the inferential target becomes the semantic class of the hidden explanation program, and Section~\ref{sec:invariance} proves a conditional interactive recovery theorem for that target under aggregate separation and exploration assumptions. The three-level framework of ideal theory, behavioral proxy, and mechanistic challenge is the companion conceptual contribution: it explains how that ideal target could be evaluated behaviorally now and mechanistically later.
+
+\subsection{Structural limitations}
+
+Two limitations of the ideal theory are worth stating precisely. The first is incomputability: the universal prior \(w\), the mixture \(\xi\), and the complexity measure \(K_U\) are all incomputable. Any practical system must substitute a restricted program class, a computable prior over that class, and a surrogate complexity measure. The behavioral proxy of Section~\ref{sec:proxy} is the principled response. The second is reference-machine dependence: the Solomonoff prior is unique only up to an additive constant on description length, and this constant can be large on any finite sample. The claim that this is a stronger choice than a stipulated FEP prior relies on the claim that universality-up-to-constant is a qualitatively stronger commitment than universality within a prespecified domain---a claim one can reasonably accept or question.
+
+\subsection{Answers to anticipated questions}
+
+We close by addressing five questions the framework naturally invites. First, is there a convergence guarantee for the posterior? Yes. Theorem~\ref{thm:predictive-merging} proves one-step predictive merging of the universal interactive posterior to the true completed kernel under any history-adapted policy, Lemma~\ref{lem:fixed-false-program} shows that any fixed false program loses posterior odds under cumulative R\'enyi-\(\frac12\) separation, Theorem~\ref{thm:semantic-consistency} upgrades this to concentration on the semantic class \([p^\star]\) under aggregate false-mixture separation, Proposition~\ref{prop:exploration-sufficient} gives a concrete exploration-style sufficient condition for that aggregate separation, and Corollary~\ref{cor:gcal-mixed} shows that an \(\epsilon\)-mixed expected-free-energy policy inherits the result under the same structural separation premise. What remains open is to weaken that premise and derive it from more intrinsic properties of the exact expected-free-energy control rule. Second, how should one compare explanations whose description-length difference is within the invariance constant? Such explanations should be treated as equivalent; ordinal comparisons across such a gap are not supported by the theory, and either ties should be broken by orthogonal desiderata or reported as a range. Third, how does the expected free energy here relate to the standard active-inference target distribution? Identically in form, once \(\rho_t\) is read as the goal/target distribution over next observations (Section~\ref{sec:action}). Fourth, how does the mechanistic challenge differ from generic calls for interpretability? By specifying which internal quantities matter, what tests apply to each, and what compositional compliance looks like (Section~\ref{sec:mechanistic}). Fifth, what about empirical validation of the proxy? This is deferred to a companion paper; the present work fixes the theory and the evaluation protocol so that empirical results can be reported against a stable target.
+
+\section{Conclusion}
+
+The free-energy principle and the algorithmic information tradition can be combined without collapsing one into the other. The resulting formulation is not ``free energy with code length in place of probability.'' It is a variational and active theory in which hidden causes are explanatory programs and prior mass over those programs is induced by self-delimiting description length relative to a fixed universal prefix machine. The machine is a global modeling choice rather than an eliminated stipulation, and the resulting prior is unique only up to an additive invariance constant that is asymptotic in nature. This yields three finite-history analytic results---the variational identity with universal interactive mixture evidence, the MDL/MAP bridge from belief states to one committed explanation, and the expected-free-energy decomposition into instrumental risk minus information gain about the hidden explanation---together with a realizable-case predictive-merging guarantee for the universal interactive posterior, a fixed-false-program elimination lemma under cumulative R\'enyi-\(\frac12\) separation, a semantic-consistency theorem under aggregate false-mixture separation, and explicit exploration-style sufficient conditions, including an \(\epsilon\)-mixed expected-free-energy policy corollary, for that semantic theorem.
+
+Mechanism discovery should not be confused with successful local fitting. A system that merely predicts well may still be oversized, transcript-bound, or easily patched. A system that infers a compact explanatory program, queries efficiently to reduce uncertainty about that program, and then continues to perform once the discovery context is removed is doing something stronger. The framework developed here makes that stronger claim precise at three levels---ideal theory, behavioral proxy, and mechanistic challenge---and the last of these, in the form of the two-quantity compliance protocol of Section~\ref{sec:mechanistic}, specifies what it would take to verify variational compliance mechanistically rather than only behaviorally.
+
+\bibliographystyle{plainnat}
+\bibliography{algorithmic_free_energy_principle}
+
+\end{document}
