@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
 """
 Generate the paper-to-Lean coverage manifest from
-`algorithmic_free_energy_principle_award.v2.tex`.
+`semantic_convergence_interactive_learning.tex`.
 
 The generator writes:
 
 - `formalization_manifest.md`
-- `AlgorithmicFreeEnergy/Manifest.lean`
+- `SemanticConvergence/Manifest.lean`
 
 The TeX file is the only theorem source.
 """
@@ -19,11 +19,11 @@ from collections import Counter
 
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
-TEX_PATH = ROOT / "algorithmic_free_energy_principle_award.v2.tex"
+TEX_PATH = ROOT / "semantic_convergence_interactive_learning.tex"
 MANIFEST_MD = ROOT / "formalization_manifest.md"
 AUDIT_MD = ROOT / "formalization_audit.md"
-BRIDGE_MD = ROOT / "first_principles_bridge.md"
-MANIFEST_LEAN = ROOT / "AlgorithmicFreeEnergy" / "Manifest.lean"
+BRIDGE_MD = ROOT / "formalization_bridge.md"
+MANIFEST_LEAN = ROOT / "SemanticConvergence" / "Manifest.lean"
 
 PATTERN = re.compile(
     r"\\begin\{(definition|lemma|proposition|corollary|theorem)\}"
@@ -358,75 +358,75 @@ COVERED_LABELS = DERIVED_LABELS | {
 }
 
 MODULE_OVERRIDES = {
-    "def:observer": "AlgorithmicFreeEnergy.Foundations",
-    "prop:amortized-surrogate-minimizer": "AlgorithmicFreeEnergy.Surrogate",
-    "thm:amortized-surrogate": "AlgorithmicFreeEnergy.Surrogate",
-    "cor:amortized-surrogate-finite-time": "AlgorithmicFreeEnergy.Surrogate",
+    "def:observer": "SemanticConvergence.Foundations",
+    "prop:amortized-surrogate-minimizer": "SemanticConvergence.Surrogate",
+    "thm:amortized-surrogate": "SemanticConvergence.Surrogate",
+    "cor:amortized-surrogate-finite-time": "SemanticConvergence.Surrogate",
 }
 
 CONCRETE_SUBSTRATE_MODULES = {
-    "AlgorithmicFreeEnergy.ConcreteCore": "Concrete discrete interaction core: histories, local laws, recursive path laws, reachability.",
-    "AlgorithmicFreeEnergy.ConcretePrior": "Concrete prefix-machine and universal-prior substrate.",
-    "AlgorithmicFreeEnergy.ConcreteHierarchy": "Concrete observers, semantic equivalence, quotient, and hierarchy witnesses.",
-    "AlgorithmicFreeEnergy.ConcreteFunctional": "Concrete Bhattacharyya scores, variational functionals, and finite-list minimizers.",
-    "AlgorithmicFreeEnergy.ConcreteBelief": "Concrete prior/posterior, class posterior mass, complement laws, and predictive mixtures.",
-    "AlgorithmicFreeEnergy.ConcreteSemantic": "Concrete semantic gain, separation, separating-action sets, and support scaffolds.",
-    "AlgorithmicFreeEnergy.ConcreteRates": "Concrete log-odds, drift, expected gain, and support-floor quantities.",
-    "AlgorithmicFreeEnergy.ConcreteNoise": "Concrete noisy-channel, decodability, and noisy separation layer.",
-    "AlgorithmicFreeEnergy.ConcreteSelfReference": "Concrete finite-time observers, self-referential rules, and witness-driven sharp self-reference layer.",
-    "AlgorithmicFreeEnergy.ConcreteBoundary": "Concrete risk/information/expected-free-energy boundary and near-miss layer.",
-    "AlgorithmicFreeEnergy.ConcreteSurrogate": "Concrete surrogate energies, finite-list surrogate minimizers, and support witnesses.",
+    "SemanticConvergence.ConcreteCore": "Concrete discrete interaction core: histories, local laws, recursive path laws, reachability.",
+    "SemanticConvergence.ConcretePrior": "Concrete prefix-machine and universal-prior substrate.",
+    "SemanticConvergence.ConcreteHierarchy": "Concrete observers, semantic equivalence, quotient, and hierarchy witnesses.",
+    "SemanticConvergence.ConcreteFunctional": "Concrete Bhattacharyya scores, variational functionals, and finite-list minimizers.",
+    "SemanticConvergence.ConcreteBelief": "Concrete prior/posterior, class posterior mass, complement laws, and predictive mixtures.",
+    "SemanticConvergence.ConcreteSemantic": "Concrete semantic gain, separation, separating-action sets, and support scaffolds.",
+    "SemanticConvergence.ConcreteRates": "Concrete log-odds, drift, expected gain, and support-floor quantities.",
+    "SemanticConvergence.ConcreteNoise": "Concrete noisy-channel, decodability, and noisy separation layer.",
+    "SemanticConvergence.ConcreteSelfReference": "Concrete finite-time observers, self-referential rules, and witness-driven sharp self-reference layer.",
+    "SemanticConvergence.ConcreteBoundary": "Concrete risk/information/expected-free-energy boundary and near-miss layer.",
+    "SemanticConvergence.ConcreteSurrogate": "Concrete surrogate energies, finite-list surrogate minimizers, and support witnesses.",
 }
 
 ABSTRACT_TO_CONCRETE = {
-    "AlgorithmicFreeEnergy.Foundations": [
-        "AlgorithmicFreeEnergy.ConcreteCore",
+    "SemanticConvergence.Foundations": [
+        "SemanticConvergence.ConcreteCore",
     ],
-    "AlgorithmicFreeEnergy.Hierarchy": [
-        "AlgorithmicFreeEnergy.ConcreteCore",
-        "AlgorithmicFreeEnergy.ConcretePrior",
-        "AlgorithmicFreeEnergy.ConcreteHierarchy",
+    "SemanticConvergence.Hierarchy": [
+        "SemanticConvergence.ConcreteCore",
+        "SemanticConvergence.ConcretePrior",
+        "SemanticConvergence.ConcreteHierarchy",
     ],
-    "AlgorithmicFreeEnergy.Functional": [
-        "AlgorithmicFreeEnergy.ConcreteCore",
-        "AlgorithmicFreeEnergy.ConcretePrior",
-        "AlgorithmicFreeEnergy.ConcreteHierarchy",
-        "AlgorithmicFreeEnergy.ConcreteFunctional",
+    "SemanticConvergence.Functional": [
+        "SemanticConvergence.ConcreteCore",
+        "SemanticConvergence.ConcretePrior",
+        "SemanticConvergence.ConcreteHierarchy",
+        "SemanticConvergence.ConcreteFunctional",
     ],
-    "AlgorithmicFreeEnergy.Belief": [
-        "AlgorithmicFreeEnergy.ConcreteCore",
-        "AlgorithmicFreeEnergy.ConcretePrior",
-        "AlgorithmicFreeEnergy.ConcreteHierarchy",
-        "AlgorithmicFreeEnergy.ConcreteBelief",
+    "SemanticConvergence.Belief": [
+        "SemanticConvergence.ConcreteCore",
+        "SemanticConvergence.ConcretePrior",
+        "SemanticConvergence.ConcreteHierarchy",
+        "SemanticConvergence.ConcreteBelief",
     ],
-    "AlgorithmicFreeEnergy.Semantic": [
-        "AlgorithmicFreeEnergy.ConcreteCore",
-        "AlgorithmicFreeEnergy.ConcretePrior",
-        "AlgorithmicFreeEnergy.ConcreteHierarchy",
-        "AlgorithmicFreeEnergy.ConcreteFunctional",
-        "AlgorithmicFreeEnergy.ConcreteBelief",
-        "AlgorithmicFreeEnergy.ConcreteSemantic",
+    "SemanticConvergence.Semantic": [
+        "SemanticConvergence.ConcreteCore",
+        "SemanticConvergence.ConcretePrior",
+        "SemanticConvergence.ConcreteHierarchy",
+        "SemanticConvergence.ConcreteFunctional",
+        "SemanticConvergence.ConcreteBelief",
+        "SemanticConvergence.ConcreteSemantic",
     ],
-    "AlgorithmicFreeEnergy.Rates": [
-        "AlgorithmicFreeEnergy.ConcreteSemantic",
-        "AlgorithmicFreeEnergy.ConcreteRates",
+    "SemanticConvergence.Rates": [
+        "SemanticConvergence.ConcreteSemantic",
+        "SemanticConvergence.ConcreteRates",
     ],
-    "AlgorithmicFreeEnergy.Noise": [
-        "AlgorithmicFreeEnergy.ConcreteSemantic",
-        "AlgorithmicFreeEnergy.ConcreteNoise",
+    "SemanticConvergence.Noise": [
+        "SemanticConvergence.ConcreteSemantic",
+        "SemanticConvergence.ConcreteNoise",
     ],
-    "AlgorithmicFreeEnergy.SelfReference": [
-        "AlgorithmicFreeEnergy.ConcreteSemantic",
-        "AlgorithmicFreeEnergy.ConcreteRates",
-        "AlgorithmicFreeEnergy.ConcreteSelfReference",
+    "SemanticConvergence.SelfReference": [
+        "SemanticConvergence.ConcreteSemantic",
+        "SemanticConvergence.ConcreteRates",
+        "SemanticConvergence.ConcreteSelfReference",
     ],
-    "AlgorithmicFreeEnergy.Boundary": [
-        "AlgorithmicFreeEnergy.ConcreteSelfReference",
-        "AlgorithmicFreeEnergy.ConcreteBoundary",
+    "SemanticConvergence.Boundary": [
+        "SemanticConvergence.ConcreteSelfReference",
+        "SemanticConvergence.ConcreteBoundary",
     ],
-    "AlgorithmicFreeEnergy.Surrogate": [
-        "AlgorithmicFreeEnergy.ConcreteBoundary",
-        "AlgorithmicFreeEnergy.ConcreteSurrogate",
+    "SemanticConvergence.Surrogate": [
+        "SemanticConvergence.ConcreteBoundary",
+        "SemanticConvergence.ConcreteSurrogate",
     ],
 }
 
@@ -444,22 +444,22 @@ def choose_module(start: int, label: str) -> str:
     if label in MODULE_OVERRIDES:
         return MODULE_OVERRIDES[label]
     if start <= 357:
-        return "AlgorithmicFreeEnergy.Hierarchy"
+        return "SemanticConvergence.Hierarchy"
     if start <= 738:
-        return "AlgorithmicFreeEnergy.Functional"
+        return "SemanticConvergence.Functional"
     if start <= 925:
-        return "AlgorithmicFreeEnergy.Belief"
+        return "SemanticConvergence.Belief"
     if 1196 <= start <= 1508:
-        return "AlgorithmicFreeEnergy.Noise"
+        return "SemanticConvergence.Noise"
     if 2644 <= start <= 2789:
-        return "AlgorithmicFreeEnergy.Rates"
+        return "SemanticConvergence.Rates"
     if 2917 <= start <= 3393:
-        return "AlgorithmicFreeEnergy.SelfReference"
+        return "SemanticConvergence.SelfReference"
     if 3411 <= start <= 3670:
-        return "AlgorithmicFreeEnergy.Boundary"
+        return "SemanticConvergence.Boundary"
     if start >= 3744:
-        return "AlgorithmicFreeEnergy.Surrogate"
-    return "AlgorithmicFreeEnergy.Semantic"
+        return "SemanticConvergence.Surrogate"
+    return "SemanticConvergence.Semantic"
 
 
 def status_for_label(label: str) -> str:
@@ -617,7 +617,7 @@ def render_audit(entries: list[dict[str, object]]) -> str:
         "This file is generated by `scripts/generate_formalization_manifest.py`.",
         "",
         "The target notion of first-principles completion is specified in",
-        f"`{(ROOT / 'first_principles_target.md').name}`.",
+        f"`{(ROOT / 'formalization_target.md').name}`.",
         "",
         "## Paper-Completeness State",
         f"- Core declarations inventoried: `{len(entries)}`",
@@ -884,7 +884,7 @@ def lean_string(value: str) -> str:
 
 def render_lean(entries: list[dict[str, object]]) -> str:
     lines = [
-        "namespace AlgorithmicFreeEnergy",
+        "namespace SemanticConvergence",
         "",
         "/-- Generated status marker for each manuscript item. -/",
         "inductive FormalizationStatus where",
@@ -1059,7 +1059,7 @@ def render_lean(entries: list[dict[str, object]]) -> str:
             f"theorem fullyFirstPrinciples_eq : fullyFirstPrinciples = {str(sum(entry['first_principles_status'] == 'abstract-interface' for entry in entries) == 0 and sum(entry['status'] == 'wrapped' for entry in entries) == 0 and sum(entry['status'] == 'declared' for entry in entries) == 0 and sum(str(entry['label']).startswith('auto__') for entry in entries) == 0).lower()} := by",
             "  native_decide",
             "",
-            "end AlgorithmicFreeEnergy",
+            "end SemanticConvergence",
         ]
     )
     return "\n".join(lines) + "\n"

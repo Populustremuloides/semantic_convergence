@@ -1,7 +1,7 @@
-# Algorithmic Free Energy
+# Semantic Convergence in Interactive Learning
 
 This repository contains the current manuscript source for
-`algorithmic_free_energy_principle_award.v2.tex` together with its Lean 4
+`semantic_convergence_interactive_learning.tex` together with its Lean 4
 formalization.
 
 ## Current status
@@ -18,13 +18,13 @@ The generated status artifacts are:
 
 - [formalization_manifest.md](formalization_manifest.md)
 - [formalization_audit.md](formalization_audit.md)
-- [first_principles_bridge.md](first_principles_bridge.md)
+- [formalization_bridge.md](formalization_bridge.md)
 
 ## Repository layout
 
-- `AlgorithmicFreeEnergy/`: Lean source files
-- `AlgorithmicFreeEnergy.lean`: top-level Lean import surface
-- `algorithmic_free_energy_principle_award.v2.tex`: canonical manuscript source
+- `SemanticConvergence/`: Lean source files
+- `SemanticConvergence.lean`: top-level Lean import surface
+- `semantic_convergence_interactive_learning.tex`: canonical manuscript source
 - `scripts/generate_formalization_manifest.py`: regenerates the manifest and
   audit artifacts
 
