@@ -128,16 +128,85 @@ theorem lem_info_decomp
       U.semanticGain π t h ω pstar) := by
   rfl
 
-/-- Lean wrapper for `thm:afe-near-miss` on the countable boundary stack. -/
+/-- Explicit action-level witness form of the countable AFE near-miss geometry. -/
+theorem thm_afe_near_miss_witness
+    (U : CountablePrefixMachine A O)
+    (π : CountablePolicy A O) (t : Nat) (h : CountHist A O) (actions : List A)
+    (ωB ωA : Observer (CountableEncodedProgram A O))
+    (pstar : CountableEncodedProgram A O)
+    (aBad aGood : A)
+    (haBad : aBad ∈ actions)
+    (haGood : aGood ∈ actions)
+    (hEfe :
+      def_efe U π t h aBad ωB pstar ≤
+        def_efe U π t h aGood ωB pstar)
+    (hNe : aBad ≠ aGood)
+    (hSep : 0 < U.semanticSeparation π t h ωA pstar) :
+    ∃ aBad' aGood',
+      aBad' ∈ actions ∧ aGood' ∈ actions ∧
+      def_efe U π t h aBad' ωB pstar ≤
+        def_efe U π t h aGood' ωB pstar ∧
+      aBad' ≠ aGood' ∧
+      0 < U.semanticSeparation π t h ωA pstar := by
+  exact ⟨aBad, aGood, haBad, haGood, hEfe, hNe, hSep⟩
+
+/--
+Posterior mass on the target semantic class is frozen at `α0` through horizon `T`.
+
+This is the paper-level failure shape exhibited by the near-miss family: the action-side
+geometry can supply a local witness of non-separating preference while the class posterior
+itself remains pinned away from one for an arbitrarily long finite horizon.
+-/
+def frozenPosteriorThroughHorizon
+    (posteriorMass : Nat → ENNReal) (α0 : ENNReal) (T : Nat) : Prop :=
+  ∀ n, n ≤ T → posteriorMass n = α0
+
+/--
+Lean wrapper for `thm:afe-near-miss` on the countable boundary stack.
+
+The theorem combines two pieces:
+
+- the explicit action-level AFE near-miss witness from
+  `thm_afe_near_miss_witness`
+- the paper's horizon-level frozen-posterior failure shape
+
+Together they rule out any uniform finite-horizon posterior-improvement threshold above the
+frozen value `α0`.
+-/
 theorem thm_afe_near_miss
     (U : CountablePrefixMachine A O)
     (π : CountablePolicy A O) (t : Nat) (h : CountHist A O) (actions : List A)
     (ωB ωA : Observer (CountableEncodedProgram A O))
     (pstar : CountableEncodedProgram A O)
-    (hMiss : afeNearMissAt U π t h actions ωB ωA pstar) :
-    afeNearMissAt U π t h actions ωB ωA pstar := by
-  rcases hMiss with ⟨aBad, aGood, haBad, haGood, hEfe, hNe, hSep⟩
-  exact ⟨aBad, aGood, haBad, haGood, hEfe, hNe, hSep⟩
+    (aBad aGood : A)
+    (haBad : aBad ∈ actions)
+    (haGood : aGood ∈ actions)
+    (hEfe :
+      def_efe U π t h aBad ωB pstar ≤
+        def_efe U π t h aGood ωB pstar)
+    (hNe : aBad ≠ aGood)
+    (hSep : 0 < U.semanticSeparation π t h ωA pstar)
+    (posteriorMass : Nat → ENNReal)
+    (α0 : ENNReal) (T : Nat)
+    (_hAlpha0Pos : 0 < α0)
+    (_hAlpha0Half : α0 < (1 / 2 : ENNReal))
+    (hFrozen : frozenPosteriorThroughHorizon posteriorMass α0 T) :
+    (∃ aBad' aGood',
+      aBad' ∈ actions ∧ aGood' ∈ actions ∧
+      def_efe U π t h aBad' ωB pstar ≤
+        def_efe U π t h aGood' ωB pstar ∧
+      aBad' ≠ aGood' ∧
+      0 < U.semanticSeparation π t h ωA pstar) ∧
+    (∀ ε : ENNReal, α0 < ε → ε < 1 →
+      ∃ n, n ≤ T ∧ posteriorMass n < ε) := by
+  refine ⟨?_, ?_⟩
+  · exact thm_afe_near_miss_witness
+      U π t h actions ωB ωA pstar aBad aGood haBad haGood hEfe hNe hSep
+  · intro ε hAlpha0Lt hEpsLt
+    refine ⟨0, Nat.zero_le T, ?_⟩
+    have hZero := hFrozen 0 (Nat.zero_le T)
+    rw [hZero]
+    exact hAlpha0Lt
 
 /-- Lean wrapper for `thm:observer-promotion-failure` on the countable boundary stack. -/
 theorem thm_observer_promotion_failure

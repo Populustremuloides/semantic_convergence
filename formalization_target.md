@@ -48,7 +48,9 @@ The exact Lean names and their current concrete scope are:
   realized trajectory law by bridging the deterministic soft-substrate
   contraction into the countable realized process: almost surely, the next-step
   residual observer-fiber odds are bounded by the floor-dependent contraction
-  factor times the current residual odds.
+  factor times the current residual odds. No external bridge-equation
+  hypothesis remains on the public theorem surface; the process transport is
+  now derived internally through `SemanticConvergence.ConcreteSubstrateBridge`.
 - `SemanticConvergence.thm_separating_support_rate`
   This upgrades that contraction to an almost-sure positive-floor `N`-step
   residual-odds rate bound on the realized process through the same explicit
@@ -69,6 +71,29 @@ They now realize the strong concrete support/rate stack used by the final
 first-principles closure pass, with the probabilistic realized-trajectory
 theorems derived from the deterministic concrete substrate through an explicit
 Lean bridge.
+
+## Current boundary and surrogate Lean scope
+
+The exact Lean names and their current concrete scope at the end-of-paper side are:
+
+- `SemanticConvergence.thm_afe_near_miss`
+  This now packages both the explicit action-level AFE near-miss witness and
+  the paper-facing finite-horizon frozen-posterior failure shape. Its helper
+  `SemanticConvergence.thm_afe_near_miss_witness` records the local action-side
+  geometry, while the public theorem adds the horizon-level posterior-freezing
+  consequence.
+- `SemanticConvergence.thm_amortized_surrogate`
+  This now lives on the concrete deployment-side stack. It exposes finite-list
+  counterparts of the paper's assumptions `(A1)`--`(A3)` and derives the
+  deployment-side separating-support floor/support conclusion for the
+  implemented surrogate law.
+- `SemanticConvergence.cor_amortized_surrogate_finite_time`
+  This then feeds that deployment-side support floor into the deterministic
+  residual-odds finite-time consequence used by the recovery stack.
+
+When the manuscript or repo prose speaks about Lean coverage of the boundary
+and surrogate sections, those declarations are the authoritative Lean-side
+objects.
 
 ## Target concrete foundation
 

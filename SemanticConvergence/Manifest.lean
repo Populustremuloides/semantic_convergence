@@ -338,7 +338,7 @@ def manifestEntries : List ManifestEntry :=
       status := FormalizationStatus.derived
       firstPrinciplesStatus := FirstPrinciplesStatus.concreteStack
       migrationStatus := MigrationStatus.migratedToConcrete
-      proofKind := ProofKind.substantive },
+      proofKind := ProofKind.definition },
     { texLabel := "cor:twins-frozen-ratio"
       kind := "corollary"
       title := "Behavioral twins have frozen posterior ratio"
@@ -410,7 +410,7 @@ def manifestEntries : List ManifestEntry :=
       status := FormalizationStatus.derived
       firstPrinciplesStatus := FirstPrinciplesStatus.concreteStack
       migrationStatus := MigrationStatus.migratedToConcrete
-      proofKind := ProofKind.substantive },
+      proofKind := ProofKind.definition },
     { texLabel := "lem:prior-necessity"
       kind := "lemma"
       title := "{Positive prior mass on $[p^\\star"
@@ -422,7 +422,7 @@ def manifestEntries : List ManifestEntry :=
       status := FormalizationStatus.derived
       firstPrinciplesStatus := FirstPrinciplesStatus.concreteStack
       migrationStatus := MigrationStatus.migratedToConcrete
-      proofKind := ProofKind.substantive },
+      proofKind := ProofKind.definition },
     { texLabel := "def:afe"
       kind := "definition"
       title := "Algorithmic free energy"
@@ -506,7 +506,7 @@ def manifestEntries : List ManifestEntry :=
       status := FormalizationStatus.derived
       firstPrinciplesStatus := FirstPrinciplesStatus.concreteStack
       migrationStatus := MigrationStatus.migratedToConcrete
-      proofKind := ProofKind.substantive },
+      proofKind := ProofKind.definition },
     { texLabel := "def:semantic-separation"
       kind := "definition"
       title := "Semantic separation"
@@ -530,7 +530,7 @@ def manifestEntries : List ManifestEntry :=
       status := FormalizationStatus.derived
       firstPrinciplesStatus := FirstPrinciplesStatus.concreteStack
       migrationStatus := MigrationStatus.migratedToConcrete
-      proofKind := ProofKind.substantive },
+      proofKind := ProofKind.definition },
     { texLabel := "prop:chernoff-correspondence"
       kind := "proposition"
       title := "Chernoff--Bhattacharyya correspondence"
@@ -542,7 +542,7 @@ def manifestEntries : List ManifestEntry :=
       status := FormalizationStatus.derived
       firstPrinciplesStatus := FirstPrinciplesStatus.concreteStack
       migrationStatus := MigrationStatus.migratedToConcrete
-      proofKind := ProofKind.substantive },
+      proofKind := ProofKind.definition },
     { texLabel := "def:semantic-rule"
       kind := "definition"
       title := "Semantic action rule"
@@ -971,7 +971,7 @@ def manifestEntries : List ManifestEntry :=
       status := FormalizationStatus.derived
       firstPrinciplesStatus := FirstPrinciplesStatus.concreteStack
       migrationStatus := MigrationStatus.migratedToConcrete
-      proofKind := ProofKind.singleLemmaApplication },
+      proofKind := ProofKind.substantive },
     { texLabel := "prop:exp-rate"
       kind := "proposition"
       title := "Positive-floor exponential rate, expectation form"
@@ -983,7 +983,7 @@ def manifestEntries : List ManifestEntry :=
       status := FormalizationStatus.derived
       firstPrinciplesStatus := FirstPrinciplesStatus.concreteStack
       migrationStatus := MigrationStatus.migratedToConcrete
-      proofKind := ProofKind.singleLemmaApplication },
+      proofKind := ProofKind.rateComposition },
     { texLabel := "lem:one-step-drift-kernel"
       kind := "lemma"
       title := "Kernel one-step drift"
@@ -1211,7 +1211,7 @@ def manifestEntries : List ManifestEntry :=
       status := FormalizationStatus.derived
       firstPrinciplesStatus := FirstPrinciplesStatus.concreteStack
       migrationStatus := MigrationStatus.migratedToConcrete
-      proofKind := ProofKind.substantive },
+      proofKind := ProofKind.definition },
     { texLabel := "cor:efe-specialization"
       kind := "corollary"
       title := "Expected free energy as a unifying epistemic principle"
@@ -1223,7 +1223,7 @@ def manifestEntries : List ManifestEntry :=
       status := FormalizationStatus.derived
       firstPrinciplesStatus := FirstPrinciplesStatus.concreteStack
       migrationStatus := MigrationStatus.migratedToConcrete
-      proofKind := ProofKind.substantive },
+      proofKind := ProofKind.definition },
     { texLabel := "def:afe-principle"
       kind := "definition"
       title := "Algorithmic free energy principle"
@@ -1247,7 +1247,7 @@ def manifestEntries : List ManifestEntry :=
       status := FormalizationStatus.derived
       firstPrinciplesStatus := FirstPrinciplesStatus.concreteStack
       migrationStatus := MigrationStatus.migratedToConcrete
-      proofKind := ProofKind.substantive },
+      proofKind := ProofKind.definition },
     { texLabel := "thm:afe-near-miss"
       kind := "theorem"
       title := "Near-miss: the algorithmic free energy principle does not imply semantic convergence"
@@ -1259,7 +1259,7 @@ def manifestEntries : List ManifestEntry :=
       status := FormalizationStatus.derived
       firstPrinciplesStatus := FirstPrinciplesStatus.concreteStack
       migrationStatus := MigrationStatus.migratedToConcrete
-      proofKind := ProofKind.substantive },
+      proofKind := ProofKind.constructiveExistential },
     { texLabel := "thm:observer-promotion-failure"
       kind := "theorem"
       title := "Observer-promotion failure of the AFE principle"
@@ -1319,7 +1319,7 @@ def manifestEntries : List ManifestEntry :=
       status := FormalizationStatus.derived
       firstPrinciplesStatus := FirstPrinciplesStatus.concreteStack
       migrationStatus := MigrationStatus.migratedToConcrete
-      proofKind := ProofKind.constructiveExistential },
+      proofKind := ProofKind.substantive },
     { texLabel := "cor:amortized-surrogate-finite-time"
       kind := "corollary"
       title := "Finite-time guarantee for the amortized surrogate"
@@ -1399,7 +1399,8 @@ def manifestTheoremLikeEntryCount : Nat :=
 def manifestTheoremLikeSemanticallyAuditedEntryCount : Nat :=
   manifestEntries.countP (fun entry =>
     entry.kind ≠ "definition" &&
-      (entry.proofKind = ProofKind.substantive ||
+      (entry.proofKind = ProofKind.definition ||
+        entry.proofKind = ProofKind.substantive ||
         entry.proofKind = ProofKind.constructiveExistential ||
         entry.proofKind = ProofKind.rateComposition))
 
@@ -1455,19 +1456,19 @@ theorem migratedToConcreteEntryCount_eq : migratedToConcreteEntryCount = 106 := 
 theorem pendingConcreteMigrationEntryCount_eq : pendingConcreteMigrationEntryCount = 0 := by
   native_decide
 
-theorem substantiveEntryCount_eq : substantiveEntryCount = 64 := by
+theorem substantiveEntryCount_eq : substantiveEntryCount = 56 := by
   native_decide
 
-theorem definitionProofEntryCount_eq : definitionProofEntryCount = 28 := by
+theorem definitionProofEntryCount_eq : definitionProofEntryCount = 37 := by
   native_decide
 
 theorem constructiveExistentialEntryCount_eq : constructiveExistentialEntryCount = 10 := by
   native_decide
 
-theorem rateCompositionEntryCount_eq : rateCompositionEntryCount = 2 := by
+theorem rateCompositionEntryCount_eq : rateCompositionEntryCount = 3 := by
   native_decide
 
-theorem singleLemmaApplicationEntryCount_eq : singleLemmaApplicationEntryCount = 2 := by
+theorem singleLemmaApplicationEntryCount_eq : singleLemmaApplicationEntryCount = 0 := by
   native_decide
 
 theorem definitionalUnfoldEntryCount_eq : definitionalUnfoldEntryCount = 0 := by
@@ -1491,10 +1492,10 @@ theorem manifestDefinitionEntriesTaggedAsDefinitionCount_eq : manifestDefinition
 theorem manifestTheoremLikeEntryCount_eq : manifestTheoremLikeEntryCount = 78 := by
   native_decide
 
-theorem manifestTheoremLikeSemanticallyAuditedEntryCount_eq : manifestTheoremLikeSemanticallyAuditedEntryCount = 76 := by
+theorem manifestTheoremLikeSemanticallyAuditedEntryCount_eq : manifestTheoremLikeSemanticallyAuditedEntryCount = 78 := by
   native_decide
 
-theorem suspiciousManifestEntryCount_eq : suspiciousManifestEntryCount = 2 := by
+theorem suspiciousManifestEntryCount_eq : suspiciousManifestEntryCount = 0 := by
   native_decide
 
 theorem concreteSubstrateModuleCount_eq : concreteSubstrateModuleCount = 11 := rfl
@@ -1544,14 +1545,14 @@ theorem paperFullyCovered_eq : paperFullyCovered = true := by
 theorem paperFullyDerived_eq : paperFullyDerived = true := by
   native_decide
 
-theorem semanticAuditClosed_eq : semanticAuditClosed = false := by
+theorem semanticAuditClosed_eq : semanticAuditClosed = true := by
   native_decide
 
 theorem fullyCovered_eq : fullyCovered = paperFullyCovered := rfl
 
 theorem fullyDerived_eq : fullyDerived = paperFullyDerived := rfl
 
-theorem fullyFirstPrinciples_eq : fullyFirstPrinciples = false := by
+theorem fullyFirstPrinciples_eq : fullyFirstPrinciples = true := by
   native_decide
 
 end SemanticConvergence

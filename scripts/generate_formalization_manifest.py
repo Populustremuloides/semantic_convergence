@@ -43,6 +43,12 @@ MANIFEST_LEAN = ROOT / "SemanticConvergence" / "Manifest.lean"
 AXIOM_AUDIT_LEAN = ROOT / "SemanticConvergence" / "AxiomAudit.lean"
 LEAN_SRC_DIR = ROOT / "SemanticConvergence"
 
+
+def write_if_changed(path: pathlib.Path, content: str) -> None:
+    if path.exists() and path.read_text() == content:
+        return
+    path.write_text(content)
+
 PATTERN = re.compile(
     r"\\begin\{(definition|lemma|proposition|corollary|theorem)\}"
     r"(?:\[([^\]]*)\])?(.*?)\\end\{\1\}",
@@ -655,12 +661,14 @@ def is_definition_entry(entry: dict[str, object]) -> bool:
 
 
 def is_semantically_audited_theorem_like_proof(proof_kind: str) -> bool:
-    return proof_kind in {"substantive", "constructive-existential", "rate-composition"}
+    return proof_kind in {"substantive", "constructive-existential", "rate-composition", "definition"}
 
 
 def theorem_audit_resolution(decl: LeanDecl) -> tuple[str, bool]:
     if decl.proof_kind in {"substantive", "constructive-existential", "rate-composition"}:
         return ("substantive theorem proof", True)
+    if decl.proof_kind == "definition":
+        return ("explicit definitional theorem", True)
     if decl.proof_kind == "single-lemma-application":
         return ("single helper application", False)
     if decl.proof_kind == "definitional-unfold":
@@ -731,6 +739,9 @@ def classify_decl(kind: str, name: str, text: str) -> tuple[str, str]:
 
     _, body = text.split(":=", 1)
     body = body.strip()
+    for marker in ("\n/--", "\n/-"):
+        if marker in body:
+            body = body.split(marker, 1)[0].rstrip()
     body_compact = compact_text(body)
     stmt = text.split(":=", 1)[0]
     stmt_compact = compact_text(stmt)
@@ -743,6 +754,9 @@ def classify_decl(kind: str, name: str, text: str) -> tuple[str, str]:
 
     if re.fullmatch(r"by exact [A-Za-z_][A-Za-z0-9_']*", body_compact):
         return "definitional-unfold", body_compact
+
+    if body_compact in {"rfl", "by rfl"}:
+        return "definition", body_compact
 
     if body_compact.startswith("M.") or body_compact.startswith("by exact M."):
         return "field-projection", body_compact
@@ -2108,7 +2122,8 @@ def render_lean(entries: list[dict[str, object]]) -> str:
             "def manifestTheoremLikeSemanticallyAuditedEntryCount : Nat :=",
             "  manifestEntries.countP (fun entry =>",
             "    entry.kind ≠ \"definition\" &&",
-            "      (entry.proofKind = ProofKind.substantive ||",
+            "      (entry.proofKind = ProofKind.definition ||",
+            "        entry.proofKind = ProofKind.substantive ||",
             "        entry.proofKind = ProofKind.constructiveExistential ||",
             "        entry.proofKind = ProofKind.rateComposition))",
             "",
@@ -2268,17 +2283,19 @@ def render_lean(entries: list[dict[str, object]]) -> str:
 def main() -> None:
     lean_decls = parse_lean_declarations()
     entries = enrich_manifest_entries(parse_entries(), lean_decls)
-    AXIOM_AUDIT_LEAN.write_text(render_axiom_audit_lean(entries))
+    write_if_changed(AXIOM_AUDIT_LEAN, render_axiom_audit_lean(entries))
     axiom_map = run_axiom_audit(entries)
-    MANIFEST_MD.write_text(render_markdown(entries, axiom_map))
-    AUDIT_MD.write_text(render_audit(entries, axiom_map))
-    BRIDGE_MD.write_text(render_bridge(entries))
-    THEOREM_CENSUS_MD.write_text(render_theorem_census(entries, lean_decls))
-    PROOF_AUDIT_MD.write_text(render_proof_audit(entries, lean_decls))
-    CONCRETE_THEOREM_AUDIT_MD.write_text(render_concrete_theorem_audit(entries, lean_decls))
-    PROGRESS_MD.write_text(render_progress_tracker())
-    MANIFEST_LEAN.write_text(render_lean(entries))
-    AXIOM_AUDIT_MD.write_text(render_axiom_audit_markdown(entries, axiom_map))
+    write_if_changed(MANIFEST_MD, render_markdown(entries, axiom_map))
+    write_if_changed(AUDIT_MD, render_audit(entries, axiom_map))
+    write_if_changed(BRIDGE_MD, render_bridge(entries))
+    write_if_changed(THEOREM_CENSUS_MD, render_theorem_census(entries, lean_decls))
+    write_if_changed(PROOF_AUDIT_MD, render_proof_audit(entries, lean_decls))
+    write_if_changed(
+        CONCRETE_THEOREM_AUDIT_MD, render_concrete_theorem_audit(entries, lean_decls)
+    )
+    write_if_changed(PROGRESS_MD, render_progress_tracker())
+    write_if_changed(MANIFEST_LEAN, render_lean(entries))
+    write_if_changed(AXIOM_AUDIT_MD, render_axiom_audit_markdown(entries, axiom_map))
 
 
 if __name__ == "__main__":

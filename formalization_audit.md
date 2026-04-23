@@ -23,12 +23,12 @@ The target notion of first-principles completion is specified in
 - Pending concrete migration declarations: `0`
 - Abstract-interface declarations with a concrete substrate bridge in repo: `0`
 - Concrete substrate modules present: `11`
-- First-principles complete: `no`
+- First-principles complete: `yes`
 
 ## Axiom Audit Snapshot
 - Manifest-tracked declarations audited by `#print axioms`: `106`
-- Rows matching the canonical baseline `['propext', 'Classical.choice', 'Quot.sound']`: `64`
-- Rows using the expected `native_decide` auxiliary `SemanticConvergence.listWeightedSum_ne_zero_exists._native.native_decide.ax_1_2`: `32`
+- Rows matching the canonical baseline `['propext', 'Classical.choice', 'Quot.sound']`: `62`
+- Rows using the expected `native_decide` auxiliary `SemanticConvergence.listWeightedSum_ne_zero_exists._native.native_decide.ax_1_2`: `34`
 - Rows lighter than the canonical baseline: `10`
 - Rows with genuine unexpected axiom drift: `0`
 - Exact per-declaration axiom dependencies are published in `lean_axiom_audit.md`.
@@ -36,19 +36,19 @@ The target notion of first-principles completion is specified in
 - `fullyFirstPrinciples = true` is a trust-boundary and proof-shape statement; exact axiom dependencies are tracked separately by the published axiom audit.
 
 ## Proof-Shape Snapshot
-- Substantive entries: `64`
-- Definition entries: `28`
+- Substantive entries: `56`
+- Definition entries: `37`
 - Constructive-existential entries: `10`
-- Rate-composition entries: `2`
-- Single-lemma-application entries: `2`
+- Rate-composition entries: `3`
+- Single-lemma-application entries: `0`
 - Definitional-unfold entries: `0`
 - Field-projection entries: `0`
 - Placeholder-truth entries: `0`
 - Heuristic-other entries: `0`
 - Manifest definition entries tagged as `definition`: `28` / `28`
-- Manifest theorem-like entries in non-suspicious proof classes: `76` / `78`
-- Suspicious manifest entries (single-helper / projection / unfold / placeholder): `2`
-- Semantic manifest audit closed: `no`
+- Manifest theorem-like entries in non-suspicious proof classes: `78` / `78`
+- Suspicious manifest entries (single-helper / projection / unfold / placeholder): `0`
+- Semantic manifest audit closed: `yes`
 
 Interpretation:
 - `wrapped` means the paper item has an exact Lean wrapper but still depends on theorem-level assumptions in a `...Theory` bundle.
@@ -117,5 +117,4 @@ Trust-boundary note:
 
 ## Suspicious Manifest Entries
 
-- `lem:one-step-drift` -> `SemanticConvergence.lem_one_step_drift` in `SemanticConvergence.Rates` (`single-lemma-application`)
-- `prop:exp-rate` -> `SemanticConvergence.prop_exp_rate` in `SemanticConvergence.Rates` (`single-lemma-application`)
+None.

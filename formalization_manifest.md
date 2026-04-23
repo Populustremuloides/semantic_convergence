@@ -30,19 +30,19 @@ Migration conventions:
 - Abstract-interface: `0`
 - Migrated-to-concrete: `106`
 - Pending concrete migration: `0`
-- Axiom-audit rows matching the canonical baseline `['propext', 'Classical.choice', 'Quot.sound']`: `64`
-- Axiom-audit rows using the expected `native_decide` auxiliary `SemanticConvergence.listWeightedSum_ne_zero_exists._native.native_decide.ax_1_2`: `32`
+- Axiom-audit rows matching the canonical baseline `['propext', 'Classical.choice', 'Quot.sound']`: `62`
+- Axiom-audit rows using the expected `native_decide` auxiliary `SemanticConvergence.listWeightedSum_ne_zero_exists._native.native_decide.ax_1_2`: `34`
 - Axiom-audit rows lighter than the canonical baseline: `10`
 - Axiom-audit rows with genuine unexpected drift: `0`
 - Exact per-declaration axiom dependencies are published in `lean_axiom_audit.md`.
 - While substantive sources still use `native_decide`, the generated axiom audit treats the corresponding compiled helper axiom as expected rather than as drift.
 
 Proof-shape snapshot:
-- `substantive`: `64`
-- `definition`: `28`
+- `substantive`: `56`
+- `definition`: `37`
 - `constructive-existential`: `10`
-- `rate-composition`: `2`
-- `single-lemma-application`: `2`
+- `rate-composition`: `3`
+- `single-lemma-application`: `0`
 - `definitional-unfold`: `0`
 - `field-projection`: `0`
 - `placeholder-truth`: `0`
@@ -73,24 +73,24 @@ Proof-shape snapshot:
 | 21 | definition | `def:meeting-point-shorthand` | Meeting-point specialization | 605-616 | `SemanticConvergence.Functional` | `def_meeting_point_shorthand` | `SemanticConvergence.def_meeting_point_shorthand` | `derived` | `concrete-stack` | `migrated-to-concrete` | `definition` |
 | 22 | proposition | `prop:belief-invariance-above` | Belief-observer invariance above $\omega_{\mathrm{behav}}$ | 625-632 | `SemanticConvergence.Functional` | `prop_belief_invariance_above` | `SemanticConvergence.prop_belief_invariance_above` | `derived` | `concrete-stack` | `migrated-to-concrete` | `substantive` |
 | 23 | proposition | `prop:belief-illtyped-below` | Belief-observer ill-typing below $\omega_{\mathrm{behav}}$ | 645-648 | `SemanticConvergence.Functional` | `prop_belief_illtyped_below` | `SemanticConvergence.prop_belief_illtyped_below` | `derived` | `concrete-stack` | `migrated-to-concrete` | `substantive` |
-| 24 | proposition | `prop:action-cap` | Action-observer cap | 661-669 | `SemanticConvergence.Functional` | `prop_action_cap` | `SemanticConvergence.prop_action_cap` | `derived` | `concrete-stack` | `migrated-to-concrete` | `substantive` |
+| 24 | proposition | `prop:action-cap` | Action-observer cap | 661-669 | `SemanticConvergence.Functional` | `prop_action_cap` | `SemanticConvergence.prop_action_cap` | `derived` | `concrete-stack` | `migrated-to-concrete` | `definition` |
 | 25 | corollary | `cor:twins-frozen-ratio` | Behavioral twins have frozen posterior ratio | 683-690 | `SemanticConvergence.Functional` | `cor_twins_frozen_ratio` | `SemanticConvergence.cor_twins_frozen_ratio` | `derived` | `concrete-stack` | `migrated-to-concrete` | `substantive` |
 | 26 | theorem | `thm:meeting-point` | Meeting point | 705-715 | `SemanticConvergence.Functional` | `thm_meeting_point` | `SemanticConvergence.thm_meeting_point` | `derived` | `concrete-stack` | `migrated-to-concrete` | `substantive` |
 | 27 | corollary | `cor:canonical-pair` | Canonical two-observer choice | 721-724 | `SemanticConvergence.Functional` | `cor_canonical_pair` | `SemanticConvergence.cor_canonical_pair` | `derived` | `concrete-stack` | `migrated-to-concrete` | `substantive` |
 | 28 | proposition | `prop:goal-dialed` | Goal-dialed convergence | 738-748 | `SemanticConvergence.Functional` | `prop_goal_dialed` | `SemanticConvergence.prop_goal_dialed` | `derived` | `concrete-stack` | `migrated-to-concrete` | `substantive` |
 | 29 | definition | `def:universal-prior` | Universal interactive prior | 780-792 | `SemanticConvergence.Belief` | `def_universal_prior` | `SemanticConvergence.def_universal_prior` | `derived` | `concrete-stack` | `migrated-to-concrete` | `definition` |
-| 30 | lemma | `lem:prior-invariance` | Machine invariance | 794-803 | `SemanticConvergence.Belief` | `lem_prior_invariance` | `SemanticConvergence.lem_prior_invariance` | `derived` | `concrete-stack` | `migrated-to-concrete` | `substantive` |
-| 31 | lemma | `lem:prior-necessity` | {Positive prior mass on $[p^\star | 817-820 | `SemanticConvergence.Belief` | `lem_prior_necessity` | `SemanticConvergence.lem_prior_necessity` | `derived` | `concrete-stack` | `migrated-to-concrete` | `substantive` |
+| 30 | lemma | `lem:prior-invariance` | Machine invariance | 794-803 | `SemanticConvergence.Belief` | `lem_prior_invariance` | `SemanticConvergence.lem_prior_invariance` | `derived` | `concrete-stack` | `migrated-to-concrete` | `definition` |
+| 31 | lemma | `lem:prior-necessity` | {Positive prior mass on $[p^\star | 817-820 | `SemanticConvergence.Belief` | `lem_prior_necessity` | `SemanticConvergence.lem_prior_necessity` | `derived` | `concrete-stack` | `migrated-to-concrete` | `definition` |
 | 32 | definition | `def:afe` | Algorithmic free energy | 834-841 | `SemanticConvergence.Belief` | `def_afe` | `SemanticConvergence.def_afe` | `derived` | `concrete-stack` | `migrated-to-concrete` | `definition` |
 | 33 | lemma | `lem:variational` | Variational identity | 843-856 | `SemanticConvergence.Belief` | `lem_variational` | `SemanticConvergence.lem_variational` | `derived` | `concrete-stack` | `migrated-to-concrete` | `substantive` |
 | 34 | lemma | `lem:kl-necessity` | KL is forced by the exact Gibbs variational formula | 874-883 | `SemanticConvergence.Belief` | `lem_kl_necessity` | `SemanticConvergence.lem_kl_necessity` | `derived` | `concrete-stack` | `migrated-to-concrete` | `substantive` |
 | 35 | lemma | `lem:merging` | Predictive merging | 901-916 | `SemanticConvergence.Belief` | `lem_merging` | `SemanticConvergence.lem_merging` | `derived` | `concrete-stack` | `migrated-to-concrete` | `substantive` |
 | 36 | definition | `def:class-complement` | Class-complement predictive law | 940-949 | `SemanticConvergence.Semantic` | `def_class_complement` | `SemanticConvergence.def_class_complement` | `derived` | `concrete-stack` | `migrated-to-concrete` | `definition` |
 | 37 | definition | `def:semantic-gain` | Semantic gain | 956-967 | `SemanticConvergence.Semantic` | `def_semantic_gain` | `SemanticConvergence.def_semantic_gain` | `derived` | `concrete-stack` | `migrated-to-concrete` | `definition` |
-| 38 | lemma | `lem:odds-identity` | Posterior-odds identity | 969-980 | `SemanticConvergence.Semantic` | `lem_odds_identity` | `SemanticConvergence.lem_odds_identity` | `derived` | `concrete-stack` | `migrated-to-concrete` | `substantive` |
+| 38 | lemma | `lem:odds-identity` | Posterior-odds identity | 969-980 | `SemanticConvergence.Semantic` | `lem_odds_identity` | `SemanticConvergence.lem_odds_identity` | `derived` | `concrete-stack` | `migrated-to-concrete` | `definition` |
 | 39 | definition | `def:semantic-separation` | Semantic separation | 992-1003 | `SemanticConvergence.Semantic` | `def_semantic_separation` | `SemanticConvergence.def_semantic_separation` | `derived` | `concrete-stack` | `migrated-to-concrete` | `definition` |
-| 40 | lemma | `lem:zero-criterion` | Zero criterion | 1010-1020 | `SemanticConvergence.Semantic` | `lem_zero_criterion` | `SemanticConvergence.lem_zero_criterion` | `derived` | `concrete-stack` | `migrated-to-concrete` | `substantive` |
-| 41 | proposition | `prop:chernoff-correspondence` | Chernoff--Bhattacharyya correspondence | 1026-1037 | `SemanticConvergence.Semantic` | `prop_chernoff_correspondence` | `SemanticConvergence.prop_chernoff_correspondence` | `derived` | `concrete-stack` | `migrated-to-concrete` | `substantive` |
+| 40 | lemma | `lem:zero-criterion` | Zero criterion | 1010-1020 | `SemanticConvergence.Semantic` | `lem_zero_criterion` | `SemanticConvergence.lem_zero_criterion` | `derived` | `concrete-stack` | `migrated-to-concrete` | `definition` |
+| 41 | proposition | `prop:chernoff-correspondence` | Chernoff--Bhattacharyya correspondence | 1026-1037 | `SemanticConvergence.Semantic` | `prop_chernoff_correspondence` | `SemanticConvergence.prop_chernoff_correspondence` | `derived` | `concrete-stack` | `migrated-to-concrete` | `definition` |
 | 42 | definition | `def:semantic-rule` | Semantic action rule | 1055-1077 | `SemanticConvergence.Semantic` | `def_semantic_rule` | `SemanticConvergence.def_semantic_rule` | `derived` | `concrete-stack` | `migrated-to-concrete` | `definition` |
 | 43 | definition | `def:promotion-supporting` | Promotion-supporting action rule | 1081-1088 | `SemanticConvergence.Semantic` | `def_promotion_supporting` | `SemanticConvergence.def_promotion_supporting` | `derived` | `concrete-stack` | `migrated-to-concrete` | `definition` |
 | 44 | proposition | `prop:semantic-is-promotion-supporting` | Semantic rule is promotion-supporting | 1090-1101 | `SemanticConvergence.Semantic` | `prop_semantic_is_promotion_supporting` | `SemanticConvergence.prop_semantic_is_promotion_supporting` | `derived` | `concrete-stack` | `migrated-to-concrete` | `substantive` |
@@ -125,8 +125,8 @@ Proof-shape snapshot:
 | 73 | corollary | `cor:finite-maximin` | Finite-class deterministic specialization | 2489-2500 | `SemanticConvergence.Semantic` | `cor_finite_maximin` | `SemanticConvergence.cor_finite_maximin` | `derived` | `concrete-stack` | `migrated-to-concrete` | `substantive` |
 | 74 | theorem | `cor:support-necessary` | Zero separating support makes semantic recovery impossible | 2521-2529 | `SemanticConvergence.Semantic` | `cor_support_necessary` | `SemanticConvergence.cor_support_necessary` | `derived` | `concrete-stack` | `migrated-to-concrete` | `constructive-existential` |
 | 75 | theorem | `thm:summable-support-insufficient` | Summable separating support is insufficient | 2546-2572 | `SemanticConvergence.Semantic` | `thm_summable_support_insufficient` | `SemanticConvergence.thm_summable_support_insufficient` | `derived` | `concrete-stack` | `migrated-to-concrete` | `constructive-existential` |
-| 76 | lemma | `lem:one-step-drift` | Canonical selector one-step drift | 2644-2656 | `SemanticConvergence.Rates` | `lem_one_step_drift` | `SemanticConvergence.lem_one_step_drift` | `derived` | `concrete-stack` | `migrated-to-concrete` | `single-lemma-application` |
-| 77 | proposition | `prop:exp-rate` | Positive-floor exponential rate, expectation form | 2683-2702 | `SemanticConvergence.Rates` | `prop_exp_rate` | `SemanticConvergence.prop_exp_rate` | `derived` | `concrete-stack` | `migrated-to-concrete` | `single-lemma-application` |
+| 76 | lemma | `lem:one-step-drift` | Canonical selector one-step drift | 2644-2656 | `SemanticConvergence.Rates` | `lem_one_step_drift` | `SemanticConvergence.lem_one_step_drift` | `derived` | `concrete-stack` | `migrated-to-concrete` | `substantive` |
+| 77 | proposition | `prop:exp-rate` | Positive-floor exponential rate, expectation form | 2683-2702 | `SemanticConvergence.Rates` | `prop_exp_rate` | `SemanticConvergence.prop_exp_rate` | `derived` | `concrete-stack` | `migrated-to-concrete` | `rate-composition` |
 | 78 | lemma | `lem:one-step-drift-kernel` | Kernel one-step drift | 2714-2726 | `SemanticConvergence.Rates` | `lem_one_step_drift_kernel` | `SemanticConvergence.lem_one_step_drift_kernel` | `derived` | `concrete-stack` | `migrated-to-concrete` | `substantive` |
 | 79 | proposition | `prop:kernel-exp-rate` | Same-view transfer of the positive-floor exponential rate | 2757-2777 | `SemanticConvergence.Rates` | `prop_kernel_exp_rate` | `SemanticConvergence.prop_kernel_exp_rate` | `derived` | `concrete-stack` | `migrated-to-concrete` | `rate-composition` |
 | 80 | theorem | `thm:exp-rate-concentration` | Finite-time positive-floor rate transfer | 2789-2823 | `SemanticConvergence.Rates` | `thm_exp_rate_concentration` | `SemanticConvergence.thm_exp_rate_concentration` | `derived` | `concrete-stack` | `migrated-to-concrete` | `rate-composition` |
@@ -145,14 +145,14 @@ Proof-shape snapshot:
 | 93 | theorem | `thm:self-ref-sharp` | Sharpened self-referential convergence under deterministic splitting | 3339-3369 | `SemanticConvergence.SelfReference` | `thm_self_ref_sharp` | `SemanticConvergence.thm_self_ref_sharp` | `derived` | `concrete-stack` | `migrated-to-concrete` | `substantive` |
 | 94 | proposition | `prop:boundary-identity` | Boundary identification under Bayes/Gibbs belief | 3411-3415 | `SemanticConvergence.Boundary` | `prop_boundary_identity` | `SemanticConvergence.prop_boundary_identity` | `derived` | `concrete-stack` | `migrated-to-concrete` | `substantive` |
 | 95 | definition | `def:efe` | Expected free energy | 3434-3448 | `SemanticConvergence.Boundary` | `def_efe` | `SemanticConvergence.def_efe` | `derived` | `concrete-stack` | `migrated-to-concrete` | `definition` |
-| 96 | lemma | `lem:risk-ig` | Risk minus information gain | 3450-3460 | `SemanticConvergence.Boundary` | `lem_risk_ig` | `SemanticConvergence.lem_risk_ig` | `derived` | `concrete-stack` | `migrated-to-concrete` | `substantive` |
-| 97 | corollary | `cor:efe-specialization` | Expected free energy as a unifying epistemic principle | 3466-3469 | `SemanticConvergence.Boundary` | `cor_efe_specialization` | `SemanticConvergence.cor_efe_specialization` | `derived` | `concrete-stack` | `migrated-to-concrete` | `substantive` |
+| 96 | lemma | `lem:risk-ig` | Risk minus information gain | 3450-3460 | `SemanticConvergence.Boundary` | `lem_risk_ig` | `SemanticConvergence.lem_risk_ig` | `derived` | `concrete-stack` | `migrated-to-concrete` | `definition` |
+| 97 | corollary | `cor:efe-specialization` | Expected free energy as a unifying epistemic principle | 3466-3469 | `SemanticConvergence.Boundary` | `cor_efe_specialization` | `SemanticConvergence.cor_efe_specialization` | `derived` | `concrete-stack` | `migrated-to-concrete` | `definition` |
 | 98 | definition | `def:afe-principle` | Algorithmic free energy principle | 3482-3490 | `SemanticConvergence.Boundary` | `def_afe_principle` | `SemanticConvergence.def_afe_principle` | `derived` | `concrete-stack` | `migrated-to-concrete` | `definition` |
-| 99 | lemma | `lem:info-decomp` | Information decomposition | 3499-3507 | `SemanticConvergence.Boundary` | `lem_info_decomp` | `SemanticConvergence.lem_info_decomp` | `derived` | `concrete-stack` | `migrated-to-concrete` | `substantive` |
-| 100 | theorem | `thm:afe-near-miss` | Near-miss: the algorithmic free energy principle does not imply semantic convergence | 3525-3533 | `SemanticConvergence.Boundary` | `thm_afe_near_miss` | `SemanticConvergence.thm_afe_near_miss` | `derived` | `concrete-stack` | `migrated-to-concrete` | `substantive` |
+| 99 | lemma | `lem:info-decomp` | Information decomposition | 3499-3507 | `SemanticConvergence.Boundary` | `lem_info_decomp` | `SemanticConvergence.lem_info_decomp` | `derived` | `concrete-stack` | `migrated-to-concrete` | `definition` |
+| 100 | theorem | `thm:afe-near-miss` | Near-miss: the algorithmic free energy principle does not imply semantic convergence | 3525-3533 | `SemanticConvergence.Boundary` | `thm_afe_near_miss` | `SemanticConvergence.thm_afe_near_miss` | `derived` | `concrete-stack` | `migrated-to-concrete` | `constructive-existential` |
 | 101 | theorem | `thm:observer-promotion-failure` | Observer-promotion failure of the AFE principle | 3625-3632 | `SemanticConvergence.Boundary` | `thm_observer_promotion_failure` | `SemanticConvergence.thm_observer_promotion_failure` | `derived` | `concrete-stack` | `migrated-to-concrete` | `substantive` |
 | 102 | corollary | `cor:observer-promotion-universal` | Universal-prior case | 3646-3649 | `SemanticConvergence.Boundary` | `cor_observer_promotion_universal` | `SemanticConvergence.cor_observer_promotion_universal` | `derived` | `concrete-stack` | `migrated-to-concrete` | `substantive` |
 | 103 | corollary | `cor:promotion-contrast` | Observer-promotion contrast | 3670-3673 | `SemanticConvergence.Boundary` | `cor_promotion_contrast` | `SemanticConvergence.cor_promotion_contrast` | `derived` | `concrete-stack` | `migrated-to-concrete` | `substantive` |
 | 104 | proposition | `prop:amortized-surrogate-minimizer` | Exact action-side minimizer of the amortized surrogate | 3744-3757 | `SemanticConvergence.Surrogate` | `prop_amortized_surrogate_minimizer` | `SemanticConvergence.prop_amortized_surrogate_minimizer` | `derived` | `concrete-stack` | `migrated-to-concrete` | `substantive` |
-| 105 | theorem | `thm:amortized-surrogate` | Semantic-recovery guarantee for the amortized surrogate | 3763-3818 | `SemanticConvergence.Surrogate` | `thm_amortized_surrogate` | `SemanticConvergence.thm_amortized_surrogate` | `derived` | `concrete-stack` | `migrated-to-concrete` | `constructive-existential` |
+| 105 | theorem | `thm:amortized-surrogate` | Semantic-recovery guarantee for the amortized surrogate | 3763-3818 | `SemanticConvergence.Surrogate` | `thm_amortized_surrogate` | `SemanticConvergence.thm_amortized_surrogate` | `derived` | `concrete-stack` | `migrated-to-concrete` | `substantive` |
 | 106 | corollary | `cor:amortized-surrogate-finite-time` | Finite-time guarantee for the amortized surrogate | 3879-3906 | `SemanticConvergence.Surrogate` | `cor_amortized_surrogate_finite_time` | `SemanticConvergence.cor_amortized_surrogate_finite_time` | `derived` | `concrete-stack` | `migrated-to-concrete` | `substantive` |

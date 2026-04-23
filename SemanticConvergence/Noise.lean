@@ -116,21 +116,16 @@ theorem cor_noise_transfer
     (K : ObsChannel O O')
     (hDec : def_decodable_channel K)
     (U : ConcretePrefixMachine A O)
+    (hCodes : U.CodesNodup)
     (π : ConcretePolicy A O) (hπ : ProbabilisticPolicy π)
+    (hπN : PolicySupportNodup π)
     (hSem : ∀ c hc, ProbabilisticKernel (U.semantics c hc))
+    (hSemN : SemanticsSupportNodup U)
     (penv : U.Program)
     (ω : Observer (EncodedProgram A O))
     {p q : U.Program}
     (δ : Rat) (T : Nat)
     (hView : ω.view (U.toEncodedProgram p) = ω.view (U.toEncodedProgram q))
-    (hBridge :
-      ∀ ξ n,
-        (U.toCountablePrefixMachine hSem).residualObserverFiberProcess
-            (toCountablePolicy π hπ) (U.liftObserver ω)
-            (U.toCountableEncodedProgram hSem p) n ξ =
-          ENNReal.ofReal
-            (U.residualObserverFiberPosteriorOdds π (prefixFullHist ξ n) ω
-              (U.toEncodedProgram p) : ℝ))
     (hStep :
       ∀ ξ, ξ ∈ ((U.toCountablePrefixMachine hSem).trajectoryLaw
         (toCountablePolicy π hπ) (U.toCountableProgram hSem penv) T).support →
@@ -157,7 +152,8 @@ theorem cor_noise_transfer
               (U.toCountableEncodedProgram hSem q) N ξ := by
   rcases hDec with ⟨decode, hdecode⟩
   refine ⟨⟨decode, hdecode⟩, ?_⟩
-  exact thm_exp_rate_concentration U π hπ hSem penv ω δ T hView hBridge hStep hInitTop
+  exact thm_exp_rate_concentration
+    U hCodes π hπ hπN hSem hSemN penv ω δ T hView hStep hInitTop
 
 end CountablePaperNoise
 

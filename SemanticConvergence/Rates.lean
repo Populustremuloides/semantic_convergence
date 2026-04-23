@@ -152,19 +152,14 @@ theorem lem_one_step_drift_of_witness
 theorem lem_one_step_drift
     [DecidableEq A] [DecidableEq O] [BEq A] [LawfulBEq A] [BEq O] [LawfulBEq O]
     (U : ConcretePrefixMachine A O)
+    (hCodes : U.CodesNodup)
     (π : ConcretePolicy A O) (hπ : ProbabilisticPolicy π)
+    (hπN : PolicySupportNodup π)
     (hSem : ∀ c hc, ProbabilisticKernel (U.semantics c hc))
+    (hSemN : SemanticsSupportNodup U)
     (penv pstar : U.Program)
     (ω : Observer (EncodedProgram A O))
     (δ : Rat) (T : Nat)
-    (hBridge :
-      ∀ ξ n,
-        (U.toCountablePrefixMachine hSem).residualObserverFiberProcess
-            (toCountablePolicy π hπ) (U.liftObserver ω)
-            (U.toCountableEncodedProgram hSem pstar) n ξ =
-          ENNReal.ofReal
-            (U.residualObserverFiberPosteriorOdds π (prefixFullHist ξ n) ω
-              (U.toEncodedProgram pstar) : ℝ))
     (hStep :
       ∀ ξ, ξ ∈ ((U.toCountablePrefixMachine hSem).trajectoryLaw
         (toCountablePolicy π hπ) (U.toCountableProgram hSem penv) T).support →
@@ -184,7 +179,22 @@ theorem lem_one_step_drift
             (U.toCountablePrefixMachine hSem).residualObserverFiberProcess
               (toCountablePolicy π hπ) (U.liftObserver ω)
               (U.toCountableEncodedProgram hSem pstar) n ξ := by
-  exact thm_separating_support_convergence U π hπ hSem penv pstar ω δ T hBridge hStep
+  let Uc := U.toCountablePrefixMachine hSem
+  let πc := toCountablePolicy π hπ
+  let penvc := U.toCountableProgram hSem penv
+  let ωc := U.liftObserver ω
+  let pstarc := U.toCountableEncodedProgram hSem pstar
+  have hWitness : Uc.HasSupportwiseResidualContractionWitness πc penvc ωc pstarc δ T := by
+    simpa [Uc, πc, penvc, ωc, pstarc] using
+      U.hasSupportwiseResidualContractionWitness_of_prefixwiseResidualDecay
+        hCodes π hπ hπN hSem hSemN penv pstar ω δ T hStep
+  have hDrift :
+      ∀ᵐ ξ ∂(Uc.trajectoryLaw πc penvc T).toMeasure,
+        ∀ n, n < T →
+          Uc.residualObserverFiberProcess πc ωc pstarc (n + 1) ξ ≤
+            posteriorDecayFactorENNReal δ * Uc.residualObserverFiberProcess πc ωc pstarc n ξ :=
+    lem_one_step_drift_of_witness Uc πc penvc ωc pstarc δ T hWitness
+  simpa [Uc, πc, penvc, ωc, pstarc] using hDrift
 
 /-- Internal witness-transport helper for `prop:exp-rate`. -/
 theorem prop_exp_rate_of_witness
@@ -223,19 +233,14 @@ theorem lem_one_step_drift_kernel
 theorem prop_exp_rate
     [DecidableEq A] [DecidableEq O] [BEq A] [LawfulBEq A] [BEq O] [LawfulBEq O]
     (U : ConcretePrefixMachine A O)
+    (hCodes : U.CodesNodup)
     (π : ConcretePolicy A O) (hπ : ProbabilisticPolicy π)
+    (hπN : PolicySupportNodup π)
     (hSem : ∀ c hc, ProbabilisticKernel (U.semantics c hc))
+    (hSemN : SemanticsSupportNodup U)
     (penv pstar : U.Program)
     (ω : Observer (EncodedProgram A O))
     (δ : Rat) (T : Nat)
-    (hBridge :
-      ∀ ξ n,
-        (U.toCountablePrefixMachine hSem).residualObserverFiberProcess
-            (toCountablePolicy π hπ) (U.liftObserver ω)
-            (U.toCountableEncodedProgram hSem pstar) n ξ =
-          ENNReal.ofReal
-            (U.residualObserverFiberPosteriorOdds π (prefixFullHist ξ n) ω
-              (U.toEncodedProgram pstar) : ℝ))
     (hStep :
       ∀ ξ, ξ ∈ ((U.toCountablePrefixMachine hSem).trajectoryLaw
         (toCountablePolicy π hπ) (U.toCountableProgram hSem penv) T).support →
@@ -255,7 +260,22 @@ theorem prop_exp_rate
             (U.toCountablePrefixMachine hSem).initialResidualObserverFiberOdds
               (toCountablePolicy π hπ) (U.liftObserver ω)
               (U.toCountableEncodedProgram hSem pstar) := by
-  exact thm_separating_support_rate U π hπ hSem penv pstar ω δ T hBridge hStep
+  let Uc := U.toCountablePrefixMachine hSem
+  let πc := toCountablePolicy π hπ
+  let penvc := U.toCountableProgram hSem penv
+  let ωc := U.liftObserver ω
+  let pstarc := U.toCountableEncodedProgram hSem pstar
+  have hWitness : Uc.HasSupportwiseResidualContractionWitness πc penvc ωc pstarc δ T := by
+    simpa [Uc, πc, penvc, ωc, pstarc] using
+      U.hasSupportwiseResidualContractionWitness_of_prefixwiseResidualDecay
+        hCodes π hπ hπN hSem hSemN penv pstar ω δ T hStep
+  have hRate :
+      ∀ᵐ ξ ∂(Uc.trajectoryLaw πc penvc T).toMeasure,
+        ∀ N, N ≤ T →
+          Uc.residualObserverFiberProcess πc ωc pstarc N ξ ≤
+            posteriorDecayFactorENNReal δ ^ N * Uc.initialResidualObserverFiberOdds πc ωc pstarc :=
+    prop_exp_rate_of_witness Uc πc penvc ωc pstarc δ T hWitness
+  simpa [Uc, πc, penvc, ωc, pstarc] using hRate
 
 /-- Internal witness-transport helper for `prop:kernel-exp-rate`. -/
 theorem prop_kernel_exp_rate_of_witness
@@ -279,21 +299,16 @@ theorem prop_kernel_exp_rate_of_witness
 theorem prop_kernel_exp_rate
     [DecidableEq A] [DecidableEq O] [BEq A] [LawfulBEq A] [BEq O] [LawfulBEq O]
     (U : ConcretePrefixMachine A O)
+    (hCodes : U.CodesNodup)
     (π : ConcretePolicy A O) (hπ : ProbabilisticPolicy π)
+    (hπN : PolicySupportNodup π)
     (hSem : ∀ c hc, ProbabilisticKernel (U.semantics c hc))
+    (hSemN : SemanticsSupportNodup U)
     (penv : U.Program)
     (ω : Observer (EncodedProgram A O))
     {p q : U.Program}
     (δ : Rat) (T : Nat)
     (hView : ω.view (U.toEncodedProgram p) = ω.view (U.toEncodedProgram q))
-    (hBridge :
-      ∀ ξ n,
-        (U.toCountablePrefixMachine hSem).residualObserverFiberProcess
-            (toCountablePolicy π hπ) (U.liftObserver ω)
-            (U.toCountableEncodedProgram hSem p) n ξ =
-          ENNReal.ofReal
-            (U.residualObserverFiberPosteriorOdds π (prefixFullHist ξ n) ω
-              (U.toEncodedProgram p) : ℝ))
     (hStep :
       ∀ ξ, ξ ∈ ((U.toCountablePrefixMachine hSem).trajectoryLaw
         (toCountablePolicy π hπ) (U.toCountableProgram hSem penv) T).support →
@@ -323,7 +338,7 @@ theorem prop_kernel_exp_rate
       Uc.HasSupportwiseResidualContractionWitness πc penvc ωc pc δ T := by
     simpa [Uc, πc, penvc, ωc, pc] using
       U.hasSupportwiseResidualContractionWitness_of_prefixwiseResidualDecay
-        π hπ hSem penv p ω δ T hBridge hStep
+        hCodes π hπ hπN hSem hSemN penv p ω δ T hStep
   have hViewCountable : ωc.view pc = ωc.view qc := by
     exact (U.liftObserver_sameView_toCountableEncodedProgram_iff ω hSem p q).2 hView
   have hWitness' := lem_one_step_drift_kernel Uc πc penvc ωc δ T hViewCountable hWitness
@@ -356,21 +371,16 @@ theorem thm_exp_rate_concentration_of_witness
 theorem thm_exp_rate_concentration
     [DecidableEq A] [DecidableEq O] [BEq A] [LawfulBEq A] [BEq O] [LawfulBEq O]
     (U : ConcretePrefixMachine A O)
+    (hCodes : U.CodesNodup)
     (π : ConcretePolicy A O) (hπ : ProbabilisticPolicy π)
+    (hπN : PolicySupportNodup π)
     (hSem : ∀ c hc, ProbabilisticKernel (U.semantics c hc))
+    (hSemN : SemanticsSupportNodup U)
     (penv : U.Program)
     (ω : Observer (EncodedProgram A O))
     {p q : U.Program}
     (δ : Rat) (T : Nat)
     (hView : ω.view (U.toEncodedProgram p) = ω.view (U.toEncodedProgram q))
-    (hBridge :
-      ∀ ξ n,
-        (U.toCountablePrefixMachine hSem).residualObserverFiberProcess
-            (toCountablePolicy π hπ) (U.liftObserver ω)
-            (U.toCountableEncodedProgram hSem p) n ξ =
-          ENNReal.ofReal
-            (U.residualObserverFiberPosteriorOdds π (prefixFullHist ξ n) ω
-              (U.toEncodedProgram p) : ℝ))
     (hStep :
       ∀ ξ, ξ ∈ ((U.toCountablePrefixMachine hSem).trajectoryLaw
         (toCountablePolicy π hπ) (U.toCountableProgram hSem penv) T).support →
@@ -404,7 +414,7 @@ theorem thm_exp_rate_concentration
       Uc.HasSupportwiseResidualContractionWitness πc penvc ωc pc δ T := by
     simpa [Uc, πc, penvc, ωc, pc] using
       U.hasSupportwiseResidualContractionWitness_of_prefixwiseResidualDecay
-        π hπ hSem penv p ω δ T hBridge hStep
+        hCodes π hπ hπN hSem hSemN penv p ω δ T hStep
   have hViewCountable : ωc.view pc = ωc.view qc := by
     exact (U.liftObserver_sameView_toCountableEncodedProgram_iff ω hSem p q).2 hView
   have hWitness' := lem_one_step_drift_kernel Uc πc penvc ωc δ T hViewCountable hWitness

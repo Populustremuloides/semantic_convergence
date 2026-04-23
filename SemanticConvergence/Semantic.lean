@@ -484,29 +484,24 @@ theorem thm_separating_support_convergence_of_witness
 Bridged probabilistic wrapper for `thm:separating-support-convergence` on the
 first-principles Section 6 stack.
 
-This is the canonical paper-facing theorem name on the probabilistic track. It builds the
-supportwise residual contraction witness from an explicit bridge between the deterministic
-prefixwise residual-odds process and the countable trajectory-side process, then upgrades
-that witness to an almost-sure recurrence statement under the bridged `trajectoryLaw`.
+This is the canonical paper-facing theorem name on the probabilistic track. It derives the
+supportwise residual contraction witness internally from the deterministic prefixwise
+residual-odds process and the concrete-to-countable bridge layer, then upgrades that
+witness to an almost-sure recurrence statement under `trajectoryLaw`.
 -/
 theorem thm_separating_support_convergence
     {A : Type u} {O : Type v}
     [DecidableEq A] [DecidableEq O] [BEq A] [LawfulBEq A] [BEq O] [LawfulBEq O]
     [Encodable A] [Encodable O]
     (U : ConcretePrefixMachine A O)
+    (hCodes : U.CodesNodup)
     (π : ConcretePolicy A O) (hπ : ProbabilisticPolicy π)
+    (hπN : PolicySupportNodup π)
     (hSem : ∀ c hc, ProbabilisticKernel (U.semantics c hc))
+    (hSemN : SemanticsSupportNodup U)
     (penv pstar : U.Program)
     (ω : Observer (EncodedProgram A O))
     (δ : Rat) (T : Nat)
-    (hBridge :
-      ∀ ξ n,
-        (U.toCountablePrefixMachine hSem).residualObserverFiberProcess
-            (toCountablePolicy π hπ) (U.liftObserver ω)
-            (U.toCountableEncodedProgram hSem pstar) n ξ =
-          ENNReal.ofReal
-            (U.residualObserverFiberPosteriorOdds π (prefixFullHist ξ n) ω
-              (U.toEncodedProgram pstar) : ℝ))
     (hStep :
       ∀ ξ, ξ ∈ ((U.toCountablePrefixMachine hSem).trajectoryLaw
         (toCountablePolicy π hπ) (U.toCountableProgram hSem penv) T).support →
@@ -535,7 +530,7 @@ theorem thm_separating_support_convergence
       Uc.HasSupportwiseResidualContractionWitness πc penvc ωc pstarc δ T := by
     simpa [Uc, πc, penvc, ωc, pstarc] using
       U.hasSupportwiseResidualContractionWitness_of_prefixwiseResidualDecay
-        π hπ hSem penv pstar ω δ T hBridge hStep
+        hCodes π hπ hπN hSem hSemN penv pstar ω δ T hStep
   simpa [Uc, πc, penvc, ωc, pstarc] using
     thm_separating_support_convergence_of_witness Uc πc penvc ωc pstarc δ T hWitness
 
@@ -570,19 +565,14 @@ theorem thm_separating_support_rate
     [DecidableEq A] [DecidableEq O] [BEq A] [LawfulBEq A] [BEq O] [LawfulBEq O]
     [Encodable A] [Encodable O]
     (U : ConcretePrefixMachine A O)
+    (hCodes : U.CodesNodup)
     (π : ConcretePolicy A O) (hπ : ProbabilisticPolicy π)
+    (hπN : PolicySupportNodup π)
     (hSem : ∀ c hc, ProbabilisticKernel (U.semantics c hc))
+    (hSemN : SemanticsSupportNodup U)
     (penv pstar : U.Program)
     (ω : Observer (EncodedProgram A O))
     (δ : Rat) (T : Nat)
-    (hBridge :
-      ∀ ξ n,
-        (U.toCountablePrefixMachine hSem).residualObserverFiberProcess
-            (toCountablePolicy π hπ) (U.liftObserver ω)
-            (U.toCountableEncodedProgram hSem pstar) n ξ =
-          ENNReal.ofReal
-            (U.residualObserverFiberPosteriorOdds π (prefixFullHist ξ n) ω
-              (U.toEncodedProgram pstar) : ℝ))
     (hStep :
       ∀ ξ, ξ ∈ ((U.toCountablePrefixMachine hSem).trajectoryLaw
         (toCountablePolicy π hπ) (U.toCountableProgram hSem penv) T).support →
@@ -611,7 +601,7 @@ theorem thm_separating_support_rate
       Uc.HasSupportwiseResidualContractionWitness πc penvc ωc pstarc δ T := by
     simpa [Uc, πc, penvc, ωc, pstarc] using
       U.hasSupportwiseResidualContractionWitness_of_prefixwiseResidualDecay
-        π hπ hSem penv pstar ω δ T hBridge hStep
+        hCodes π hπ hπN hSem hSemN penv pstar ω δ T hStep
   simpa [Uc, πc, penvc, ωc, pstarc] using
     thm_separating_support_rate_of_witness Uc πc penvc ωc pstarc δ T hWitness
 
@@ -662,19 +652,14 @@ theorem cor_separating_support_finite_time
     [DecidableEq A] [DecidableEq O] [BEq A] [LawfulBEq A] [BEq O] [LawfulBEq O]
     [Encodable A] [Encodable O]
     (U : ConcretePrefixMachine A O)
+    (hCodes : U.CodesNodup)
     (π : ConcretePolicy A O) (hπ : ProbabilisticPolicy π)
+    (hπN : PolicySupportNodup π)
     (hSem : ∀ c hc, ProbabilisticKernel (U.semantics c hc))
+    (hSemN : SemanticsSupportNodup U)
     (penv pstar : U.Program)
     (ω : Observer (EncodedProgram A O))
     (δ : Rat) (T : Nat)
-    (hBridge :
-      ∀ ξ n,
-        (U.toCountablePrefixMachine hSem).residualObserverFiberProcess
-            (toCountablePolicy π hπ) (U.liftObserver ω)
-            (U.toCountableEncodedProgram hSem pstar) n ξ =
-          ENNReal.ofReal
-            (U.residualObserverFiberPosteriorOdds π (prefixFullHist ξ n) ω
-              (U.toEncodedProgram pstar) : ℝ))
     (hStep :
       ∀ ξ, ξ ∈ ((U.toCountablePrefixMachine hSem).trajectoryLaw
         (toCountablePolicy π hπ) (U.toCountableProgram hSem penv) T).support →
@@ -707,7 +692,7 @@ theorem cor_separating_support_finite_time
       Uc.HasSupportwiseResidualContractionWitness πc penvc ωc pstarc δ T := by
     simpa [Uc, πc, penvc, ωc, pstarc] using
       U.hasSupportwiseResidualContractionWitness_of_prefixwiseResidualDecay
-        π hπ hSem penv pstar ω δ T hBridge hStep
+        hCodes π hπ hπN hSem hSemN penv pstar ω δ T hStep
   simpa [Uc, πc, penvc, ωc, pstarc] using
     cor_separating_support_finite_time_of_witness
       Uc πc penvc ωc pstarc δ T hWitness hInitTop

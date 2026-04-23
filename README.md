@@ -18,7 +18,7 @@ and classifies deviations from the canonical baseline.
 - `fullyFirstPrinciples = true`
 - `semanticAuditClosed = true`
 - `0` manifest-tracked entries are in suspicious proof classes
-- `lean_axiom_audit.md` currently reports `72` canonical-baseline rows, `24`
+- `lean_axiom_audit.md` currently reports `62` canonical-baseline rows, `34`
   expected `native_decide`-auxiliary rows, `10` lighter-than-baseline rows,
   and `0` genuine unexpected drift rows
 - `lean_axiom_audit.md` records the actual per-declaration axiom dependencies
@@ -37,10 +37,26 @@ Section 6 status note:
   corresponding almost-sure `N`-step residual-odds rate bound and almost-sure
   lower bound on the realized observer-fiber posterior share on the same
   bridged realized process.
+- No public Section 6 theorem now carries an external bridge-equation
+  hypothesis: the deterministic-to-probabilistic process transport is derived
+  internally through `SemanticConvergence.ConcreteSubstrateBridge`.
 - `SemanticConvergence.thm_semantic_convergence` and
   `SemanticConvergence.thm_kernel_semantic_convergence` currently certify the
   corresponding selector and kernel realizations inside that closed semantic
   theorem stack.
+
+Boundary and surrogate status note:
+
+- `SemanticConvergence.thm_afe_near_miss` now packages both the explicit
+  action-level near-miss witness and the paper-facing finite-horizon
+  frozen-posterior failure shape.
+- `SemanticConvergence.thm_amortized_surrogate` now lives on the concrete
+  deployment-side stack, exposes finite-list counterparts of the paper's
+  assumptions `(A1)`--`(A3)`, and derives the separating-support floor/support
+  theorem for the implemented surrogate law.
+- `SemanticConvergence.cor_amortized_surrogate_finite_time` then converts that
+  deployment-side support floor into the corresponding deterministic residual-
+  odds finite-time consequence used by the recovery stack.
 
 The generated status artifacts are:
 

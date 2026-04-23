@@ -226,7 +226,7 @@ Real-valued prefix weight on a codeword, viewed in `ℝ≥0∞` so it can partic
 style countable sums without collapsing back to the old rational substrate.
 -/
 def codeWeightENNReal (c : BitCode) : ENNReal :=
-  ENNReal.ofReal ((1 / 2 : ℝ) ^ c.length)
+  ENNReal.ofReal (codeWeight c : ℝ)
 
 /-- Countable universal prior weight on an enumerable machine-domain program. -/
 def universalWeight (U : CountablePrefixMachine A O) (p : U.Program) : ENNReal :=
