@@ -37,10 +37,17 @@ Migration conventions:
 - Exact per-declaration axiom dependencies are published in `lean_axiom_audit.md`.
 - While substantive sources still use `native_decide`, the generated axiom audit treats the corresponding compiled helper axiom as expected rather than as drift.
 
+Probabilistic bridge-surface snapshot:
+- Public probabilistic bridge entries audited: `8`
+- Public bridge entries carrying `HasSupportwiseResidualContractionWitness`: `0`
+- Public bridge entries carrying `hBridge`: `0`
+- Public bridge entries rooted at `ConcretePrefixMachine` inputs: `8`
+- Probabilistic bridge surface closed: `yes`
+
 Proof-shape snapshot:
-- `substantive`: `56`
-- `definition`: `37`
-- `constructive-existential`: `10`
+- `substantive`: `59`
+- `definition`: `36`
+- `constructive-existential`: `8`
 - `rate-composition`: `3`
 - `single-lemma-application`: `0`
 - `definitional-unfold`: `0`
@@ -68,12 +75,12 @@ Proof-shape snapshot:
 | 16 | definition | `def:two-observer-functional` | Two-observer variational functional | 456-474 | `SemanticConvergence.Functional` | `def_two_observer_functional` | `SemanticConvergence.def_two_observer_functional` | `derived` | `concrete-stack` | `migrated-to-concrete` | `definition` |
 | 17 | proposition | `prop:two-observer-minimizer` | Exact global minimizer of the two-observer functional | 476-486 | `SemanticConvergence.Functional` | `prop_two_observer_minimizer` | `SemanticConvergence.prop_two_observer_minimizer` | `derived` | `concrete-stack` | `migrated-to-concrete` | `substantive` |
 | 18 | definition | `def:kernel-functional` | Kernel lift of the two-observer functional | 511-521 | `SemanticConvergence.Functional` | `def_kernel_functional` | `SemanticConvergence.def_kernel_functional` | `derived` | `concrete-stack` | `migrated-to-concrete` | `definition` |
-| 19 | proposition | `prop:kernel-functional-minimizer` | Exact global minimizer of the kernel lift | 523-533 | `SemanticConvergence.Functional` | `prop_kernel_functional_minimizer` | `SemanticConvergence.prop_kernel_functional_minimizer` | `derived` | `concrete-stack` | `migrated-to-concrete` | `constructive-existential` |
-| 20 | proposition | `prop:kernel-functional-minimizer-compact` | Exact global minimizer of the compact-action kernel lift | 556-577 | `SemanticConvergence.Functional` | `prop_kernel_functional_minimizer_compact` | `SemanticConvergence.prop_kernel_functional_minimizer_compact` | `derived` | `concrete-stack` | `migrated-to-concrete` | `constructive-existential` |
+| 19 | proposition | `prop:kernel-functional-minimizer` | Exact global minimizer of the kernel lift | 523-533 | `SemanticConvergence.Functional` | `prop_kernel_functional_minimizer` | `SemanticConvergence.prop_kernel_functional_minimizer` | `derived` | `concrete-stack` | `migrated-to-concrete` | `substantive` |
+| 20 | proposition | `prop:kernel-functional-minimizer-compact` | Exact global minimizer of the compact-action kernel lift | 556-577 | `SemanticConvergence.Functional` | `prop_kernel_functional_minimizer_compact` | `SemanticConvergence.prop_kernel_functional_minimizer_compact` | `derived` | `concrete-stack` | `migrated-to-concrete` | `substantive` |
 | 21 | definition | `def:meeting-point-shorthand` | Meeting-point specialization | 605-616 | `SemanticConvergence.Functional` | `def_meeting_point_shorthand` | `SemanticConvergence.def_meeting_point_shorthand` | `derived` | `concrete-stack` | `migrated-to-concrete` | `definition` |
 | 22 | proposition | `prop:belief-invariance-above` | Belief-observer invariance above $\omega_{\mathrm{behav}}$ | 625-632 | `SemanticConvergence.Functional` | `prop_belief_invariance_above` | `SemanticConvergence.prop_belief_invariance_above` | `derived` | `concrete-stack` | `migrated-to-concrete` | `substantive` |
 | 23 | proposition | `prop:belief-illtyped-below` | Belief-observer ill-typing below $\omega_{\mathrm{behav}}$ | 645-648 | `SemanticConvergence.Functional` | `prop_belief_illtyped_below` | `SemanticConvergence.prop_belief_illtyped_below` | `derived` | `concrete-stack` | `migrated-to-concrete` | `substantive` |
-| 24 | proposition | `prop:action-cap` | Action-observer cap | 661-669 | `SemanticConvergence.Functional` | `prop_action_cap` | `SemanticConvergence.prop_action_cap` | `derived` | `concrete-stack` | `migrated-to-concrete` | `definition` |
+| 24 | proposition | `prop:action-cap` | Action-observer cap | 661-669 | `SemanticConvergence.Functional` | `prop_action_cap` | `SemanticConvergence.prop_action_cap` | `derived` | `concrete-stack` | `migrated-to-concrete` | `substantive` |
 | 25 | corollary | `cor:twins-frozen-ratio` | Behavioral twins have frozen posterior ratio | 683-690 | `SemanticConvergence.Functional` | `cor_twins_frozen_ratio` | `SemanticConvergence.cor_twins_frozen_ratio` | `derived` | `concrete-stack` | `migrated-to-concrete` | `substantive` |
 | 26 | theorem | `thm:meeting-point` | Meeting point | 705-715 | `SemanticConvergence.Functional` | `thm_meeting_point` | `SemanticConvergence.thm_meeting_point` | `derived` | `concrete-stack` | `migrated-to-concrete` | `substantive` |
 | 27 | corollary | `cor:canonical-pair` | Canonical two-observer choice | 721-724 | `SemanticConvergence.Functional` | `cor_canonical_pair` | `SemanticConvergence.cor_canonical_pair` | `derived` | `concrete-stack` | `migrated-to-concrete` | `substantive` |

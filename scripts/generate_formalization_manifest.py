@@ -79,6 +79,17 @@ TITLE_OVERRIDES = {
     "thm:exp-rate-concentration": "Finite-time positive-floor rate transfer",
 }
 
+PUBLIC_PROBABILISTIC_BRIDGE_LABELS = {
+    "thm:separating-support-convergence",
+    "thm:separating-support-rate",
+    "cor:separating-support-finite-time",
+    "lem:one-step-drift",
+    "prop:exp-rate",
+    "prop:kernel-exp-rate",
+    "thm:exp-rate-concentration",
+    "cor:noise-transfer",
+}
+
 MANIFEST_ENTRY_COMMENTS = {
     "thm:separating-support-convergence": [
         "    /-",
@@ -787,6 +798,12 @@ def classify_decl(kind: str, name: str, text: str) -> tuple[str, str]:
     return "substantive", body_compact
 
 
+def statement_text(text: str) -> str:
+    if ":=" not in text:
+        return text.strip()
+    return text.split(":=", 1)[0].strip()
+
+
 def parse_lean_declarations() -> list[LeanDecl]:
     decls: list[LeanDecl] = []
     for path in sorted(LEAN_SRC_DIR.glob("*.lean")):
@@ -843,6 +860,8 @@ def choose_decl_for_entry(
         decl for decl in decls if decl.module == module and decl.name == name
     ]
     if not candidates:
+        candidates = [decl for decl in decls if decl.name == name]
+    if not candidates:
         return None
     concrete_candidates = [
         decl for decl in candidates if ".ConcretePaper" in decl.qualified_name
@@ -875,9 +894,22 @@ def enrich_manifest_entries(
     for entry in entries:
         enriched_entry = dict(entry)
         chosen_decl = choose_decl_for_entry(entry, decls)
+        stmt = statement_text(chosen_decl.text) if chosen_decl is not None else ""
+        is_public_bridge_surface = str(entry["label"]) in PUBLIC_PROBABILISTIC_BRIDGE_LABELS
         enriched_entry["proof_kind"] = proof_kind_for_entry(entry, decls)
         enriched_entry["qualified_decl_name"] = (
             chosen_decl.qualified_name if chosen_decl is not None else str(entry["decl_name"])
+        )
+        enriched_entry["public_probabilistic_bridge_surface"] = is_public_bridge_surface
+        enriched_entry["public_probabilistic_bridge_witness_hyp"] = (
+            is_public_bridge_surface
+            and "HasSupportwiseResidualContractionWitness" in stmt
+        )
+        enriched_entry["public_probabilistic_bridge_equation_hyp"] = (
+            is_public_bridge_surface and "hBridge" in stmt
+        )
+        enriched_entry["public_probabilistic_bridge_concrete_root"] = (
+            is_public_bridge_surface and "ConcretePrefixMachine" in stmt
         )
         enriched.append(enriched_entry)
     return enriched
@@ -986,6 +1018,24 @@ def render_markdown(entries: list[dict[str, object]], axiom_map: dict[str, list[
     pending_migration_count = sum(
         entry["migration_status"] == "pending-concrete-migration" for entry in entries
     )
+    public_bridge_entries = [
+        entry for entry in entries if entry["public_probabilistic_bridge_surface"]
+    ]
+    public_bridge_witness_hyp_entries = [
+        entry for entry in public_bridge_entries if entry["public_probabilistic_bridge_witness_hyp"]
+    ]
+    public_bridge_equation_hyp_entries = [
+        entry for entry in public_bridge_entries if entry["public_probabilistic_bridge_equation_hyp"]
+    ]
+    public_bridge_concrete_root_entries = [
+        entry for entry in public_bridge_entries if entry["public_probabilistic_bridge_concrete_root"]
+    ]
+    public_bridge_surface_closed = (
+        len(public_bridge_entries) == len(PUBLIC_PROBABILISTIC_BRIDGE_LABELS)
+        and len(public_bridge_witness_hyp_entries) == 0
+        and len(public_bridge_equation_hyp_entries) == 0
+        and len(public_bridge_concrete_root_entries) == len(public_bridge_entries)
+    )
     axiom_groups = axiom_status_groups(entries, axiom_map)
     lines = [
         "# Formalization Manifest",
@@ -1026,6 +1076,13 @@ def render_markdown(entries: list[dict[str, object]], axiom_map: dict[str, list[
         f"- Axiom-audit rows with genuine unexpected drift: `{len(axiom_groups[GENUINE_AXIOM_DRIFT_STATUS])}`",
         "- Exact per-declaration axiom dependencies are published in `lean_axiom_audit.md`.",
         "- While substantive sources still use `native_decide`, the generated axiom audit treats the corresponding compiled helper axiom as expected rather than as drift.",
+        "",
+        "Probabilistic bridge-surface snapshot:",
+        f"- Public probabilistic bridge entries audited: `{len(public_bridge_entries)}`",
+        f"- Public bridge entries carrying `HasSupportwiseResidualContractionWitness`: `{len(public_bridge_witness_hyp_entries)}`",
+        f"- Public bridge entries carrying `hBridge`: `{len(public_bridge_equation_hyp_entries)}`",
+        f"- Public bridge entries rooted at `ConcretePrefixMachine` inputs: `{len(public_bridge_concrete_root_entries)}`",
+        f"- Probabilistic bridge surface closed: `{'yes' if public_bridge_surface_closed else 'no'}`",
         "",
         "Proof-shape snapshot:",
         f"- `substantive`: `{proof_kind_counts['substantive']}`",
@@ -1103,6 +1160,24 @@ def render_audit(entries: list[dict[str, object]], axiom_map: dict[str, list[str
         if entry["first_principles_status"] == "abstract-interface"
         and str(entry["module"]) in ABSTRACT_TO_CONCRETE
     )
+    public_bridge_entries = [
+        entry for entry in entries if entry["public_probabilistic_bridge_surface"]
+    ]
+    public_bridge_witness_hyp_entries = [
+        entry for entry in public_bridge_entries if entry["public_probabilistic_bridge_witness_hyp"]
+    ]
+    public_bridge_equation_hyp_entries = [
+        entry for entry in public_bridge_entries if entry["public_probabilistic_bridge_equation_hyp"]
+    ]
+    public_bridge_concrete_root_entries = [
+        entry for entry in public_bridge_entries if entry["public_probabilistic_bridge_concrete_root"]
+    ]
+    public_bridge_surface_closed = (
+        len(public_bridge_entries) == len(PUBLIC_PROBABILISTIC_BRIDGE_LABELS)
+        and len(public_bridge_witness_hyp_entries) == 0
+        and len(public_bridge_equation_hyp_entries) == 0
+        and len(public_bridge_concrete_root_entries) == len(public_bridge_entries)
+    )
     axiom_groups = axiom_status_groups(entries, axiom_map)
 
     lines = [
@@ -1132,6 +1207,17 @@ def render_audit(entries: list[dict[str, object]], axiom_map: dict[str, list[str
         f"- Abstract-interface declarations with a concrete substrate bridge in repo: `{bridge_ready_abstract_count}`",
         f"- Concrete substrate modules present: `{len(CONCRETE_SUBSTRATE_MODULES)}`",
         f"- First-principles complete: `{'yes' if fp_counts['abstract-interface'] == 0 and status_counts['wrapped'] == 0 and status_counts['declared'] == 0 and unlabeled_count == 0 and semantic_audit_closed else 'no'}`",
+        "",
+        "## Probabilistic Bridge Surface",
+        f"- Public probabilistic bridge entries audited: `{len(public_bridge_entries)}`",
+        f"- Public bridge entries carrying `HasSupportwiseResidualContractionWitness`: `{len(public_bridge_witness_hyp_entries)}`",
+        f"- Public bridge entries carrying `hBridge`: `{len(public_bridge_equation_hyp_entries)}`",
+        f"- Public bridge entries rooted at `ConcretePrefixMachine` inputs: `{len(public_bridge_concrete_root_entries)}` / `{len(public_bridge_entries)}`",
+        f"- Probabilistic bridge surface closed: `{'yes' if public_bridge_surface_closed else 'no'}`",
+        "",
+        "Interpretation:",
+        "- This audit targets the public probabilistic Section 6 / rate / noise theorem names.",
+        "- Closure here means those public declarations start from `ConcretePrefixMachine` data and carry neither an external supportwise-witness hypothesis nor an external bridge-equation hypothesis.",
         "",
         "## Axiom Audit Snapshot",
         f"- Manifest-tracked declarations audited by `#print axioms`: `{len(entries)}`",
@@ -1959,6 +2045,25 @@ def render_lean(entries: list[dict[str, object]]) -> str:
     suspicious_manifest_entry_count = sum(
         is_suspicious_proof_kind(str(entry["proof_kind"])) for entry in entries
     )
+    public_probabilistic_bridge_entry_count = sum(
+        bool(entry["public_probabilistic_bridge_surface"]) for entry in entries
+    )
+    public_probabilistic_bridge_witness_hyp_entry_count = sum(
+        bool(entry["public_probabilistic_bridge_witness_hyp"]) for entry in entries
+    )
+    public_probabilistic_bridge_equation_hyp_entry_count = sum(
+        bool(entry["public_probabilistic_bridge_equation_hyp"]) for entry in entries
+    )
+    public_probabilistic_bridge_concrete_root_entry_count = sum(
+        bool(entry["public_probabilistic_bridge_concrete_root"]) for entry in entries
+    )
+    public_probabilistic_bridge_surface_closed = (
+        public_probabilistic_bridge_entry_count == len(PUBLIC_PROBABILISTIC_BRIDGE_LABELS)
+        and public_probabilistic_bridge_witness_hyp_entry_count == 0
+        and public_probabilistic_bridge_equation_hyp_entry_count == 0
+        and public_probabilistic_bridge_concrete_root_entry_count
+        == public_probabilistic_bridge_entry_count
+    )
     semantic_audit_closed = (
         suspicious_manifest_entry_count == 0
         and definition_entries_tagged_count == definition_entry_count
@@ -2013,6 +2118,10 @@ def render_lean(entries: list[dict[str, object]]) -> str:
         "  firstPrinciplesStatus : FirstPrinciplesStatus",
         "  migrationStatus : MigrationStatus",
         "  proofKind : ProofKind",
+        "  publicProbabilisticBridgeSurface : Bool",
+        "  publicProbabilisticBridgeWitnessHyp : Bool",
+        "  publicProbabilisticBridgeEquationHyp : Bool",
+        "  publicProbabilisticBridgeConcreteRoot : Bool",
         "deriving Repr, DecidableEq",
         "",
         "/-- Generated coverage list for the canonical TeX source. -/",
@@ -2050,6 +2159,14 @@ def render_lean(entries: list[dict[str, object]]) -> str:
                     "placeholder-truth": "placeholderTruth",
                     "heuristic-other": "heuristicOther",
                 }[str(entry["proof_kind"])]
+                + "\n      publicProbabilisticBridgeSurface := "
+                + str(bool(entry["public_probabilistic_bridge_surface"])).lower()
+                + "\n      publicProbabilisticBridgeWitnessHyp := "
+                + str(bool(entry["public_probabilistic_bridge_witness_hyp"])).lower()
+                + "\n      publicProbabilisticBridgeEquationHyp := "
+                + str(bool(entry["public_probabilistic_bridge_equation_hyp"])).lower()
+                + "\n      publicProbabilisticBridgeConcreteRoot := "
+                + str(bool(entry["public_probabilistic_bridge_concrete_root"])).lower()
                 + " },",
             ]
         )
@@ -2135,6 +2252,18 @@ def render_lean(entries: list[dict[str, object]]) -> str:
             "      entry.proofKind = ProofKind.placeholderTruth ||",
             "      entry.proofKind = ProofKind.heuristicOther)",
             "",
+            "def publicProbabilisticBridgeEntryCount : Nat :=",
+            "  manifestEntries.countP (fun entry => entry.publicProbabilisticBridgeSurface)",
+            "",
+            "def publicProbabilisticBridgeWitnessHypEntryCount : Nat :=",
+            "  manifestEntries.countP (fun entry => entry.publicProbabilisticBridgeWitnessHyp)",
+            "",
+            "def publicProbabilisticBridgeEquationHypEntryCount : Nat :=",
+            "  manifestEntries.countP (fun entry => entry.publicProbabilisticBridgeEquationHyp)",
+            "",
+            "def publicProbabilisticBridgeConcreteRootEntryCount : Nat :=",
+            "  manifestEntries.countP (fun entry => entry.publicProbabilisticBridgeConcreteRoot)",
+            "",
             f"def concreteSubstrateModuleCount : Nat := {len(CONCRETE_SUBSTRATE_MODULES)}",
             "",
             "def bridgeReadyAbstractEntryCount : Nat :=",
@@ -2217,6 +2346,18 @@ def render_lean(entries: list[dict[str, object]]) -> str:
             f"theorem suspiciousManifestEntryCount_eq : suspiciousManifestEntryCount = {suspicious_manifest_entry_count} := by",
             "  native_decide",
             "",
+            f"theorem publicProbabilisticBridgeEntryCount_eq : publicProbabilisticBridgeEntryCount = {public_probabilistic_bridge_entry_count} := by",
+            "  native_decide",
+            "",
+            f"theorem publicProbabilisticBridgeWitnessHypEntryCount_eq : publicProbabilisticBridgeWitnessHypEntryCount = {public_probabilistic_bridge_witness_hyp_entry_count} := by",
+            "  native_decide",
+            "",
+            f"theorem publicProbabilisticBridgeEquationHypEntryCount_eq : publicProbabilisticBridgeEquationHypEntryCount = {public_probabilistic_bridge_equation_hyp_entry_count} := by",
+            "  native_decide",
+            "",
+            f"theorem publicProbabilisticBridgeConcreteRootEntryCount_eq : publicProbabilisticBridgeConcreteRootEntryCount = {public_probabilistic_bridge_concrete_root_entry_count} := by",
+            "  native_decide",
+            "",
             f"theorem concreteSubstrateModuleCount_eq : concreteSubstrateModuleCount = {len(CONCRETE_SUBSTRATE_MODULES)} := rfl",
             "",
             f"theorem bridgeReadyAbstractEntryCount_eq : bridgeReadyAbstractEntryCount = {sum(entry['first_principles_status'] == 'abstract-interface' and str(entry['module']) in ABSTRACT_TO_CONCRETE for entry in entries)} := by",
@@ -2249,6 +2390,12 @@ def render_lean(entries: list[dict[str, object]]) -> str:
             "    manifestDefinitionEntriesTaggedAsDefinitionCount = manifestDefinitionEntryCount &&",
             "    manifestTheoremLikeSemanticallyAuditedEntryCount = manifestTheoremLikeEntryCount",
             "",
+            "def publicProbabilisticBridgeSurfaceClosed : Bool :=",
+            f"  publicProbabilisticBridgeEntryCount = {len(PUBLIC_PROBABILISTIC_BRIDGE_LABELS)} &&",
+            "    publicProbabilisticBridgeWitnessHypEntryCount = 0 &&",
+            "    publicProbabilisticBridgeEquationHypEntryCount = 0 &&",
+            "    publicProbabilisticBridgeConcreteRootEntryCount = publicProbabilisticBridgeEntryCount",
+            "",
             "def fullyCovered : Bool :=",
             "  paperFullyCovered",
             "",
@@ -2256,7 +2403,7 @@ def render_lean(entries: list[dict[str, object]]) -> str:
             "  paperFullyDerived",
             "",
             "def fullyFirstPrinciples : Bool :=",
-            "  abstractInterfaceEntryCount = 0 && paperFullyDerived && semanticAuditClosed",
+            "  abstractInterfaceEntryCount = 0 && paperFullyDerived && semanticAuditClosed && publicProbabilisticBridgeSurfaceClosed",
             "",
             f"theorem paperFullyCovered_eq : paperFullyCovered = {str(sum(entry['status'] == 'declared' for entry in entries) == 0 and sum(str(entry['label']).startswith('auto__') for entry in entries) == 0).lower()} := by",
             "  native_decide",
@@ -2267,11 +2414,14 @@ def render_lean(entries: list[dict[str, object]]) -> str:
             f"theorem semanticAuditClosed_eq : semanticAuditClosed = {str(semantic_audit_closed).lower()} := by",
             "  native_decide",
             "",
+            f"theorem publicProbabilisticBridgeSurfaceClosed_eq : publicProbabilisticBridgeSurfaceClosed = {str(public_probabilistic_bridge_surface_closed).lower()} := by",
+            "  native_decide",
+            "",
             "theorem fullyCovered_eq : fullyCovered = paperFullyCovered := rfl",
             "",
             "theorem fullyDerived_eq : fullyDerived = paperFullyDerived := rfl",
             "",
-            f"theorem fullyFirstPrinciples_eq : fullyFirstPrinciples = {str(sum(entry['first_principles_status'] == 'abstract-interface' for entry in entries) == 0 and sum(entry['status'] == 'wrapped' for entry in entries) == 0 and sum(entry['status'] == 'declared' for entry in entries) == 0 and sum(str(entry['label']).startswith('auto__') for entry in entries) == 0 and semantic_audit_closed).lower()} := by",
+            f"theorem fullyFirstPrinciples_eq : fullyFirstPrinciples = {str(sum(entry['first_principles_status'] == 'abstract-interface' for entry in entries) == 0 and sum(entry['status'] == 'wrapped' for entry in entries) == 0 and sum(entry['status'] == 'declared' for entry in entries) == 0 and sum(str(entry['label']).startswith('auto__') for entry in entries) == 0 and semantic_audit_closed and public_probabilistic_bridge_surface_closed).lower()} := by",
             "  native_decide",
             "",
             "end SemanticConvergence",

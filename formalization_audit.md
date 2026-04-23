@@ -25,6 +25,17 @@ The target notion of first-principles completion is specified in
 - Concrete substrate modules present: `11`
 - First-principles complete: `yes`
 
+## Probabilistic Bridge Surface
+- Public probabilistic bridge entries audited: `8`
+- Public bridge entries carrying `HasSupportwiseResidualContractionWitness`: `0`
+- Public bridge entries carrying `hBridge`: `0`
+- Public bridge entries rooted at `ConcretePrefixMachine` inputs: `8` / `8`
+- Probabilistic bridge surface closed: `yes`
+
+Interpretation:
+- This audit targets the public probabilistic Section 6 / rate / noise theorem names.
+- Closure here means those public declarations start from `ConcretePrefixMachine` data and carry neither an external supportwise-witness hypothesis nor an external bridge-equation hypothesis.
+
 ## Axiom Audit Snapshot
 - Manifest-tracked declarations audited by `#print axioms`: `106`
 - Rows matching the canonical baseline `['propext', 'Classical.choice', 'Quot.sound']`: `62`
@@ -36,9 +47,9 @@ The target notion of first-principles completion is specified in
 - `fullyFirstPrinciples = true` is a trust-boundary and proof-shape statement; exact axiom dependencies are tracked separately by the published axiom audit.
 
 ## Proof-Shape Snapshot
-- Substantive entries: `56`
-- Definition entries: `37`
-- Constructive-existential entries: `10`
+- Substantive entries: `59`
+- Definition entries: `36`
+- Constructive-existential entries: `8`
 - Rate-composition entries: `3`
 - Single-lemma-application entries: `0`
 - Definitional-unfold entries: `0`

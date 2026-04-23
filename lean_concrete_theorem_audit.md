@@ -24,8 +24,8 @@ Concrete proof-shape counts:
 - `heuristic-other`: `0`
 
 Paper-facing proof-shape counts:
-- `substantive`: `56`
-- `constructive-existential`: `10`
+- `substantive`: `59`
+- `constructive-existential`: `8`
 - `rate-composition`: `3`
 - `single-lemma-application`: `0`
 - `definitional-unfold`: `0`
@@ -47,7 +47,7 @@ Acceptance rule used here:
 | `SemanticConvergence.ConcreteBoundary` | `SemanticConvergence.ConcretePrefixMachine.riskMinusInformationGain_of_rfl` | `177-186` | `single-lemma-application` | single helper application |
 | `SemanticConvergence.ConcreteCore` | `SemanticConvergence.reachableHist_mem_support` | `250-255` | `single-lemma-application` | single helper application |
 | `SemanticConvergence.ConcreteCore` | `SemanticConvergence.reachableFullHist_mem_support` | `256-261` | `single-lemma-application` | single helper application |
-| `SemanticConvergence.ConcreteFunctional` | `SemanticConvergence.argminOnList_spec` | `296-304` | `single-lemma-application` | single helper application |
+| `SemanticConvergence.ConcreteFunctional` | `SemanticConvergence.argminOnList_spec` | `456-464` | `single-lemma-application` | single helper application |
 | `SemanticConvergence.ConcretePrior` | `SemanticConvergence.pow2_ne_zero` | `51-53` | `single-lemma-application` | single helper application |
 | `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.ae_residualObserverFiberRecurrence_of_witness` | `338-356` | `single-lemma-application` | single helper application |
 | `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.ae_residualObserverFiberRateBound_of_witness` | `357-372` | `single-lemma-application` | single helper application |
@@ -99,9 +99,9 @@ None.
 | `SemanticConvergence.ConcreteCore` | `SemanticConvergence.CountableConcrete.reachableHist_iff_ne_zero` | `364-374` | `substantive` | substantive theorem proof |
 | `SemanticConvergence.ConcreteFunctional` | `SemanticConvergence.ConcreteLaw.restrict_mass_of_pos` | `42-46` | `substantive` | substantive theorem proof |
 | `SemanticConvergence.ConcreteFunctional` | `SemanticConvergence.ConcreteLaw.restrict_mass_of_neg` | `47-54` | `substantive` | substantive theorem proof |
-| `SemanticConvergence.ConcreteFunctional` | `SemanticConvergence.lawL1_self` | `225-249` | `substantive` | substantive theorem proof |
-| `SemanticConvergence.ConcreteFunctional` | `SemanticConvergence.exists_minimizerOnList` | `253-292` | `constructive-existential` | substantive theorem proof |
-| `SemanticConvergence.ConcreteFunctional` | `SemanticConvergence.argminOnList_spec` | `296-304` | `single-lemma-application` | single helper application |
+| `SemanticConvergence.ConcreteFunctional` | `SemanticConvergence.lawL1_self` | `385-409` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteFunctional` | `SemanticConvergence.exists_minimizerOnList` | `413-452` | `constructive-existential` | substantive theorem proof |
+| `SemanticConvergence.ConcreteFunctional` | `SemanticConvergence.argminOnList_spec` | `456-464` | `single-lemma-application` | single helper application |
 | `SemanticConvergence.ConcreteHierarchy` | `SemanticConvergence.EncodedProgram.intSemClass_self` | `104-110` | `substantive` | substantive theorem proof |
 | `SemanticConvergence.ConcreteHierarchy` | `SemanticConvergence.EncodedProgram.intSemClass_subset_policyPred` | `111-117` | `substantive` | substantive theorem proof |
 | `SemanticConvergence.ConcreteHierarchy` | `SemanticConvergence.EncodedProgram.policyPred_subset_historyCompat` | `118-125` | `substantive` | substantive theorem proof |
@@ -310,11 +310,11 @@ None.
 
 | Label | Module | Decl | Lines | Proof kind | Resolution |
 | --- | --- | --- | --- | --- | --- |
-| `lem:prior-invariance` | `SemanticConvergence.Belief` | `SemanticConvergence.lem_prior_invariance` | `49-55` | `definition` | explicit definitional theorem |
-| `lem:prior-necessity` | `SemanticConvergence.Belief` | `SemanticConvergence.lem_prior_necessity` | `56-63` | `definition` | explicit definitional theorem |
-| `lem:variational` | `SemanticConvergence.Belief` | `SemanticConvergence.lem_variational` | `64-77` | `substantive` | substantive theorem proof |
-| `lem:kl-necessity` | `SemanticConvergence.Belief` | `SemanticConvergence.lem_kl_necessity` | `78-88` | `substantive` | substantive theorem proof |
-| `lem:merging` | `SemanticConvergence.Belief` | `SemanticConvergence.lem_merging` | `89-101` | `substantive` | substantive theorem proof |
+| `lem:prior-invariance` | `SemanticConvergence.Belief` | `SemanticConvergence.lem_prior_invariance` | `28-34` | `definition` | explicit definitional theorem |
+| `lem:prior-necessity` | `SemanticConvergence.Belief` | `SemanticConvergence.lem_prior_necessity` | `35-42` | `definition` | explicit definitional theorem |
+| `lem:variational` | `SemanticConvergence.Belief` | `SemanticConvergence.lem_variational` | `43-56` | `substantive` | substantive theorem proof |
+| `lem:kl-necessity` | `SemanticConvergence.Belief` | `SemanticConvergence.lem_kl_necessity` | `57-71` | `substantive` | substantive theorem proof |
+| `lem:merging` | `SemanticConvergence.Belief` | `SemanticConvergence.lem_merging` | `72-84` | `substantive` | substantive theorem proof |
 | `prop:boundary-identity` | `SemanticConvergence.Boundary` | `SemanticConvergence.prop_boundary_identity` | `75-87` | `substantive` | substantive theorem proof |
 | `lem:risk-ig` | `SemanticConvergence.Boundary` | `SemanticConvergence.lem_risk_ig` | `88-98` | `definition` | explicit definitional theorem |
 | `cor:efe-specialization` | `SemanticConvergence.Boundary` | `SemanticConvergence.cor_efe_specialization` | `99-109` | `definition` | explicit definitional theorem |
@@ -323,16 +323,16 @@ None.
 | `thm:observer-promotion-failure` | `SemanticConvergence.Boundary` | `SemanticConvergence.thm_observer_promotion_failure` | `212-218` | `substantive` | substantive theorem proof |
 | `cor:observer-promotion-universal` | `SemanticConvergence.Boundary` | `SemanticConvergence.cor_observer_promotion_universal` | `219-225` | `substantive` | substantive theorem proof |
 | `cor:promotion-contrast` | `SemanticConvergence.Boundary` | `SemanticConvergence.cor_promotion_contrast` | `226-238` | `substantive` | substantive theorem proof |
-| `prop:belief-invariance-above` | `SemanticConvergence.Functional` | `SemanticConvergence.prop_belief_invariance_above` | `166-176` | `substantive` | substantive theorem proof |
-| `cor:twins-frozen-ratio` | `SemanticConvergence.Functional` | `SemanticConvergence.cor_twins_frozen_ratio` | `177-187` | `substantive` | substantive theorem proof |
-| `cor:canonical-pair` | `SemanticConvergence.Functional` | `SemanticConvergence.cor_canonical_pair` | `188-195` | `substantive` | substantive theorem proof |
-| `prop:goal-dialed` | `SemanticConvergence.Functional` | `SemanticConvergence.prop_goal_dialed` | `196-203` | `substantive` | substantive theorem proof |
-| `prop:two-observer-minimizer` | `SemanticConvergence.Functional` | `SemanticConvergence.prop_two_observer_minimizer` | `204-215` | `substantive` | substantive theorem proof |
-| `prop:kernel-functional-minimizer` | `SemanticConvergence.Functional` | `SemanticConvergence.prop_kernel_functional_minimizer` | `216-233` | `constructive-existential` | substantive theorem proof |
-| `prop:kernel-functional-minimizer-compact` | `SemanticConvergence.Functional` | `SemanticConvergence.prop_kernel_functional_minimizer_compact` | `234-251` | `constructive-existential` | substantive theorem proof |
-| `prop:belief-illtyped-below` | `SemanticConvergence.Functional` | `SemanticConvergence.prop_belief_illtyped_below` | `252-260` | `substantive` | substantive theorem proof |
-| `prop:action-cap` | `SemanticConvergence.Functional` | `SemanticConvergence.prop_action_cap` | `261-271` | `definition` | explicit definitional theorem |
-| `thm:meeting-point` | `SemanticConvergence.Functional` | `SemanticConvergence.thm_meeting_point` | `272-279` | `substantive` | substantive theorem proof |
+| `prop:belief-invariance-above` | `SemanticConvergence.Functional` | `SemanticConvergence.prop_belief_invariance_above` | `520-530` | `substantive` | substantive theorem proof |
+| `cor:twins-frozen-ratio` | `SemanticConvergence.Functional` | `SemanticConvergence.cor_twins_frozen_ratio` | `531-541` | `substantive` | substantive theorem proof |
+| `cor:canonical-pair` | `SemanticConvergence.Functional` | `SemanticConvergence.cor_canonical_pair` | `542-549` | `substantive` | substantive theorem proof |
+| `prop:goal-dialed` | `SemanticConvergence.Functional` | `SemanticConvergence.prop_goal_dialed` | `550-564` | `substantive` | substantive theorem proof |
+| `prop:two-observer-minimizer` | `SemanticConvergence.Functional` | `SemanticConvergence.prop_two_observer_minimizer` | `565-629` | `substantive` | substantive theorem proof |
+| `prop:kernel-functional-minimizer` | `SemanticConvergence.Functional` | `SemanticConvergence.prop_kernel_functional_minimizer` | `630-717` | `substantive` | substantive theorem proof |
+| `prop:kernel-functional-minimizer-compact` | `SemanticConvergence.Functional` | `SemanticConvergence.prop_kernel_functional_minimizer_compact` | `718-738` | `substantive` | substantive theorem proof |
+| `prop:belief-illtyped-below` | `SemanticConvergence.Functional` | `SemanticConvergence.prop_belief_illtyped_below` | `739-747` | `substantive` | substantive theorem proof |
+| `prop:action-cap` | `SemanticConvergence.Functional` | `SemanticConvergence.prop_action_cap` | `748-770` | `substantive` | substantive theorem proof |
+| `thm:meeting-point` | `SemanticConvergence.Functional` | `SemanticConvergence.thm_meeting_point` | `771-778` | `substantive` | substantive theorem proof |
 | `lem:nesting` | `SemanticConvergence.Hierarchy` | `SemanticConvergence.lem_nesting` | `136-156` | `substantive` | substantive theorem proof |
 | `prop:refinement-chain` | `SemanticConvergence.Hierarchy` | `SemanticConvergence.prop_refinement_chain` | `157-175` | `substantive` | substantive theorem proof |
 | `lem:observable-quotient` | `SemanticConvergence.Hierarchy` | `SemanticConvergence.lem_observable_quotient` | `176-182` | `substantive` | substantive theorem proof |
@@ -385,6 +385,6 @@ None.
 | `cor:support-necessary` | `SemanticConvergence.Semantic` | `SemanticConvergence.cor_support_necessary` | `757-775` | `constructive-existential` | substantive theorem proof |
 | `thm:summable-support-insufficient` | `SemanticConvergence.Semantic` | `SemanticConvergence.thm_summable_support_insufficient` | `917-939` | `constructive-existential` | substantive theorem proof |
 | `cor:goal-dialed-payoff` | `SemanticConvergence.Semantic` | `SemanticConvergence.cor_goal_dialed_payoff` | `940-954` | `substantive` | substantive theorem proof |
-| `prop:amortized-surrogate-minimizer` | `SemanticConvergence.Surrogate` | `SemanticConvergence.prop_amortized_surrogate_minimizer` | `63-77` | `substantive` | substantive theorem proof |
-| `thm:amortized-surrogate` | `SemanticConvergence.Surrogate` | `SemanticConvergence.thm_amortized_surrogate` | `141-186` | `substantive` | substantive theorem proof |
-| `cor:amortized-surrogate-finite-time` | `SemanticConvergence.Surrogate` | `SemanticConvergence.cor_amortized_surrogate_finite_time` | `187-257` | `substantive` | substantive theorem proof |
+| `prop:amortized-surrogate-minimizer` | `SemanticConvergence.Surrogate` | `SemanticConvergence.prop_amortized_surrogate_minimizer` | `64-85` | `substantive` | substantive theorem proof |
+| `thm:amortized-surrogate` | `SemanticConvergence.Surrogate` | `SemanticConvergence.thm_amortized_surrogate` | `257-302` | `substantive` | substantive theorem proof |
+| `cor:amortized-surrogate-finite-time` | `SemanticConvergence.Surrogate` | `SemanticConvergence.cor_amortized_surrogate_finite_time` | `303-373` | `substantive` | substantive theorem proof |

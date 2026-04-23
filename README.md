@@ -23,6 +23,23 @@ and classifies deviations from the canonical baseline.
   and `0` genuine unexpected drift rows
 - `lean_axiom_audit.md` records the actual per-declaration axiom dependencies
 
+Belief and variational status note:
+
+- `SemanticConvergence.def_afe` now implements the countable generalized
+  KL / I-divergence against the posterior-weight scaffold, and
+  `SemanticConvergence.lem_variational` plus
+  `SemanticConvergence.lem_kl_necessity` certify the exact Bayes/Gibbs
+  minimizer and the necessity direction on that repaired belief-side object.
+- `SemanticConvergence.def_two_observer_functional` now exposes the repaired
+  three-part Gibbs variational shape on the paper-facing countable stack:
+  belief term, class-score term, and class-law regularizer. The matching exact
+  minimizer theorem is `SemanticConvergence.prop_two_observer_minimizer`.
+- `SemanticConvergence.def_kernel_functional` now exposes the repaired joint
+  class-action kernel lift with reference-law regularization, and
+  `SemanticConvergence.prop_kernel_functional_minimizer` together with
+  `SemanticConvergence.prop_kernel_functional_minimizer_compact` certify the
+  exact and compact-action Gibbs kernel minimizers on that surface.
+
 Section 6 status note:
 
 - `SemanticConvergence.thm_separating_support_convergence` currently proves a
@@ -50,6 +67,10 @@ Boundary and surrogate status note:
 - `SemanticConvergence.thm_afe_near_miss` now packages both the explicit
   action-level near-miss witness and the paper-facing finite-horizon
   frozen-posterior failure shape.
+- `SemanticConvergence.thm_amortized_surrogate_selector_existence` and
+  `SemanticConvergence.cor_amortized_surrogate_selector_support` now give the
+  repaired countable finite-list wrapper carrying counterparts of `(A1)`--`(A3)`
+  to an implemented-law support-floor / supported-action conclusion.
 - `SemanticConvergence.thm_amortized_surrogate` now lives on the concrete
   deployment-side stack, exposes finite-list counterparts of the paper's
   assumptions `(A1)`--`(A3)`, and derives the separating-support floor/support

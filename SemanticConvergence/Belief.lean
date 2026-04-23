@@ -18,27 +18,6 @@ variable [Encodable A] [Encodable O]
 def def_universal_prior (U : CountablePrefixMachine A O) : U.Program → ENNReal :=
   U.universalWeight
 
-/-- Countable posterior-weight agreement on the enumerable machine domain. -/
-def samePosteriorWeights
-    (U : CountablePrefixMachine A O)
-    (π : CountablePolicy A O) (t : Nat) (h : CountHist A O)
-    (q : U.Program → ENNReal) : Prop :=
-  ∀ p, q p = U.posteriorWeight π t h p
-
-/-- Countable paper-facing AFE proxy: zero exactly on posterior-weight agreement. -/
-def def_afe
-    (U : CountablePrefixMachine A O)
-    (π : CountablePolicy A O) (t : Nat) (h : CountHist A O)
-    (q : U.Program → ENNReal) : ENNReal :=
-  if samePosteriorWeights U π t h q then 0 else 1
-
-theorem posteriorWeight_samePosteriorWeights
-    (U : CountablePrefixMachine A O)
-    (π : CountablePolicy A O) (t : Nat) (h : CountHist A O) :
-    samePosteriorWeights U π t h (fun p => U.posteriorWeight π t h p) := by
-  intro p
-  rfl
-
 /-- Countable class-prior weight scaffold. -/
 def classPriorWeight
     (U : CountablePrefixMachine A O)
@@ -68,11 +47,11 @@ theorem lem_variational
     ∀ q : U.Program → ENNReal,
       def_afe U π t h q = 0 ↔ samePosteriorWeights U π t h q := by
   constructor
-  · simp [def_afe, posteriorWeight_samePosteriorWeights]
+  · exact (def_afe_eq_zero_iff_samePosteriorWeights U π t h
+      (fun p => U.posteriorWeight π t h p)).2
+        (posteriorWeight_samePosteriorWeights U π t h)
   · intro q
-    by_cases hq : samePosteriorWeights U π t h q
-    · simp [def_afe, hq]
-    · simp [def_afe, hq]
+    exact def_afe_eq_zero_iff_samePosteriorWeights U π t h q
 
 /-- Lean wrapper for `lem:kl-necessity` on the countable posterior stack. -/
 theorem lem_kl_necessity
@@ -81,9 +60,13 @@ theorem lem_kl_necessity
     (q : U.Program → ENNReal)
     (hZero : def_afe U π t h q = 0) :
     samePosteriorWeights U π t h q := by
-  by_cases hq : samePosteriorWeights U π t h q
-  · exact hq
-  · simp [def_afe, hq] at hZero
+  have hTerms :
+      ∀ p : U.Program,
+        posteriorWeightKLDivergenceTerm (q p) (U.posteriorWeight π t h p) = 0 := by
+    exact ENNReal.tsum_eq_zero.mp (by simpa [def_afe] using hZero)
+  intro p
+  exact (posteriorWeightKLDivergenceTerm_eq_zero_iff
+      (posteriorWeight_ne_top U π t h p)).mp (hTerms p)
 
 /-- Lean wrapper for `lem:merging` on the countable posterior stack. -/
 theorem lem_merging

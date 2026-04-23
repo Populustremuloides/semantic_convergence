@@ -6,13 +6,13 @@ It is a source-level heuristic audit of theorem proof bodies. It does not
 replace mathematical review; it exists to surface likely projection /
 tautology / placeholder patterns quickly.
 
-- Total `theorem` declarations audited: `387`
-- Suspicious theorem declarations: `29`
-- Substantive: `313`
+- Total `theorem` declarations audited: `406`
+- Suspicious theorem declarations: `31`
+- Substantive: `331`
 - Constructive existential: `24`
 - Rate composition: `10`
 - Single helper application: `13`
-- Definitional unfold: `16`
+- Definitional unfold: `18`
 - Field projection: `0`
 - Placeholder truth: `0`
 
@@ -29,7 +29,7 @@ tautology / placeholder patterns quickly.
 | `SemanticConvergence.ConcreteCore` | `SemanticConvergence.listWeightedSum_cons` | `19-25` | `no` | `definitional-unfold` | `rfl` |
 | `SemanticConvergence.ConcreteCore` | `SemanticConvergence.reachableHist_mem_support` | `250-255` | `no` | `single-lemma-application` | `(histLaw π κ t).support_complete h hReach omit [BEq A] [LawfulBEq A] [BEq O] [LawfulBEq O] in` |
 | `SemanticConvergence.ConcreteCore` | `SemanticConvergence.reachableFullHist_mem_support` | `256-261` | `no` | `single-lemma-application` | `(fullHistLaw π κ t).support_complete h hReach` |
-| `SemanticConvergence.ConcreteFunctional` | `SemanticConvergence.argminOnList_spec` | `296-304` | `no` | `single-lemma-application` | `Classical.choose_spec (exists_minimizerOnList xs f hxs) end FiniteArgmin end end SemanticConvergence` |
+| `SemanticConvergence.ConcreteFunctional` | `SemanticConvergence.argminOnList_spec` | `456-464` | `no` | `single-lemma-application` | `Classical.choose_spec (exists_minimizerOnList xs f hxs) end FiniteArgmin end end SemanticConvergence` |
 | `SemanticConvergence.ConcreteNoise` | `SemanticConvergence.decodable_implies_supportLeftInvertible` | `66-80` | `no` | `definitional-unfold` | `hDec end Channels namespace ConcretePrefixMachine variable {A : Type u} {O : Type v} {O' : Type w} variable [DecidableEq A] [DecidableEq O] [BEq A] [LawfulBEq A] [BEq O] [LawfulBEq` |
 | `SemanticConvergence.ConcretePrior` | `SemanticConvergence.pow2_ne_zero` | `51-53` | `no` | `single-lemma-application` | `Nat.ne_of_gt (pow2_pos n)` |
 | `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.ae_residualObserverFiberRecurrence_of_witness` | `338-356` | `no` | `single-lemma-application` | `by exact U.ae_residualObserverFiberRecurrence_of_supportwise π penv ω pstar δ T (U.hasSupportwiseResidualRecurrence_of_witness π penv ω pstar δ T hWitness)` |
@@ -44,22 +44,23 @@ tautology / placeholder patterns quickly.
 | `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.toCountableKernel_apply` | `736-741` | `no` | `definitional-unfold` | `rfl` |
 | `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.toCountableEncodedProgram_code` | `953-959` | `no` | `definitional-unfold` | `rfl` |
 | `SemanticConvergence.ConcreteSurrogate` | `SemanticConvergence.ConcretePrefixMachine.amortizedSurrogate_from_witness` | `122-146` | `no` | `single-lemma-application` | `U.surrogateChosenLaw_hasSeparatingSupport_of_argmin π h actions hActions ω pstar refLaw reg hSep` |
-| `SemanticConvergence.Functional` | `SemanticConvergence.argminOnListENNReal_spec` | `68-73` | `no` | `single-lemma-application` | `Classical.choose_spec (exists_minimizerOnListENNReal xs f hxs)` |
-| `SemanticConvergence.Manifest` | `SemanticConvergence.manifestEntryCount_eq` | `1339-1340` | `no` | `definitional-unfold` | `rfl` |
-| `SemanticConvergence.Manifest` | `SemanticConvergence.concreteSubstrateModuleCount_eq` | `1501-1502` | `no` | `definitional-unfold` | `rfl` |
-| `SemanticConvergence.Manifest` | `SemanticConvergence.fullyCovered_eq` | `1551-1552` | `no` | `definitional-unfold` | `rfl` |
-| `SemanticConvergence.Manifest` | `SemanticConvergence.fullyDerived_eq` | `1553-1554` | `no` | `definitional-unfold` | `rfl` |
+| `SemanticConvergence.Functional` | `SemanticConvergence.listSumENNReal_nil` | `30-33` | `no` | `definitional-unfold` | `rfl` |
+| `SemanticConvergence.Functional` | `SemanticConvergence.listSumENNReal_cons` | `34-37` | `no` | `definitional-unfold` | `rfl` |
+| `SemanticConvergence.Functional` | `SemanticConvergence.argminOnListENNReal_spec` | `115-120` | `no` | `single-lemma-application` | `Classical.choose_spec (exists_minimizerOnListENNReal xs f hxs)` |
+| `SemanticConvergence.Manifest` | `SemanticConvergence.manifestEntryCount_eq` | `1767-1768` | `no` | `definitional-unfold` | `rfl` |
+| `SemanticConvergence.Manifest` | `SemanticConvergence.concreteSubstrateModuleCount_eq` | `1953-1954` | `no` | `definitional-unfold` | `rfl` |
+| `SemanticConvergence.Manifest` | `SemanticConvergence.fullyCovered_eq` | `2012-2013` | `no` | `definitional-unfold` | `rfl` |
+| `SemanticConvergence.Manifest` | `SemanticConvergence.fullyDerived_eq` | `2014-2015` | `no` | `definitional-unfold` | `rfl` |
 
 ## Full Theorem Table
 
 | Module | Decl | Lines | Manifest-tracked | Proof kind |
 | --- | --- | --- | --- | --- |
-| `SemanticConvergence.Belief` | `SemanticConvergence.posteriorWeight_samePosteriorWeights` | `35-42` | `no` | `substantive` |
-| `SemanticConvergence.Belief` | `SemanticConvergence.lem_prior_invariance` | `49-55` | `yes` | `definition` |
-| `SemanticConvergence.Belief` | `SemanticConvergence.lem_prior_necessity` | `56-63` | `yes` | `definition` |
-| `SemanticConvergence.Belief` | `SemanticConvergence.lem_variational` | `64-77` | `yes` | `substantive` |
-| `SemanticConvergence.Belief` | `SemanticConvergence.lem_kl_necessity` | `78-88` | `yes` | `substantive` |
-| `SemanticConvergence.Belief` | `SemanticConvergence.lem_merging` | `89-101` | `yes` | `substantive` |
+| `SemanticConvergence.Belief` | `SemanticConvergence.lem_prior_invariance` | `28-34` | `yes` | `definition` |
+| `SemanticConvergence.Belief` | `SemanticConvergence.lem_prior_necessity` | `35-42` | `yes` | `definition` |
+| `SemanticConvergence.Belief` | `SemanticConvergence.lem_variational` | `43-56` | `yes` | `substantive` |
+| `SemanticConvergence.Belief` | `SemanticConvergence.lem_kl_necessity` | `57-71` | `yes` | `substantive` |
+| `SemanticConvergence.Belief` | `SemanticConvergence.lem_merging` | `72-84` | `yes` | `substantive` |
 | `SemanticConvergence.Boundary` | `SemanticConvergence.prop_boundary_identity` | `75-87` | `yes` | `substantive` |
 | `SemanticConvergence.Boundary` | `SemanticConvergence.lem_risk_ig` | `88-98` | `yes` | `definition` |
 | `SemanticConvergence.Boundary` | `SemanticConvergence.cor_efe_specialization` | `99-109` | `yes` | `definition` |
@@ -104,9 +105,9 @@ tautology / placeholder patterns quickly.
 | `SemanticConvergence.ConcreteCore` | `SemanticConvergence.CountableConcrete.reachableHist_iff_ne_zero` | `364-374` | `no` | `substantive` |
 | `SemanticConvergence.ConcreteFunctional` | `SemanticConvergence.ConcreteLaw.restrict_mass_of_pos` | `42-46` | `no` | `substantive` |
 | `SemanticConvergence.ConcreteFunctional` | `SemanticConvergence.ConcreteLaw.restrict_mass_of_neg` | `47-54` | `no` | `substantive` |
-| `SemanticConvergence.ConcreteFunctional` | `SemanticConvergence.lawL1_self` | `225-249` | `no` | `substantive` |
-| `SemanticConvergence.ConcreteFunctional` | `SemanticConvergence.exists_minimizerOnList` | `253-292` | `no` | `constructive-existential` |
-| `SemanticConvergence.ConcreteFunctional` | `SemanticConvergence.argminOnList_spec` | `296-304` | `no` | `single-lemma-application` |
+| `SemanticConvergence.ConcreteFunctional` | `SemanticConvergence.lawL1_self` | `385-409` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteFunctional` | `SemanticConvergence.exists_minimizerOnList` | `413-452` | `no` | `constructive-existential` |
+| `SemanticConvergence.ConcreteFunctional` | `SemanticConvergence.argminOnList_spec` | `456-464` | `no` | `single-lemma-application` |
 | `SemanticConvergence.ConcreteHierarchy` | `SemanticConvergence.EncodedProgram.intSemClass_self` | `104-110` | `no` | `substantive` |
 | `SemanticConvergence.ConcreteHierarchy` | `SemanticConvergence.EncodedProgram.intSemClass_subset_policyPred` | `111-117` | `no` | `substantive` |
 | `SemanticConvergence.ConcreteHierarchy` | `SemanticConvergence.EncodedProgram.policyPred_subset_historyCompat` | `118-125` | `no` | `substantive` |
@@ -315,18 +316,31 @@ tautology / placeholder patterns quickly.
 | `SemanticConvergence.Foundations` | `SemanticConvergence.constantOnSetoid_iff_exists_quotientLift` | `91-111` | `no` | `constructive-existential` |
 | `SemanticConvergence.Foundations` | `SemanticConvergence.quotientLift_unique` | `112-124` | `no` | `substantive` |
 | `SemanticConvergence.Foundations` | `SemanticConvergence.quotientObserver_eq_iff` | `125-133` | `no` | `substantive` |
-| `SemanticConvergence.Functional` | `SemanticConvergence.exists_minimizerOnListENNReal` | `28-63` | `no` | `constructive-existential` |
-| `SemanticConvergence.Functional` | `SemanticConvergence.argminOnListENNReal_spec` | `68-73` | `no` | `single-lemma-application` |
-| `SemanticConvergence.Functional` | `SemanticConvergence.prop_belief_invariance_above` | `166-176` | `yes` | `substantive` |
-| `SemanticConvergence.Functional` | `SemanticConvergence.cor_twins_frozen_ratio` | `177-187` | `yes` | `substantive` |
-| `SemanticConvergence.Functional` | `SemanticConvergence.cor_canonical_pair` | `188-195` | `yes` | `substantive` |
-| `SemanticConvergence.Functional` | `SemanticConvergence.prop_goal_dialed` | `196-203` | `yes` | `substantive` |
-| `SemanticConvergence.Functional` | `SemanticConvergence.prop_two_observer_minimizer` | `204-215` | `yes` | `substantive` |
-| `SemanticConvergence.Functional` | `SemanticConvergence.prop_kernel_functional_minimizer` | `216-233` | `yes` | `constructive-existential` |
-| `SemanticConvergence.Functional` | `SemanticConvergence.prop_kernel_functional_minimizer_compact` | `234-251` | `yes` | `constructive-existential` |
-| `SemanticConvergence.Functional` | `SemanticConvergence.prop_belief_illtyped_below` | `252-260` | `yes` | `substantive` |
-| `SemanticConvergence.Functional` | `SemanticConvergence.prop_action_cap` | `261-271` | `yes` | `definition` |
-| `SemanticConvergence.Functional` | `SemanticConvergence.thm_meeting_point` | `272-279` | `yes` | `substantive` |
+| `SemanticConvergence.Functional` | `SemanticConvergence.listSumENNReal_nil` | `30-33` | `no` | `definitional-unfold` |
+| `SemanticConvergence.Functional` | `SemanticConvergence.listSumENNReal_cons` | `34-37` | `no` | `definitional-unfold` |
+| `SemanticConvergence.Functional` | `SemanticConvergence.listSumENNReal_eq_zero_iff` | `38-59` | `no` | `substantive` |
+| `SemanticConvergence.Functional` | `SemanticConvergence.listSumENNReal_ne_top` | `60-71` | `no` | `substantive` |
+| `SemanticConvergence.Functional` | `SemanticConvergence.exists_minimizerOnListENNReal` | `75-110` | `no` | `constructive-existential` |
+| `SemanticConvergence.Functional` | `SemanticConvergence.argminOnListENNReal_spec` | `115-120` | `no` | `single-lemma-application` |
+| `SemanticConvergence.Functional` | `SemanticConvergence.posteriorWeight_ne_top` | `141-156` | `no` | `substantive` |
+| `SemanticConvergence.Functional` | `SemanticConvergence.posteriorWeightKLDivergenceTerm_eq_zero_iff` | `157-203` | `no` | `substantive` |
+| `SemanticConvergence.Functional` | `SemanticConvergence.posteriorWeight_samePosteriorWeights` | `210-219` | `no` | `substantive` |
+| `SemanticConvergence.Functional` | `SemanticConvergence.samePosteriorWeights_of_def_afe_eq_zero` | `220-234` | `no` | `substantive` |
+| `SemanticConvergence.Functional` | `SemanticConvergence.def_afe_eq_zero_iff_samePosteriorWeights` | `235-248` | `no` | `substantive` |
+| `SemanticConvergence.Functional` | `SemanticConvergence.observerClassReferenceWeightOnTargets_ne_top` | `303-315` | `no` | `substantive` |
+| `SemanticConvergence.Functional` | `SemanticConvergence.observerClassGibbsWeightOnTargets_ne_top` | `336-349` | `no` | `substantive` |
+| `SemanticConvergence.Functional` | `SemanticConvergence.countableKernelReferenceWeightOnTargets_ne_top` | `422-437` | `no` | `substantive` |
+| `SemanticConvergence.Functional` | `SemanticConvergence.countableKernelGibbsWeightOnTargets_ne_top` | `448-462` | `no` | `substantive` |
+| `SemanticConvergence.Functional` | `SemanticConvergence.prop_belief_invariance_above` | `520-530` | `yes` | `substantive` |
+| `SemanticConvergence.Functional` | `SemanticConvergence.cor_twins_frozen_ratio` | `531-541` | `yes` | `substantive` |
+| `SemanticConvergence.Functional` | `SemanticConvergence.cor_canonical_pair` | `542-549` | `yes` | `substantive` |
+| `SemanticConvergence.Functional` | `SemanticConvergence.prop_goal_dialed` | `550-564` | `yes` | `substantive` |
+| `SemanticConvergence.Functional` | `SemanticConvergence.prop_two_observer_minimizer` | `565-629` | `yes` | `substantive` |
+| `SemanticConvergence.Functional` | `SemanticConvergence.prop_kernel_functional_minimizer` | `630-717` | `yes` | `substantive` |
+| `SemanticConvergence.Functional` | `SemanticConvergence.prop_kernel_functional_minimizer_compact` | `718-738` | `yes` | `substantive` |
+| `SemanticConvergence.Functional` | `SemanticConvergence.prop_belief_illtyped_below` | `739-747` | `yes` | `substantive` |
+| `SemanticConvergence.Functional` | `SemanticConvergence.prop_action_cap` | `748-770` | `yes` | `substantive` |
+| `SemanticConvergence.Functional` | `SemanticConvergence.thm_meeting_point` | `771-778` | `yes` | `substantive` |
 | `SemanticConvergence.Hierarchy` | `SemanticConvergence.intSemClass_self` | `99-103` | `no` | `substantive` |
 | `SemanticConvergence.Hierarchy` | `SemanticConvergence.intSemClass_subset_policyPred` | `104-110` | `no` | `substantive` |
 | `SemanticConvergence.Hierarchy` | `SemanticConvergence.policyPred_subset_historyCompat` | `111-119` | `no` | `substantive` |
@@ -339,37 +353,42 @@ tautology / placeholder patterns quickly.
 | `SemanticConvergence.Hierarchy` | `SemanticConvergence.thm_policy_gap` | `215-224` | `yes` | `substantive` |
 | `SemanticConvergence.Hierarchy` | `SemanticConvergence.lem_syntactic_gap` | `225-239` | `yes` | `substantive` |
 | `SemanticConvergence.Hierarchy` | `SemanticConvergence.thm_strict_hierarchy` | `240-261` | `yes` | `substantive` |
-| `SemanticConvergence.Manifest` | `SemanticConvergence.manifestEntryCount_eq` | `1339-1340` | `no` | `definitional-unfold` |
-| `SemanticConvergence.Manifest` | `SemanticConvergence.derivedEntryCount_eq` | `1438-1440` | `no` | `substantive` |
-| `SemanticConvergence.Manifest` | `SemanticConvergence.wrappedEntryCount_eq` | `1441-1443` | `no` | `substantive` |
-| `SemanticConvergence.Manifest` | `SemanticConvergence.declaredEntryCount_eq` | `1444-1446` | `no` | `substantive` |
-| `SemanticConvergence.Manifest` | `SemanticConvergence.concreteStackEntryCount_eq` | `1447-1449` | `no` | `substantive` |
-| `SemanticConvergence.Manifest` | `SemanticConvergence.abstractInterfaceEntryCount_eq` | `1450-1452` | `no` | `substantive` |
-| `SemanticConvergence.Manifest` | `SemanticConvergence.migratedToConcreteEntryCount_eq` | `1453-1455` | `no` | `substantive` |
-| `SemanticConvergence.Manifest` | `SemanticConvergence.pendingConcreteMigrationEntryCount_eq` | `1456-1458` | `no` | `substantive` |
-| `SemanticConvergence.Manifest` | `SemanticConvergence.substantiveEntryCount_eq` | `1459-1461` | `no` | `substantive` |
-| `SemanticConvergence.Manifest` | `SemanticConvergence.definitionProofEntryCount_eq` | `1462-1464` | `no` | `substantive` |
-| `SemanticConvergence.Manifest` | `SemanticConvergence.constructiveExistentialEntryCount_eq` | `1465-1467` | `no` | `substantive` |
-| `SemanticConvergence.Manifest` | `SemanticConvergence.rateCompositionEntryCount_eq` | `1468-1470` | `no` | `substantive` |
-| `SemanticConvergence.Manifest` | `SemanticConvergence.singleLemmaApplicationEntryCount_eq` | `1471-1473` | `no` | `substantive` |
-| `SemanticConvergence.Manifest` | `SemanticConvergence.definitionalUnfoldEntryCount_eq` | `1474-1476` | `no` | `substantive` |
-| `SemanticConvergence.Manifest` | `SemanticConvergence.fieldProjectionEntryCount_eq` | `1477-1479` | `no` | `substantive` |
-| `SemanticConvergence.Manifest` | `SemanticConvergence.placeholderTruthEntryCount_eq` | `1480-1482` | `no` | `substantive` |
-| `SemanticConvergence.Manifest` | `SemanticConvergence.heuristicOtherEntryCount_eq` | `1483-1485` | `no` | `substantive` |
-| `SemanticConvergence.Manifest` | `SemanticConvergence.manifestDefinitionEntryCount_eq` | `1486-1488` | `no` | `substantive` |
-| `SemanticConvergence.Manifest` | `SemanticConvergence.manifestDefinitionEntriesTaggedAsDefinitionCount_eq` | `1489-1491` | `no` | `substantive` |
-| `SemanticConvergence.Manifest` | `SemanticConvergence.manifestTheoremLikeEntryCount_eq` | `1492-1494` | `no` | `substantive` |
-| `SemanticConvergence.Manifest` | `SemanticConvergence.manifestTheoremLikeSemanticallyAuditedEntryCount_eq` | `1495-1497` | `no` | `substantive` |
-| `SemanticConvergence.Manifest` | `SemanticConvergence.suspiciousManifestEntryCount_eq` | `1498-1500` | `no` | `substantive` |
-| `SemanticConvergence.Manifest` | `SemanticConvergence.concreteSubstrateModuleCount_eq` | `1501-1502` | `no` | `definitional-unfold` |
-| `SemanticConvergence.Manifest` | `SemanticConvergence.bridgeReadyAbstractEntryCount_eq` | `1503-1505` | `no` | `substantive` |
-| `SemanticConvergence.Manifest` | `SemanticConvergence.unlabeledEntryCount_eq` | `1519-1521` | `no` | `substantive` |
-| `SemanticConvergence.Manifest` | `SemanticConvergence.paperFullyCovered_eq` | `1542-1544` | `no` | `substantive` |
-| `SemanticConvergence.Manifest` | `SemanticConvergence.paperFullyDerived_eq` | `1545-1547` | `no` | `substantive` |
-| `SemanticConvergence.Manifest` | `SemanticConvergence.semanticAuditClosed_eq` | `1548-1550` | `no` | `substantive` |
-| `SemanticConvergence.Manifest` | `SemanticConvergence.fullyCovered_eq` | `1551-1552` | `no` | `definitional-unfold` |
-| `SemanticConvergence.Manifest` | `SemanticConvergence.fullyDerived_eq` | `1553-1554` | `no` | `definitional-unfold` |
-| `SemanticConvergence.Manifest` | `SemanticConvergence.fullyFirstPrinciples_eq` | `1555-1558` | `no` | `substantive` |
+| `SemanticConvergence.Manifest` | `SemanticConvergence.manifestEntryCount_eq` | `1767-1768` | `no` | `definitional-unfold` |
+| `SemanticConvergence.Manifest` | `SemanticConvergence.derivedEntryCount_eq` | `1878-1880` | `no` | `substantive` |
+| `SemanticConvergence.Manifest` | `SemanticConvergence.wrappedEntryCount_eq` | `1881-1883` | `no` | `substantive` |
+| `SemanticConvergence.Manifest` | `SemanticConvergence.declaredEntryCount_eq` | `1884-1886` | `no` | `substantive` |
+| `SemanticConvergence.Manifest` | `SemanticConvergence.concreteStackEntryCount_eq` | `1887-1889` | `no` | `substantive` |
+| `SemanticConvergence.Manifest` | `SemanticConvergence.abstractInterfaceEntryCount_eq` | `1890-1892` | `no` | `substantive` |
+| `SemanticConvergence.Manifest` | `SemanticConvergence.migratedToConcreteEntryCount_eq` | `1893-1895` | `no` | `substantive` |
+| `SemanticConvergence.Manifest` | `SemanticConvergence.pendingConcreteMigrationEntryCount_eq` | `1896-1898` | `no` | `substantive` |
+| `SemanticConvergence.Manifest` | `SemanticConvergence.substantiveEntryCount_eq` | `1899-1901` | `no` | `substantive` |
+| `SemanticConvergence.Manifest` | `SemanticConvergence.definitionProofEntryCount_eq` | `1902-1904` | `no` | `substantive` |
+| `SemanticConvergence.Manifest` | `SemanticConvergence.constructiveExistentialEntryCount_eq` | `1905-1907` | `no` | `substantive` |
+| `SemanticConvergence.Manifest` | `SemanticConvergence.rateCompositionEntryCount_eq` | `1908-1910` | `no` | `substantive` |
+| `SemanticConvergence.Manifest` | `SemanticConvergence.singleLemmaApplicationEntryCount_eq` | `1911-1913` | `no` | `substantive` |
+| `SemanticConvergence.Manifest` | `SemanticConvergence.definitionalUnfoldEntryCount_eq` | `1914-1916` | `no` | `substantive` |
+| `SemanticConvergence.Manifest` | `SemanticConvergence.fieldProjectionEntryCount_eq` | `1917-1919` | `no` | `substantive` |
+| `SemanticConvergence.Manifest` | `SemanticConvergence.placeholderTruthEntryCount_eq` | `1920-1922` | `no` | `substantive` |
+| `SemanticConvergence.Manifest` | `SemanticConvergence.heuristicOtherEntryCount_eq` | `1923-1925` | `no` | `substantive` |
+| `SemanticConvergence.Manifest` | `SemanticConvergence.manifestDefinitionEntryCount_eq` | `1926-1928` | `no` | `substantive` |
+| `SemanticConvergence.Manifest` | `SemanticConvergence.manifestDefinitionEntriesTaggedAsDefinitionCount_eq` | `1929-1931` | `no` | `substantive` |
+| `SemanticConvergence.Manifest` | `SemanticConvergence.manifestTheoremLikeEntryCount_eq` | `1932-1934` | `no` | `substantive` |
+| `SemanticConvergence.Manifest` | `SemanticConvergence.manifestTheoremLikeSemanticallyAuditedEntryCount_eq` | `1935-1937` | `no` | `substantive` |
+| `SemanticConvergence.Manifest` | `SemanticConvergence.suspiciousManifestEntryCount_eq` | `1938-1940` | `no` | `substantive` |
+| `SemanticConvergence.Manifest` | `SemanticConvergence.publicProbabilisticBridgeEntryCount_eq` | `1941-1943` | `no` | `substantive` |
+| `SemanticConvergence.Manifest` | `SemanticConvergence.publicProbabilisticBridgeWitnessHypEntryCount_eq` | `1944-1946` | `no` | `substantive` |
+| `SemanticConvergence.Manifest` | `SemanticConvergence.publicProbabilisticBridgeEquationHypEntryCount_eq` | `1947-1949` | `no` | `substantive` |
+| `SemanticConvergence.Manifest` | `SemanticConvergence.publicProbabilisticBridgeConcreteRootEntryCount_eq` | `1950-1952` | `no` | `substantive` |
+| `SemanticConvergence.Manifest` | `SemanticConvergence.concreteSubstrateModuleCount_eq` | `1953-1954` | `no` | `definitional-unfold` |
+| `SemanticConvergence.Manifest` | `SemanticConvergence.bridgeReadyAbstractEntryCount_eq` | `1955-1957` | `no` | `substantive` |
+| `SemanticConvergence.Manifest` | `SemanticConvergence.unlabeledEntryCount_eq` | `1971-1973` | `no` | `substantive` |
+| `SemanticConvergence.Manifest` | `SemanticConvergence.paperFullyCovered_eq` | `2000-2002` | `no` | `substantive` |
+| `SemanticConvergence.Manifest` | `SemanticConvergence.paperFullyDerived_eq` | `2003-2005` | `no` | `substantive` |
+| `SemanticConvergence.Manifest` | `SemanticConvergence.semanticAuditClosed_eq` | `2006-2008` | `no` | `substantive` |
+| `SemanticConvergence.Manifest` | `SemanticConvergence.publicProbabilisticBridgeSurfaceClosed_eq` | `2009-2011` | `no` | `substantive` |
+| `SemanticConvergence.Manifest` | `SemanticConvergence.fullyCovered_eq` | `2012-2013` | `no` | `definitional-unfold` |
+| `SemanticConvergence.Manifest` | `SemanticConvergence.fullyDerived_eq` | `2014-2015` | `no` | `definitional-unfold` |
+| `SemanticConvergence.Manifest` | `SemanticConvergence.fullyFirstPrinciples_eq` | `2016-2019` | `no` | `substantive` |
 | `SemanticConvergence.Noise` | `SemanticConvergence.prop_noise_immunity` | `25-39` | `yes` | `substantive` |
 | `SemanticConvergence.Noise` | `SemanticConvergence.prop_noise_left_invertible` | `40-47` | `yes` | `constructive-existential` |
 | `SemanticConvergence.Noise` | `SemanticConvergence.prop_noise_decoding` | `48-55` | `yes` | `substantive` |
@@ -436,8 +455,10 @@ tautology / placeholder patterns quickly.
 | `SemanticConvergence.Semantic` | `SemanticConvergence.SummableSupportCounterexample.no_oneStepResidualPosteriorConcentrates` | `859-916` | `no` | `substantive` |
 | `SemanticConvergence.Semantic` | `SemanticConvergence.thm_summable_support_insufficient` | `917-939` | `yes` | `constructive-existential` |
 | `SemanticConvergence.Semantic` | `SemanticConvergence.cor_goal_dialed_payoff` | `940-954` | `yes` | `substantive` |
-| `SemanticConvergence.Surrogate` | `SemanticConvergence.prop_amortized_surrogate_minimizer` | `63-77` | `yes` | `substantive` |
-| `SemanticConvergence.Surrogate` | `SemanticConvergence.thm_amortized_surrogate_selector_existence` | `78-92` | `no` | `constructive-existential` |
-| `SemanticConvergence.Surrogate` | `SemanticConvergence.cor_amortized_surrogate_selector_support` | `93-119` | `no` | `substantive` |
-| `SemanticConvergence.Surrogate` | `SemanticConvergence.thm_amortized_surrogate` | `141-186` | `yes` | `substantive` |
-| `SemanticConvergence.Surrogate` | `SemanticConvergence.cor_amortized_surrogate_finite_time` | `187-257` | `yes` | `substantive` |
+| `SemanticConvergence.Surrogate` | `SemanticConvergence.prop_amortized_surrogate_minimizer` | `64-85` | `yes` | `substantive` |
+| `SemanticConvergence.Surrogate` | `SemanticConvergence.helper_amortized_surrogate_selector_existence_of_positiveSeparation` | `95-109` | `no` | `constructive-existential` |
+| `SemanticConvergence.Surrogate` | `SemanticConvergence.helper_amortized_surrogate_selector_support` | `110-128` | `no` | `substantive` |
+| `SemanticConvergence.Surrogate` | `SemanticConvergence.thm_amortized_surrogate_selector_existence` | `129-196` | `no` | `constructive-existential` |
+| `SemanticConvergence.Surrogate` | `SemanticConvergence.cor_amortized_surrogate_selector_support` | `197-235` | `no` | `constructive-existential` |
+| `SemanticConvergence.Surrogate` | `SemanticConvergence.thm_amortized_surrogate` | `257-302` | `yes` | `substantive` |
+| `SemanticConvergence.Surrogate` | `SemanticConvergence.cor_amortized_surrogate_finite_time` | `303-373` | `yes` | `substantive` |

@@ -10,6 +10,7 @@ noncomputable section CountablePaperSurrogate
 
 open CountableConcrete
 open CountableConcrete.CountablePrefixMachine
+open ConcretePrefixMachine
 
 variable {A : Type u} {O : Type v}
 variable [Encodable A] [Encodable O]
@@ -74,8 +75,24 @@ theorem prop_amortized_surrogate_minimizer
     (fun a => surrogateEnergy U π t h a ω pstar refLaw reg)
     hActions
 
+/--
+Countable finite-list counterpart of deployment assumption `(A3)`.
+
+Because the present countable semantic scaffold carries the class-vs.-complement score at
+the history level rather than as an action-indexed predicate, the assumption says that the
+same positive semantic-separation floor is inherited along the entire learned high-score
+set.
+-/
+def countableSurrogateAssumptionA3
+    (U : CountablePrefixMachine A O)
+    (π : CountablePolicy A O) (t : Nat) (h : CountHist A O)
+    (ω : Observer (CountableEncodedProgram A O))
+    (pstar : CountableEncodedProgram A O)
+    (highScoreActions : List A) : Prop :=
+  ∀ a, a ∈ highScoreActions → 0 < U.semanticSeparation π t h ω pstar
+
 /-- Helper theorem retaining the old singleton-selector existence result. -/
-theorem thm_amortized_surrogate_selector_existence
+theorem helper_amortized_surrogate_selector_existence_of_positiveSeparation
     (U : CountablePrefixMachine A O)
     (π : CountablePolicy A O) (t : Nat) (h : CountHist A O) (actions : List A)
     (hActions : actions ≠ [])
@@ -90,7 +107,7 @@ theorem thm_amortized_surrogate_selector_existence
   simp [surrogateChosenLaw, singletonActionLaw]
 
 /-- Helper corollary retaining the old singleton-selector support fact. -/
-theorem cor_amortized_surrogate_selector_support
+theorem helper_amortized_surrogate_selector_support
     (U : CountablePrefixMachine A O)
     (π : CountablePolicy A O) (t : Nat) (h : CountHist A O) (actions : List A)
     (hActions : actions ≠ [])
@@ -100,6 +117,105 @@ theorem cor_amortized_surrogate_selector_support
     (surrogateChosenLaw U π t h actions hActions ω pstar refLaw reg).mass
       (surrogateArgmin U π t h actions hActions ω pstar refLaw reg) ≠ 0 := by
   simp [surrogateChosenLaw, singletonActionLaw]
+
+/--
+Countable deployment-side surrogate support theorem.
+
+This is the countable wrapper matching the repaired concrete theorem surface: assumptions
+`(A1)`--`(A3)` are exposed directly, the implemented law is the same finite-list
+deployment law `surrogateImplementedLaw`, and the conclusion gives both the paper's
+`δ_impl` lower bound and an explicit supported high-score action.
+-/
+theorem thm_amortized_surrogate_selector_existence
+    (U : CountablePrefixMachine A O)
+    (π : CountablePolicy A O) (t : Nat) (h : CountHist A O)
+    (ω : Observer (CountableEncodedProgram A O))
+    (pstar : CountableEncodedProgram A O)
+    (highScoreActions : List A)
+    (refLaw : ActionLaw A)
+    (rhoFloor rhoStar lambdaFloor bonusFloor : Rat)
+    (hRhoFloorPos : 0 < rhoFloor)
+    (hLambdaFloorPos : 0 < lambdaFloor)
+    (hBonusFloorPos : 0 < bonusFloor)
+    (hA1 : surrogateAssumptionA1 rhoFloor rhoStar)
+    (hA2 : surrogateAssumptionA2 refLaw highScoreActions lambdaFloor)
+    (hA3 : countableSurrogateAssumptionA3 U π t h ω pstar highScoreActions) :
+    surrogateDeltaImpl rhoFloor lambdaFloor bonusFloor ≤
+        listWeightedSum highScoreActions
+          (fun a => (surrogateImplementedLaw highScoreActions refLaw rhoStar bonusFloor).mass a) ∧
+      ∃ a, a ∈ highScoreActions ∧
+        (surrogateImplementedLaw highScoreActions refLaw rhoStar bonusFloor).mass a ≠ 0 ∧
+        0 < U.semanticSeparation π t h ω pstar := by
+  have hRhoStarNonneg : 0 ≤ rhoStar := le_trans (le_of_lt hRhoFloorPos) hA1
+  have hScaledRho :
+      rhoFloor * lambdaFloor ≤ rhoStar * lambdaFloor := by
+    exact mul_le_mul_of_nonneg_right hA1 (le_of_lt hLambdaFloorPos)
+  have hScaledMass :
+      rhoStar * lambdaFloor ≤ rhoStar * listWeightedSum highScoreActions refLaw.mass := by
+    exact mul_le_mul_of_nonneg_left hA2 hRhoStarNonneg
+  have hCombined :
+      rhoFloor * lambdaFloor ≤ rhoStar * listWeightedSum highScoreActions refLaw.mass := by
+    exact le_trans hScaledRho hScaledMass
+  have hBonusScaled :
+      bonusFloor * (rhoFloor * lambdaFloor) ≤
+        bonusFloor * (rhoStar * listWeightedSum highScoreActions refLaw.mass) := by
+    exact mul_le_mul_of_nonneg_left hCombined (le_of_lt hBonusFloorPos)
+  have hFloorWeight :
+      surrogateDeltaImpl rhoFloor lambdaFloor bonusFloor ≤
+        listWeightedSum highScoreActions
+          (fun a => (surrogateImplementedLaw highScoreActions refLaw rhoStar bonusFloor).mass a) := by
+    rw [surrogateImplementedLaw_weight_on_highScore highScoreActions refLaw rhoStar bonusFloor]
+    unfold surrogateDeltaImpl
+    simpa [mul_assoc, mul_left_comm, mul_comm] using hBonusScaled
+  have hRefMassPos : 0 < listWeightedSum highScoreActions refLaw.mass := by
+    exact lt_of_lt_of_le hLambdaFloorPos hA2
+  have hRefMassNe :
+      listWeightedSum highScoreActions refLaw.mass ≠ 0 := ne_of_gt hRefMassPos
+  rcases listWeightedSum_ne_zero_exists
+      (xs := highScoreActions) (f := refLaw.mass) hRefMassNe with
+    ⟨a, ha, hRefMassA⟩
+  have hRhoStarPos : 0 < rhoStar := lt_of_lt_of_le hRhoFloorPos hA1
+  have hMassEq :
+      (surrogateImplementedLaw highScoreActions refLaw rhoStar bonusFloor).mass a =
+        rhoStar * bonusFloor * refLaw.mass a :=
+    surrogateImplementedLaw_mass_of_mem ha
+  have hImplMass :
+      (surrogateImplementedLaw highScoreActions refLaw rhoStar bonusFloor).mass a ≠ 0 := by
+    rw [hMassEq]
+    exact mul_ne_zero
+      (mul_ne_zero (ne_of_gt hRhoStarPos) (ne_of_gt hBonusFloorPos))
+      hRefMassA
+  exact ⟨hFloorWeight, ⟨a, ha, hImplMass, hA3 a ha⟩⟩
+
+/--
+Countable support corollary for the deployment-side surrogate wrapper.
+
+This is intentionally weaker than the full concrete theorem: it records the abstract
+countable fact that assumptions `(A1)`--`(A3)` already force some supported high-score
+action under the implemented law.
+-/
+theorem cor_amortized_surrogate_selector_support
+    (U : CountablePrefixMachine A O)
+    (π : CountablePolicy A O) (t : Nat) (h : CountHist A O)
+    (ω : Observer (CountableEncodedProgram A O))
+    (pstar : CountableEncodedProgram A O)
+    (highScoreActions : List A)
+    (refLaw : ActionLaw A)
+    (rhoFloor rhoStar lambdaFloor bonusFloor : Rat)
+    (hRhoFloorPos : 0 < rhoFloor)
+    (hLambdaFloorPos : 0 < lambdaFloor)
+    (hBonusFloorPos : 0 < bonusFloor)
+    (hA1 : surrogateAssumptionA1 rhoFloor rhoStar)
+    (hA2 : surrogateAssumptionA2 refLaw highScoreActions lambdaFloor)
+    (hA3 : countableSurrogateAssumptionA3 U π t h ω pstar highScoreActions) :
+    ∃ a, a ∈ highScoreActions ∧
+      (surrogateImplementedLaw highScoreActions refLaw rhoStar bonusFloor).mass a ≠ 0 := by
+  rcases (thm_amortized_surrogate_selector_existence
+      U π t h ω pstar highScoreActions refLaw
+      rhoFloor rhoStar lambdaFloor bonusFloor
+      hRhoFloorPos hLambdaFloorPos hBonusFloorPos hA1 hA2 hA3).2 with
+    ⟨a, ha, hMass, _⟩
+  exact ⟨a, ha, hMass⟩
 
 end CountablePaperSurrogate
 

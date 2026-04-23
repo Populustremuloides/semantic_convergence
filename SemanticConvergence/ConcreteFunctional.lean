@@ -130,6 +130,9 @@ abbrev ProgramLaw (A : Type u) (O : Type v) := ConcreteLaw (EncodedProgram A O)
 /-- Concrete local action laws for the functional layer. -/
 abbrev ActionLaw (A : Type u) := ConcreteLaw A
 
+/-- Concrete joint class-action laws for the kernel lift. -/
+abbrev KernelLaw (A : Type u) (O : Type v) := ConcreteLaw (EncodedProgram A O × A)
+
 /-- Concrete observation law emitted by a program after a full history and action. -/
 def programObsLaw (h : FullHist A O) (a : A) (p : EncodedProgram A O) : ConcreteLaw O :=
   p.kernel h.1 h.2 a
@@ -174,26 +177,175 @@ def bhatOmega
 def actionExpectation (π : ActionLaw A) (f : A → Float) : Float :=
   listWeightedSumFloat π.support (fun a => ratToFloat (π.mass a) * f a)
 
+/-- One-step predictive codelength of a finitely supported observation law. -/
+def observationCodelength (μ : ConcreteLaw O) : Float :=
+  listWeightedSumFloat μ.support (fun o =>
+    let m := μ.mass o
+    ratToFloat m * (if m ≤ 0 then 0 else Float.neg (Float.log (ratToNonnegFloat m))))
+
+/-- Local predictive codelength term used by the concrete belief functional. -/
+def historyCodelength
+    (π : ActionLaw A) (h : FullHist A O) (p : EncodedProgram A O) : Float :=
+  actionExpectation π (fun a => observationCodelength (programObsLaw h a p))
+
+/-- Concrete code-length prior weight attached to a single encoded program. -/
+def encodedProgramPriorWeight (p : EncodedProgram A O) : Rat :=
+  codeWeight p.code
+
 /--
-Concrete raw two-observer functional: belief-fiber mass under `ω_B` times the actionwise
-Bhattacharyya gain evaluated at `ω_A`.
+Concrete generalized-KL proxy between two nonnegative rational weights. The paper-facing
+layer only needs the variational shape here, so the impossible `r = 0 < q` branch is
+recorded as a large positive penalty rather than an actual infinity.
+-/
+def concreteKLDivergenceTerm (q r : Rat) : Float :=
+  if q = 0 then 0
+  else if r = 0 then ratToFloat q * 1000000
+  else ratToFloat q * Float.log (ratToNonnegFloat (q / r))
+
+/-- Belief-side regularizer against the code-length prior. -/
+def beliefRegularizer
+    (q : ProgramLaw A O) : Float :=
+  listWeightedSumFloat q.support
+    (fun p => concreteKLDivergenceTerm (q.mass p) (encodedProgramPriorWeight p))
+
+/--
+Concrete belief term of the two-observer variational functional: expected codelength plus
+the code-prior KL proxy.
+-/
+def beliefFunctional
+    (q : ProgramLaw A O) (π : ActionLaw A) (h : FullHist A O) : Float :=
+  listWeightedSumFloat q.support
+      (fun p => ratToFloat (q.mass p) * historyCodelength π h p) +
+    beliefRegularizer q
+
+/-- Capped Bhattacharyya score entering the concrete action-side variational term. -/
+def cappedBhatOmega
+    (ω : Observer (EncodedProgram A O))
+    (pstar : EncodedProgram A O)
+    (q : ProgramLaw A O) (a : A) (h : FullHist A O) : Float :=
+  let s := bhatOmega ω pstar q a h
+  if s ≤ 1 then s else 1
+
+/-- Concrete action-side class score induced by the realized local action law. -/
+def classActionScore
+    (ω : Observer (EncodedProgram A O))
+    (q : ProgramLaw A O) (π : ActionLaw A)
+    (h : FullHist A O) (pstar : EncodedProgram A O) : Float :=
+  actionExpectation π (fun a => cappedBhatOmega ω pstar q a h)
+
+/-- Finite-list reference mass on a concrete observer class, induced by code weights. -/
+def classReferenceWeightOnTargets
+    (ω : Observer (EncodedProgram A O))
+    (targets : List (EncodedProgram A O))
+    (pstar : EncodedProgram A O) : Rat :=
+  listWeightedSum targets
+    (fun p => if ω.view p = ω.view pstar then encodedProgramPriorWeight p else 0)
+
+/-- Concrete KL regularizer of the class law against the finite-list class reference mass. -/
+def classLawRegularizer
+    (ω : Observer (EncodedProgram A O))
+    (ν : ProgramLaw A O) : Float :=
+  listWeightedSumFloat ν.support
+    (fun p => concreteKLDivergenceTerm
+      (ν.mass p) (classReferenceWeightOnTargets ω ν.support p))
+
+/-- Concrete expected class score under the current class-targeting law. -/
+def expectedClassActionScore
+    (ω : Observer (EncodedProgram A O))
+    (q ν : ProgramLaw A O) (π : ActionLaw A) (h : FullHist A O) : Float :=
+  listWeightedSumFloat ν.support
+    (fun p => ratToFloat (ν.mass p) * classActionScore ω q π h p)
+
+/--
+Marginal action law induced by a concrete class-action kernel. This is the action-side
+distribution that enters the belief term of the kernel lift.
+-/
+def kernelActionMarginal
+    [DecidableEq A] [BEq A] [LawfulBEq A]
+    (κ : KernelLaw A O) : ActionLaw A where
+  mass a := listWeightedSum κ.support (fun ca => if ca.2 = a then κ.mass ca else 0)
+  support := (κ.support.map Prod.snd).eraseDups
+  support_complete := by
+    intro a ha
+    rcases listWeightedSum_ne_zero_exists (xs := κ.support)
+        (f := fun ca => if ca.2 = a then κ.mass ca else 0) ha with ⟨ca, hca, hneq⟩
+    have hEq : ca.2 = a := by
+      by_cases h : ca.2 = a
+      · exact h
+      · simp [h] at hneq
+    exact (List.mem_eraseDups).2 <| (List.mem_map).2 ⟨ca, hca, hEq⟩
+
+/-- Reference mass on a concrete target-action pair induced by class reference and `λ`. -/
+def kernelReferenceWeightOnTargets
+    (ω : Observer (EncodedProgram A O))
+    (targets : List (EncodedProgram A O))
+    (refLaw : ActionLaw A)
+    (pstar : EncodedProgram A O) (a : A) : Rat :=
+  classReferenceWeightOnTargets ω targets pstar * refLaw.mass a
+
+/-- Concrete class-action score entering the kernel lift. -/
+def kernelActionScore
+    (ω : Observer (EncodedProgram A O))
+    (q : ProgramLaw A O) (h : FullHist A O)
+    (pstar : EncodedProgram A O) (a : A) : Float :=
+  cappedBhatOmega ω pstar q a h
+
+/--
+Concrete Gibbs weight on a target-action pair: the class reference mass times the action
+reference mass, tilted by the capped class-action score.
+-/
+def kernelGibbsWeightOnTargets
+    (ω : Observer (EncodedProgram A O))
+    (q : ProgramLaw A O)
+    (targets : List (EncodedProgram A O))
+    (refLaw : ActionLaw A)
+    (h : FullHist A O)
+    (pstar : EncodedProgram A O) (a : A) : Float :=
+  ratToFloat (kernelReferenceWeightOnTargets ω targets refLaw pstar a) *
+    Float.exp (kernelActionScore ω q h pstar a)
+
+/-- Concrete expected class-action score under a joint kernel law. -/
+def expectedKernelActionScore
+    (ω : Observer (EncodedProgram A O))
+    (q : ProgramLaw A O) (κ : KernelLaw A O) (h : FullHist A O) : Float :=
+  listWeightedSumFloat κ.support
+    (fun ca => ratToFloat (κ.mass ca) * kernelActionScore ω q h ca.1 ca.2)
+
+/--
+Concrete KL regularizer of the class-action kernel against the product of the target-class
+reference mass and the reference action law `λ`.
+-/
+def kernelLawRegularizer
+    (ω : Observer (EncodedProgram A O))
+    (targets : List (EncodedProgram A O))
+    (κ : KernelLaw A O)
+    (refLaw : ActionLaw A) : Float :=
+  listWeightedSumFloat κ.support
+    (fun ca => concreteKLDivergenceTerm
+      (κ.mass ca) (kernelReferenceWeightOnTargets ω targets refLaw ca.1 ca.2))
+
+/--
+Concrete raw two-observer functional: the belief term together with the action-side class
+score for a single target class.
 -/
 def rawTwoObserverFunctional
     (ωB ωA : Observer (EncodedProgram A O))
     (q : ProgramLaw A O) (π : ActionLaw A)
     (h : FullHist A O) (pstar : EncodedProgram A O) : Float :=
-  ratToFloat (observerFiberMass ωB q pstar) *
-    actionExpectation π (fun a => bhatOmega ωA pstar q a h)
+  let _ := ωB
+  beliefFunctional q π h - classActionScore ωA q π h pstar
 
 /--
-Concrete two-observer functional obtained by averaging the raw target-program functional
-against a finitely supported representative law on programs.
+Concrete two-observer variational functional: belief term, minus the expected class score
+under `ν`, plus the class-law regularizer against the finite-list code-prior reference.
 -/
 def twoObserverFunctional
     (ωB ωA : Observer (EncodedProgram A O))
     (q ν : ProgramLaw A O) (π : ActionLaw A) (h : FullHist A O) : Float :=
-  listWeightedSumFloat ν.support (fun p =>
-    ratToFloat (ν.mass p) * rawTwoObserverFunctional ωB ωA q π h p)
+  let _ := ωB
+  beliefFunctional q π h -
+    expectedClassActionScore ωA q ν π h +
+    classLawRegularizer ωA ν
 
 /-- Rational `L^1`-distance between two concrete local action laws. -/
 def lawL1 (κ refLaw : ActionLaw A) [DecidableEq A] [BEq A] [LawfulBEq A] : Rat :=
@@ -202,25 +354,33 @@ def lawL1 (κ refLaw : ActionLaw A) [DecidableEq A] [BEq A] [LawfulBEq A] : Rat 
 
 /--
 Concrete kernel lift of the two-observer functional. The regularizer is the rational
-`L^1` deviation from the reference action law.
+joint KL term against the product of the class reference mass and the action reference
+law, and the belief term is evaluated at the action marginal induced by the kernel.
 -/
 def kernelFunctional
     [DecidableEq A] [BEq A] [LawfulBEq A]
     (ωB ωA : Observer (EncodedProgram A O))
-    (q ν : ProgramLaw A O)
-    (κ refLaw : ActionLaw A) (h : FullHist A O) : Float :=
-  twoObserverFunctional ωB ωA q ν κ h + ratToFloat (lawL1 κ refLaw)
+    (q : ProgramLaw A O)
+    (κ : KernelLaw A O)
+    (targets : List (EncodedProgram A O))
+    (refLaw : ActionLaw A) (h : FullHist A O) : Float :=
+  let _ := ωB
+  beliefFunctional q (kernelActionMarginal κ) h -
+    expectedKernelActionScore ωA q κ h +
+    kernelLawRegularizer ωA targets κ refLaw
 
 /-- Concrete meeting-point shorthand bundling the three local functionals. -/
 def meetingPointShorthand
     [DecidableEq A] [BEq A] [LawfulBEq A]
     (ωB ωA : Observer (EncodedProgram A O))
     (q ν : ProgramLaw A O)
-    (κ refLaw : ActionLaw A) (h : FullHist A O) :
+    (targets : List (EncodedProgram A O))
+    (κ : KernelLaw A O)
+    (refLaw : ActionLaw A) (h : FullHist A O) :
     (EncodedProgram A O → Float) × Float × Float :=
-  (fun pstar => rawTwoObserverFunctional ωB ωA q κ h pstar,
-   twoObserverFunctional ωB ωA q ν κ h,
-   kernelFunctional ωB ωA q ν κ refLaw h)
+  (fun pstar => rawTwoObserverFunctional ωB ωA q (kernelActionMarginal κ) h pstar,
+   twoObserverFunctional ωB ωA q ν (kernelActionMarginal κ) h,
+   kernelFunctional ωB ωA q κ targets refLaw h)
 
 theorem lawL1_self
     [DecidableEq A] [BEq A] [LawfulBEq A]

@@ -39,6 +39,34 @@ The live status for both notions is tracked in:
 - [formalization_audit.md](/Users/brianbrown/Documents/Claude/Projects/algorithmic_free_energy/formalization_audit.md)
 - [Manifest.lean](/Users/brianbrown/Documents/Claude/Projects/algorithmic_free_energy/SemanticConvergence/Manifest.lean)
 
+## Current belief and variational Lean scope
+
+The exact Lean names and their current concrete scope on the belief / Gibbs side are:
+
+- `SemanticConvergence.def_afe`
+  This is now the countable generalized KL / I-divergence from a proposed belief
+  weight function to the posterior-weight scaffold, not the older binary proxy.
+- `SemanticConvergence.lem_variational`
+  This now certifies that zero AFE is attained exactly at posterior-weight
+  agreement on that generalized-KL object.
+- `SemanticConvergence.lem_kl_necessity`
+  This now proves the necessity direction directly from the zero characterization
+  of the pointwise generalized-KL terms.
+- `SemanticConvergence.def_two_observer_functional`
+  This now exposes the repaired three-part Gibbs variational structure on the
+  paper-facing countable stack: belief term, class-score term, and class-law
+  regularizer.
+- `SemanticConvergence.prop_two_observer_minimizer`
+  This is the countable exact-minimizer theorem for that repaired two-observer
+  variational.
+- `SemanticConvergence.def_kernel_functional`
+  This now exposes the repaired joint class-action kernel lift with
+  reference-law regularization, not the earlier reduced-form add-on.
+- `SemanticConvergence.prop_kernel_functional_minimizer`
+  and `SemanticConvergence.prop_kernel_functional_minimizer_compact`
+  These are the corresponding exact and compact-action Gibbs kernel minimizer
+  theorems on the paper-facing countable surface.
+
 ## Current Section 6 Lean scope
 
 The exact Lean names and their current concrete scope are:
@@ -82,6 +110,11 @@ The exact Lean names and their current concrete scope at the end-of-paper side a
   `SemanticConvergence.thm_afe_near_miss_witness` records the local action-side
   geometry, while the public theorem adds the horizon-level posterior-freezing
   consequence.
+- `SemanticConvergence.thm_amortized_surrogate_selector_existence`
+  and `SemanticConvergence.cor_amortized_surrogate_selector_support`
+  These now give the repaired countable finite-list surrogate wrapper: finite
+  counterparts of `(A1)`--`(A3)` yield the implemented-law support floor and a
+  supported high-score action.
 - `SemanticConvergence.thm_amortized_surrogate`
   This now lives on the concrete deployment-side stack. It exposes finite-list
   counterparts of the paper's assumptions `(A1)`--`(A3)` and derives the
