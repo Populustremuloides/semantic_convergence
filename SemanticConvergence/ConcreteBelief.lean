@@ -204,6 +204,94 @@ def observerFiberComplementLaw (U : ConcretePrefixMachine A O)
 
 end ConcretePrefixMachine
 
+namespace CountableConcrete
+
+namespace CountablePrefixMachine
+
+variable {A : Type u} {O : Type v}
+variable [Encodable A] [Encodable O]
+
+/-- Observer fiber on the enumerable machine domain. -/
+def observerFiber (U : CountablePrefixMachine A O)
+    (ω : Observer (CountableEncodedProgram A O))
+    (pstar : CountableEncodedProgram A O) : PredSet U.Program :=
+  fun p => ω.view (U.toEncodedProgram p) = ω.view pstar
+
+/-- Posterior weight assigned to an observer fiber in the countable substrate. -/
+def observerFiberPosteriorWeight (U : CountablePrefixMachine A O)
+    (π : CountablePolicy A O) (t : Nat) (h : CountHist A O)
+    (ω : Observer (CountableEncodedProgram A O))
+    (pstar : CountableEncodedProgram A O) : ENNReal :=
+  ∑' p : U.Program,
+    if U.observerFiber ω pstar p then U.posteriorWeight π t h p else 0
+
+/-- Posterior weight assigned to the complement of an observer fiber. -/
+def observerFiberComplementWeight (U : CountablePrefixMachine A O)
+    (π : CountablePolicy A O) (t : Nat) (h : CountHist A O)
+    (ω : Observer (CountableEncodedProgram A O))
+    (pstar : CountableEncodedProgram A O) : ENNReal :=
+  ∑' p : U.Program,
+    if U.observerFiber ω pstar p then 0 else U.posteriorWeight π t h p
+
+/-- Same-view targets induce the same machine-domain observer fiber. -/
+theorem observerFiber_eq_of_sameView (U : CountablePrefixMachine A O)
+    (ω : Observer (CountableEncodedProgram A O))
+    {p q : CountableEncodedProgram A O}
+    (hView : ω.view p = ω.view q) :
+    U.observerFiber ω p = U.observerFiber ω q := by
+  funext r
+  simp [observerFiber, hView]
+
+/-- Same-view targets have the same observer-fiber posterior weight. -/
+theorem observerFiberPosteriorWeight_eq_of_sameView
+    (U : CountablePrefixMachine A O)
+    (π : CountablePolicy A O) (t : Nat) (h : CountHist A O)
+    (ω : Observer (CountableEncodedProgram A O))
+    {p q : CountableEncodedProgram A O}
+    (hView : ω.view p = ω.view q) :
+    U.observerFiberPosteriorWeight π t h ω p =
+      U.observerFiberPosteriorWeight π t h ω q := by
+  simp [observerFiberPosteriorWeight, observerFiber, hView]
+  rfl
+
+/-- Same-view targets have the same observer-fiber complement weight. -/
+theorem observerFiberComplementWeight_eq_of_sameView
+    (U : CountablePrefixMachine A O)
+    (π : CountablePolicy A O) (t : Nat) (h : CountHist A O)
+    (ω : Observer (CountableEncodedProgram A O))
+    {p q : CountableEncodedProgram A O}
+    (hView : ω.view p = ω.view q) :
+    U.observerFiberComplementWeight π t h ω p =
+      U.observerFiberComplementWeight π t h ω q := by
+  simp [observerFiberComplementWeight, observerFiber, hView]
+  rfl
+
+/-- Posterior odds of an observer fiber against its complement in the countable substrate. -/
+def observerFiberPosteriorOdds (U : CountablePrefixMachine A O)
+    (π : CountablePolicy A O) (t : Nat) (h : CountHist A O)
+    (ω : Observer (CountableEncodedProgram A O))
+    (pstar : CountableEncodedProgram A O) : ENNReal :=
+  let num := U.observerFiberPosteriorWeight π t h ω pstar
+  let den := U.observerFiberComplementWeight π t h ω pstar
+  if den = 0 then 0 else num / den
+
+/-- Same-view targets have the same observer-fiber posterior odds. -/
+theorem observerFiberPosteriorOdds_eq_of_sameView
+    (U : CountablePrefixMachine A O)
+    (π : CountablePolicy A O) (t : Nat) (h : CountHist A O)
+    (ω : Observer (CountableEncodedProgram A O))
+    {p q : CountableEncodedProgram A O}
+    (hView : ω.view p = ω.view q) :
+    U.observerFiberPosteriorOdds π t h ω p =
+      U.observerFiberPosteriorOdds π t h ω q := by
+  have hNum := U.observerFiberPosteriorWeight_eq_of_sameView π t h ω hView
+  have hDen := U.observerFiberComplementWeight_eq_of_sameView π t h ω hView
+  simp [observerFiberPosteriorOdds, hNum, hDen]
+
+end CountablePrefixMachine
+
+end CountableConcrete
+
 end
 
 end SemanticConvergence

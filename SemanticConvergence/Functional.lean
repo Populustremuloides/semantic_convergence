@@ -1,483 +1,190 @@
 import SemanticConvergence.Hierarchy
+import SemanticConvergence.ConcreteBelief
+import SemanticConvergence.ConcreteSemantic
 import SemanticConvergence.ConcreteFunctional
 
 namespace SemanticConvergence
 
-universe u v w x y z t s r q m n p o
+universe u v
 
-/--
-Abstract unique-minimizer predicate used throughout the functional layer.
-The objective codomain and minimization notion are left abstract and are supplied by the
-ambient functional model.
--/
-def UniqueMinimizer {α : Type u} {β : Type v}
-    (minimizes : (α → β) → α → Prop) (f : α → β) (x : α) : Prop :=
-  minimizes f x ∧ ∀ y, minimizes f y → y = x
+noncomputable section CountablePaperFunctional
 
-/--
-Generic constructor for `UniqueMinimizer` from a minimizing witness and a uniqueness
-principle for all minimizers.
--/
-theorem uniqueMinimizer_of_minimizes_unique
-    {α : Type u} {β : Type v}
-    {minimizes : (α → β) → α → Prop}
-    {f : α → β} {x : α}
-    (hx : minimizes f x)
-    (huniq : ∀ y, minimizes f y → y = x) :
-    UniqueMinimizer minimizes f x :=
-  ⟨hx, huniq⟩
-
-/--
-`FunctionalModel` is a legacy abstract compatibility package for the two-observer
-functional layer. It is retained for archival comparison and backward
-compatibility only; the paper-facing functional declarations below now terminate
-at the concrete stack.
--/
-structure FunctionalModel extends HierarchyModel where
-  Score : Type s
-  LawObs : Type r
-  ObserverId : Type t
-  ObsClass : Type q
-  ProgramDist : Type m
-  ClassDist : Type n
-  KernelDist : Type p
-  CompactKernelDist : Type o
-  ReferenceMeasure : Type
-  refines : ObserverId → ObserverId → Prop
-  observerFiber : ObserverId → Program → PredSet Program
-  ωsyn : ObserverId
-  ωbehav : ObserverId
-  envLaw : Program → LawObs
-  classContains : ObsClass → Program → Prop
-  scoreLE : Score → Score → Prop
-  beliefPosteriorMass : ObserverId → History → ObsClass → Score
-  priorRatio : ObsClass → ObsClass → Score
-  actionCapBound : History → ObsClass → ObsClass → Score
-  goalScore : ObserverId → ObsClass → History → Score
-  bhatOmega : ObserverId → ObsClass → Action → History → Score
-  cappedBhat : ObserverId → ObsClass → Action → History → Score
-  rawFunctional :
-    ObserverId → ObserverId → ProgramDist → Policy → History → Score
-  twoObserverFunctional :
-    ObserverId → ObserverId → ProgramDist → ClassDist → History → Score
-  kernelFunctional :
-    ObserverId → ObserverId →
-      ProgramDist → KernelDist → ReferenceMeasure → History → Score
-  compactKernelFunctional :
-    ObserverId → ObserverId →
-      ProgramDist → CompactKernelDist → ReferenceMeasure → History → Score
-  bayesGibbsPosterior : History → ProgramDist
-  nuGibbs : ObserverId → History → ClassDist
-  kappaGibbs : ObserverId → ReferenceMeasure → History → KernelDist
-  compactKappaGibbs :
-    ObserverId → ReferenceMeasure → History → CompactKernelDist
-  minimizesProgramDist : (ProgramDist → Score) → ProgramDist → Prop
-  minimizesClassDist : (ClassDist → Score) → ClassDist → Prop
-  minimizesKernelDist : (KernelDist → Score) → KernelDist → Prop
-  minimizesCompactKernelDist : (CompactKernelDist → Score) → CompactKernelDist → Prop
-  sameBehavioralFiber : ObsClass → ObsClass → Prop
-  positivePairMass : History → ObsClass → ObsClass → Prop
-  goalDialHyp : ObserverId → Program → Prop
-  refines_refl : ∀ ω : ObserverId, refines ω ω
-  refines_antisymm_behav :
-    ∀ {ω : ObserverId}, refines ωbehav ω → refines ω ωbehav → ω = ωbehav
-  syntacticTop : ∀ ω : ObserverId, refines ω ωsyn
-  scoreLE_refl : ∀ s : Score, scoreLE s s
-  scoreLE_trans :
-    ∀ {s₁ s₂ s₃ : Score}, scoreLE s₁ s₂ → scoreLE s₂ s₃ → scoreLE s₁ s₃
-  bhat_le_capped :
-    ∀ (ω : ObserverId) (c : ObsClass) (a : Action) (h : History),
-      scoreLE (bhatOmega ω c a h) (cappedBhat ω c a h)
-  twoObserverProgramMinimizes :
-    ∀ (ωB ωA : ObserverId) (h : History),
-      minimizesProgramDist
-        (fun q => twoObserverFunctional ωB ωA q (nuGibbs ωA h) h)
-        (bayesGibbsPosterior h)
-  twoObserverProgramUnique :
-    ∀ (ωB ωA : ObserverId) (h : History) (q : ProgramDist),
-      minimizesProgramDist
-        (fun q' => twoObserverFunctional ωB ωA q' (nuGibbs ωA h) h)
-        q →
-      q = bayesGibbsPosterior h
-  twoObserverClassMinimizes :
-    ∀ (ωB ωA : ObserverId) (h : History),
-      minimizesClassDist
-        (fun ν => twoObserverFunctional ωB ωA (bayesGibbsPosterior h) ν h)
-        (nuGibbs ωA h)
-  twoObserverClassUnique :
-    ∀ (ωB ωA : ObserverId) (h : History) (ν : ClassDist),
-      minimizesClassDist
-        (fun ν' => twoObserverFunctional ωB ωA (bayesGibbsPosterior h) ν' h)
-        ν →
-      ν = nuGibbs ωA h
-  kernelProgramMinimizes :
-    ∀ (ωB ωA : ObserverId) (ref : ReferenceMeasure) (h : History),
-      minimizesProgramDist
-        (fun q => kernelFunctional ωB ωA q (kappaGibbs ωA ref h) ref h)
-        (bayesGibbsPosterior h)
-  kernelProgramUnique :
-    ∀ (ωB ωA : ObserverId) (ref : ReferenceMeasure) (h : History) (q : ProgramDist),
-      minimizesProgramDist
-        (fun q' => kernelFunctional ωB ωA q' (kappaGibbs ωA ref h) ref h)
-        q →
-      q = bayesGibbsPosterior h
-  kernelKernelMinimizes :
-    ∀ (ωB ωA : ObserverId) (ref : ReferenceMeasure) (h : History),
-      minimizesKernelDist
-        (fun κ => kernelFunctional ωB ωA (bayesGibbsPosterior h) κ ref h)
-        (kappaGibbs ωA ref h)
-  kernelKernelUnique :
-    ∀ (ωB ωA : ObserverId) (ref : ReferenceMeasure) (h : History) (κ : KernelDist),
-      minimizesKernelDist
-        (fun κ' => kernelFunctional ωB ωA (bayesGibbsPosterior h) κ' ref h)
-        κ →
-      κ = kappaGibbs ωA ref h
-  compactKernelProgramMinimizes :
-    ∀ (ωB ωA : ObserverId) (ref : ReferenceMeasure) (h : History),
-      minimizesProgramDist
-        (fun q =>
-          compactKernelFunctional ωB ωA q (compactKappaGibbs ωA ref h) ref h)
-        (bayesGibbsPosterior h)
-  compactKernelProgramUnique :
-    ∀ (ωB ωA : ObserverId) (ref : ReferenceMeasure) (h : History)
-      (q : ProgramDist),
-      minimizesProgramDist
-        (fun q' =>
-          compactKernelFunctional ωB ωA q' (compactKappaGibbs ωA ref h) ref h)
-        q →
-      q = bayesGibbsPosterior h
-  compactKernelMinimizes :
-    ∀ (ωB ωA : ObserverId) (ref : ReferenceMeasure) (h : History),
-      minimizesCompactKernelDist
-        (fun κ =>
-          compactKernelFunctional ωB ωA (bayesGibbsPosterior h) κ ref h)
-        (compactKappaGibbs ωA ref h)
-  compactKernelUnique :
-    ∀ (ωB ωA : ObserverId) (ref : ReferenceMeasure) (h : History)
-      (κ : CompactKernelDist),
-      minimizesCompactKernelDist
-        (fun κ' =>
-          compactKernelFunctional ωB ωA (bayesGibbsPosterior h) κ' ref h)
-        κ →
-      κ = compactKappaGibbs ωA ref h
-  belowBehavioralWitness :
-    ∀ {ωB : ObserverId},
-      refines ωB ωbehav →
-      ¬ refines ωbehav ωB →
-      ∃ c : ObsClass, ∃ p₁ p₂ : Program,
-        classContains c p₁ ∧ classContains c p₂ ∧ envLaw p₁ ≠ envLaw p₂
-  capped_le_actionCap :
-    ∀ {ωA : ObserverId} {c₁ c₂ : ObsClass} {h : History},
-      refines ωbehav ωA →
-      ¬ refines ωA ωbehav →
-      c₁ ≠ c₂ →
-      sameBehavioralFiber c₁ c₂ →
-      positivePairMass h c₁ c₂ →
-      ∀ a : Action, scoreLE (cappedBhat ωA c₁ a h) (actionCapBound h c₁ c₂)
-
-namespace FunctionalModel
-
-variable (M : FunctionalModel)
-
-/-- Belief-side admissibility range from the manuscript. -/
-def BeliefAdmissible (ω : M.ObserverId) : Prop :=
-  M.refines M.ωbehav ω
-
-/-- Action-side admissibility range from the manuscript. -/
-def ActionAdmissible (ω : M.ObserverId) : Prop :=
-  M.refines ω M.ωbehav
-
-/-- Programs in the `ω`-fiber of `pstar`, i.e. `[p^\star]_\omega`. -/
-def goalDialedTarget (ω : M.ObserverId) (pstar : M.Program) : PredSet M.Program :=
-  M.observerFiber ω pstar
-
-/--
-Behavioral-fiber mass is definitionally the behavioral posterior mass in the current
-abstract model, so the manuscript's invariance-above statement becomes immediate.
--/
-def behavioralFiberMass (_ω : M.ObserverId) (h : M.History) (c : M.ObsClass) : M.Score :=
-  M.beliefPosteriorMass M.ωbehav h c
-
-/--
-Posterior ratios for behavioral twins are definitionally frozen at their prior values in
-the current abstract functional API.
--/
-def posteriorRatio (_h : M.History) (c₁ c₂ : M.ObsClass) : M.Score :=
-  M.priorRatio c₁ c₂
-
-/--
-Goal-dialed convergence is represented by the conjunction of the behavioral-refinement
-premise and the designated goal-dial hypothesis.
--/
-def goalDialConverges (ω : M.ObserverId) (pstar : M.Program) : Prop :=
-  M.refines ω M.ωbehav ∧ M.goalDialHyp ω pstar
-
-/-- Lean wrapper for `def:bhat-omega`. -/
-def def_bhat_omega (ω : M.ObserverId) (c : M.ObsClass) (a : M.Action) (h : M.History) :
-    M.Score :=
-  M.bhatOmega ω c a h
-
-/-- Lean wrapper for `def:raw-two-observer-functional`. -/
-def def_raw_two_observer_functional
-    (ωB ωA : M.ObserverId) (q : M.ProgramDist) (π : M.Policy) (h : M.History) :
-    M.Score :=
-  M.rawFunctional ωB ωA q π h
-
-/-- Lean wrapper for `def:two-observer-functional`. -/
-def def_two_observer_functional
-    (ωB ωA : M.ObserverId) (q : M.ProgramDist) (ν : M.ClassDist) (h : M.History) :
-    M.Score :=
-  M.twoObserverFunctional ωB ωA q ν h
-
-/-- Lean wrapper for `def:kernel-functional`. -/
-def def_kernel_functional
-    (ωB ωA : M.ObserverId) (q : M.ProgramDist) (κ : M.KernelDist)
-    (ref : M.ReferenceMeasure) (h : M.History) : M.Score :=
-  M.kernelFunctional ωB ωA q κ ref h
-
-/-- Lean wrapper for `def:meeting-point-shorthand`. -/
-def def_meeting_point_shorthand (h : M.History) :
-    (M.ProgramDist → M.ClassDist → M.Score) ×
-      (M.ProgramDist → M.Policy → M.Score) ×
-      (M.ProgramDist → M.KernelDist → M.ReferenceMeasure → M.Score) :=
-  (fun q ν => M.def_two_observer_functional M.ωsyn M.ωbehav q ν h,
-    fun q π => M.def_raw_two_observer_functional M.ωsyn M.ωbehav q π h,
-    fun q κ ref => M.def_kernel_functional M.ωsyn M.ωbehav q κ ref h)
-
-/-- Lean wrapper for `prop:belief-invariance-above`. -/
-theorem prop_belief_invariance_above {ωB : M.ObserverId}
-    (_hAbove : M.BeliefAdmissible ωB) :
-    ∀ (c : M.ObsClass) (h : M.History),
-      M.behavioralFiberMass ωB h c = M.beliefPosteriorMass M.ωbehav h c := by
-  intro c h
-  rfl
-
-/-- Lean wrapper for `cor:twins-frozen-ratio`. -/
-theorem cor_twins_frozen_ratio
-    {ωA : M.ObserverId} {c₁ c₂ : M.ObsClass} {h : M.History}
-    (_hAbove : M.BeliefAdmissible ωA)
-    (_hNotBelow : ¬ M.ActionAdmissible ωA)
-    (_hDistinct : c₁ ≠ c₂)
-    (_hSameFiber : M.sameBehavioralFiber c₁ c₂)
-    (_hPos : M.positivePairMass h c₁ c₂) :
-    M.posteriorRatio h c₁ c₂ = M.priorRatio c₁ c₂ := by
-  rfl
-
-/-- Lean wrapper for `cor:canonical-pair`. -/
-theorem cor_canonical_pair :
-    M.BeliefAdmissible M.ωbehav ∧ M.ActionAdmissible M.ωbehav := by
-  constructor
-  · exact M.refines_refl M.ωbehav
-  · exact M.refines_refl M.ωbehav
-
-/-- Lean wrapper for `prop:goal-dialed`. -/
-theorem prop_goal_dialed {ωA : M.ObserverId} {pstar : M.Program}
-    (hRef : M.refines ωA M.ωbehav)
-    (hGoal : M.goalDialHyp ωA pstar) :
-    M.goalDialConverges ωA pstar :=
-  ⟨hRef, hGoal⟩
-
-/-- Lean wrapper for `prop:two-observer-minimizer`. -/
-theorem prop_two_observer_minimizer
-    (ωB ωA : M.ObserverId) (h : M.History) :
-    UniqueMinimizer M.minimizesProgramDist
-      (fun q => M.def_two_observer_functional ωB ωA q (M.nuGibbs ωA h) h)
-      (M.bayesGibbsPosterior h) ∧
-    UniqueMinimizer M.minimizesClassDist
-      (fun ν => M.def_two_observer_functional ωB ωA (M.bayesGibbsPosterior h) ν h)
-      (M.nuGibbs ωA h) := by
-  constructor
-  · exact uniqueMinimizer_of_minimizes_unique
-      (M.twoObserverProgramMinimizes ωB ωA h)
-      (M.twoObserverProgramUnique ωB ωA h)
-  · exact uniqueMinimizer_of_minimizes_unique
-      (M.twoObserverClassMinimizes ωB ωA h)
-      (M.twoObserverClassUnique ωB ωA h)
-
-/-- Lean wrapper for `prop:kernel-functional-minimizer`. -/
-theorem prop_kernel_functional_minimizer
-    (ωB ωA : M.ObserverId) (ref : M.ReferenceMeasure) (h : M.History) :
-    UniqueMinimizer M.minimizesProgramDist
-      (fun q => M.def_kernel_functional ωB ωA q (M.kappaGibbs ωA ref h) ref h)
-      (M.bayesGibbsPosterior h) ∧
-    UniqueMinimizer M.minimizesKernelDist
-      (fun κ => M.def_kernel_functional ωB ωA (M.bayesGibbsPosterior h) κ ref h)
-      (M.kappaGibbs ωA ref h) := by
-  constructor
-  · exact uniqueMinimizer_of_minimizes_unique
-      (M.kernelProgramMinimizes ωB ωA ref h)
-      (M.kernelProgramUnique ωB ωA ref h)
-  · exact uniqueMinimizer_of_minimizes_unique
-      (M.kernelKernelMinimizes ωB ωA ref h)
-      (M.kernelKernelUnique ωB ωA ref h)
-
-/-- Lean wrapper for `prop:kernel-functional-minimizer-compact`. -/
-theorem prop_kernel_functional_minimizer_compact
-    (ωB ωA : M.ObserverId) (ref : M.ReferenceMeasure) (h : M.History) :
-    UniqueMinimizer M.minimizesProgramDist
-      (fun q =>
-        M.compactKernelFunctional ωB ωA q (M.compactKappaGibbs ωA ref h) ref h)
-      (M.bayesGibbsPosterior h) ∧
-    UniqueMinimizer M.minimizesCompactKernelDist
-      (fun κ =>
-        M.compactKernelFunctional ωB ωA (M.bayesGibbsPosterior h) κ ref h)
-      (M.compactKappaGibbs ωA ref h) := by
-  constructor
-  · exact uniqueMinimizer_of_minimizes_unique
-      (M.compactKernelProgramMinimizes ωB ωA ref h)
-      (M.compactKernelProgramUnique ωB ωA ref h)
-  · exact uniqueMinimizer_of_minimizes_unique
-      (M.compactKernelMinimizes ωB ωA ref h)
-      (M.compactKernelUnique ωB ωA ref h)
-
-/-- Lean wrapper for `prop:belief-illtyped-below`. -/
-theorem prop_belief_illtyped_below {ωB : M.ObserverId}
-    (hBelow : M.ActionAdmissible ωB)
-    (hNotAbove : ¬ M.BeliefAdmissible ωB) :
-    ∃ c : M.ObsClass, ∃ p₁ p₂ : M.Program,
-      M.classContains c p₁ ∧ M.classContains c p₂ ∧ M.envLaw p₁ ≠ M.envLaw p₂ :=
-  M.belowBehavioralWitness hBelow hNotAbove
-
-/-- Lean wrapper for `prop:action-cap`. -/
-theorem prop_action_cap
-    {ωA : M.ObserverId} {c₁ c₂ : M.ObsClass} {h : M.History}
-    (hAbove : M.BeliefAdmissible ωA)
-    (hNotBelow : ¬ M.ActionAdmissible ωA)
-    (hDistinct : c₁ ≠ c₂)
-    (hSameFiber : M.sameBehavioralFiber c₁ c₂)
-    (hPos : M.positivePairMass h c₁ c₂) :
-    ∀ a : M.Action, M.scoreLE (M.def_bhat_omega ωA c₁ a h) (M.actionCapBound h c₁ c₂) := by
-  intro a
-  exact M.scoreLE_trans
-    (M.bhat_le_capped ωA c₁ a h)
-    (M.capped_le_actionCap hAbove hNotBelow hDistinct hSameFiber hPos a)
-
-/-- Lean wrapper for `thm:meeting-point`. -/
-theorem thm_meeting_point :
-    (∀ {ωB : M.ObserverId},
-      M.ActionAdmissible ωB →
-      ¬ M.BeliefAdmissible ωB →
-      ∃ c : M.ObsClass, ∃ p₁ p₂ : M.Program,
-        M.classContains c p₁ ∧ M.classContains c p₂ ∧ M.envLaw p₁ ≠ M.envLaw p₂) ∧
-    (∀ {ωB : M.ObserverId},
-      M.BeliefAdmissible ωB →
-      M.ActionAdmissible ωB →
-      ωB = M.ωbehav) := by
-  constructor
-  · intro ωB hBelow hNotAbove
-    exact M.prop_belief_illtyped_below hBelow hNotAbove
-  · intro ωB hAbove hBelow
-    exact M.refines_antisymm_behav hAbove hBelow
-
-end FunctionalModel
-
-noncomputable section ConcretePaperFunctional
-
-open EncodedProgram
+open Classical
+open CountableConcrete
+open CountableConcrete.CountablePrefixMachine
 
 variable {A : Type u} {O : Type v}
-variable [DecidableEq A] [DecidableEq O] [BEq A] [LawfulBEq A] [BEq O] [LawfulBEq O]
+variable [Encodable A] [Encodable O]
+[DecidableEq A] [BEq A] [LawfulBEq A]
 
-/-- Concrete finite-list witness used by the migrated functional wrappers. -/
-def MinimizesOnListFloat {α : Type u} (xs : List α) (_f : α → Float) (x : α) : Prop :=
-  x ∈ xs
+/-- Convert a rational into `ℝ≥0∞` for the countable action-side penalties. -/
+def ratToENNReal (q : Rat) : ENNReal :=
+  ENNReal.ofReal q
 
-theorem exists_minimizerOnListFloat {α : Type u}
-    (xs : List α) (f : α → Float) (hxs : xs ≠ []) :
-    ∃ x, MinimizesOnListFloat xs f x := by
+/-- Finite-list minimizer witness for `ℝ≥0∞`-valued objectives. -/
+def MinimizesOnListENNReal {α : Type u} (xs : List α) (f : α → ENNReal) (x : α) : Prop :=
+  x ∈ xs ∧ ∀ y, y ∈ xs → f x ≤ f y
+
+theorem exists_minimizerOnListENNReal {α : Type u}
+    (xs : List α) (f : α → ENNReal) (hxs : xs ≠ []) :
+    ∃ x, MinimizesOnListENNReal xs f x := by
   induction xs with
   | nil =>
       contradiction
   | cons x xs ih =>
-      exact ⟨x, by simp [MinimizesOnListFloat]⟩
+      by_cases htail : xs = []
+      · refine ⟨x, ?_⟩
+        constructor
+        · simp
+        · intro y hy
+          simp [htail] at hy
+          rcases hy with rfl
+          exact le_rfl
+      · rcases ih htail with ⟨x', hx'⟩
+        by_cases hle : f x ≤ f x'
+        · refine ⟨x, ?_⟩
+          constructor
+          · simp
+          · intro y hy
+            simp at hy
+            rcases hy with rfl | hy
+            · exact le_rfl
+            · exact le_trans hle (hx'.2 y hy)
+        · have hx'le : f x' ≤ f x := le_of_not_ge hle
+          refine ⟨x', ?_⟩
+          constructor
+          · simp [hx'.1]
+          · intro y hy
+            simp at hy
+            rcases hy with rfl | hy
+            · exact hx'le
+            · exact hx'.2 y hy
 
-/-- Concrete belief-side admissibility range: observers at least as informative as behavior. -/
-def BeliefAdmissible (ω : Observer (EncodedProgram A O)) : Prop :=
+/-- Countable `argmin` on a nonempty finite list. -/
+noncomputable def argminOnListENNReal {α : Type u}
+    (xs : List α) (f : α → ENNReal) (hxs : xs ≠ []) : α :=
+  Classical.choose (exists_minimizerOnListENNReal xs f hxs)
+
+theorem argminOnListENNReal_spec {α : Type u}
+    (xs : List α) (f : α → ENNReal) (hxs : xs ≠ []) :
+    MinimizesOnListENNReal xs f (argminOnListENNReal xs f hxs) :=
+  Classical.choose_spec (exists_minimizerOnListENNReal xs f hxs)
+
+/-- Countable belief-side admissibility range. -/
+def BeliefAdmissible (ω : Observer (CountableEncodedProgram A O)) : Prop :=
   behavioralObserver (A := A) (O := O) ≼ω ω
 
-/-- Concrete action-side admissibility range: observers no more informative than behavior. -/
-def ActionAdmissible (ω : Observer (EncodedProgram A O)) : Prop :=
+/-- Countable action-side admissibility range. -/
+def ActionAdmissible (ω : Observer (CountableEncodedProgram A O)) : Prop :=
   ω ≼ω behavioralObserver (A := A) (O := O)
 
-/-- Concrete programs in the `ω`-fiber of `pstar`. -/
+/-- Countable programs in the `ω`-fiber of `pstar`, viewed on the enumerable machine domain. -/
 def goalDialedTarget
-    (ω : Observer (EncodedProgram A O)) (pstar : EncodedProgram A O) :
-    PredSet (EncodedProgram A O) :=
-  observerFiber ω pstar
+    (U : CountablePrefixMachine A O)
+    (ω : Observer (CountableEncodedProgram A O))
+    (pstar : CountableEncodedProgram A O) :
+    PredSet U.Program :=
+  U.observerFiber ω pstar
 
-/-- Concrete behavioral-fiber mass under a finitely supported program law. -/
+/-- Countable observer fiber viewed directly on encoded programs. -/
+def encodedObserverFiber
+    (ω : Observer (CountableEncodedProgram A O))
+    (pstar : CountableEncodedProgram A O) :
+    PredSet (CountableEncodedProgram A O) :=
+  fun p => ω.view p = ω.view pstar
+
+/-- Countable behavioral-fiber weight under the current posterior scaffold. -/
 def behavioralFiberMass
-    (q : ProgramLaw A O) (pstar : EncodedProgram A O) : Rat :=
-  observerFiberMass (behavioralObserver (A := A) (O := O)) q pstar
+    (U : CountablePrefixMachine A O)
+    (π : CountablePolicy A O) (t : Nat) (h : CountHist A O)
+    (pstar : CountableEncodedProgram A O) : ENNReal :=
+  U.observerFiberPosteriorWeight π t h (behavioralObserver (A := A) (O := O)) pstar
 
-/-- Concrete ratio of masses assigned by a program law to two programs. -/
+/-- Ratio of behavioral-fiber posterior weights for two targets. -/
 def posteriorRatio
-    (q : ProgramLaw A O) (p₁ p₂ : EncodedProgram A O) : Rat :=
-  if h : q.mass p₂ = 0 then 0 else q.mass p₁ / q.mass p₂
+    (U : CountablePrefixMachine A O)
+    (π : CountablePolicy A O) (t : Nat) (h : CountHist A O)
+    (p₁ p₂ : CountableEncodedProgram A O) : ENNReal :=
+  let num := behavioralFiberMass (A := A) (O := O) U π t h p₁
+  let den := behavioralFiberMass (A := A) (O := O) U π t h p₂
+  if den = 0 then 0 else num / den
 
-/-- Concrete goal-dialed convergence proxy. -/
+/-- Countable goal-dialed convergence proxy. -/
 def goalDialConverges
-    (ω : Observer (EncodedProgram A O)) (_pstar : EncodedProgram A O) : Prop :=
+    (ω : Observer (CountableEncodedProgram A O))
+    (_pstar : CountableEncodedProgram A O) : Prop :=
   BeliefAdmissible (A := A) (O := O) ω
 
-/-- Lean wrapper for `def:bhat-omega` on the concrete functional stack. -/
+/-- Lean wrapper for `def:bhat-omega` on the countable functional stack. -/
 def def_bhat_omega
-    (ω : Observer (EncodedProgram A O))
-    (pstar : EncodedProgram A O)
-    (q : ProgramLaw A O) (a : A) (h : FullHist A O) : Float :=
-  bhatOmega ω pstar q a h
+    (U : CountablePrefixMachine A O)
+    (π : CountablePolicy A O) (t : Nat) (h : CountHist A O)
+    (ω : Observer (CountableEncodedProgram A O))
+    (pstar : CountableEncodedProgram A O) : ENNReal :=
+  U.semanticSeparation π t h ω pstar
 
-/-- Lean wrapper for `def:raw-two-observer-functional` on the concrete functional stack. -/
+/-- Lean wrapper for `def:raw-two-observer-functional` on the countable functional stack. -/
 def def_raw_two_observer_functional
-    (ωB ωA : Observer (EncodedProgram A O))
-    (q : ProgramLaw A O) (π : ActionLaw A) (h : FullHist A O) :
-    EncodedProgram A O → Float :=
-  fun pstar => rawTwoObserverFunctional ωB ωA q π h pstar
+    (U : CountablePrefixMachine A O)
+    (π : CountablePolicy A O) (t : Nat) (h : CountHist A O)
+    (ωB ωA : Observer (CountableEncodedProgram A O))
+    (pstar : CountableEncodedProgram A O) : ENNReal :=
+  U.observerFiberPosteriorWeight π t h ωB pstar *
+    U.semanticSeparation π t h ωA pstar
 
-/-- Lean wrapper for `def:two-observer-functional` on the concrete functional stack. -/
+/-- Lean wrapper for `def:two-observer-functional` on the countable functional stack. -/
 def def_two_observer_functional
-    (ωB ωA : Observer (EncodedProgram A O))
-    (q ν : ProgramLaw A O) (π : ActionLaw A) (h : FullHist A O) : Float :=
-  twoObserverFunctional ωB ωA q ν π h
+    (U : CountablePrefixMachine A O)
+    (π : CountablePolicy A O) (t : Nat) (h : CountHist A O)
+    (ωB ωA : Observer (CountableEncodedProgram A O))
+    (pstar : CountableEncodedProgram A O) : ENNReal :=
+  def_raw_two_observer_functional U π t h ωB ωA pstar
 
-/-- Lean wrapper for `def:kernel-functional` on the concrete functional stack. -/
+/-- Lean wrapper for `def:kernel-functional` on the countable functional stack. -/
 def def_kernel_functional
-    (ωB ωA : Observer (EncodedProgram A O))
-    (q ν : ProgramLaw A O)
-    (κ refLaw : ActionLaw A) (h : FullHist A O) : Float :=
-  kernelFunctional ωB ωA q ν κ refLaw h
+    (U : CountablePrefixMachine A O)
+    (π : CountablePolicy A O) (t : Nat) (h : CountHist A O)
+    (ωB ωA : Observer (CountableEncodedProgram A O))
+    (pstar : CountableEncodedProgram A O)
+    (κ refLaw : ActionLaw A) : ENNReal :=
+  def_two_observer_functional U π t h ωB ωA pstar +
+    ratToENNReal (lawL1 κ refLaw)
 
-/-- Lean wrapper for `def:meeting-point-shorthand` on the concrete functional stack. -/
+/-- Lean wrapper for `def:meeting-point-shorthand` on the countable functional stack. -/
 def def_meeting_point_shorthand
-    (ωB ωA : Observer (EncodedProgram A O))
-    (q ν : ProgramLaw A O)
-    (κ refLaw : ActionLaw A) (h : FullHist A O) :
-    (EncodedProgram A O → Float) × Float × Float :=
-  meetingPointShorthand ωB ωA q ν κ refLaw h
+    (U : CountablePrefixMachine A O)
+    (π : CountablePolicy A O) (t : Nat) (h : CountHist A O)
+    (ωB ωA : Observer (CountableEncodedProgram A O))
+    (pstar : CountableEncodedProgram A O)
+    (κ refLaw : ActionLaw A) :
+    ENNReal × ENNReal × ENNReal :=
+  (def_bhat_omega U π t h ωA pstar,
+   def_two_observer_functional U π t h ωB ωA pstar,
+   def_kernel_functional U π t h ωB ωA pstar κ refLaw)
 
-/-- Lean wrapper for `prop:belief-invariance-above` on the concrete functional stack. -/
+/-- Lean wrapper for `prop:belief-invariance-above` on the countable functional stack. -/
 theorem prop_belief_invariance_above
-    {ωB : Observer (EncodedProgram A O)}
+    {ωB : Observer (CountableEncodedProgram A O)}
     (hAbove : BeliefAdmissible (A := A) (O := O) ωB)
-    {p q : EncodedProgram A O}
+    {p q : CountableEncodedProgram A O}
     (hSame : ωB.view p = ωB.view q) :
     (behavioralObserver (A := A) (O := O)).view p =
       (behavioralObserver (A := A) (O := O)).view q := by
   rcases hAbove with ⟨f, hf⟩
   simpa [Function.comp, hf] using congrArg f hSame
 
-/-- Lean wrapper for `cor:twins-frozen-ratio` on the concrete functional stack. -/
+/-- Lean wrapper for `cor:twins-frozen-ratio` on the countable functional stack. -/
 theorem cor_twins_frozen_ratio
-    {p₁ p₂ : EncodedProgram A O}
+    {p₁ p₂ : CountableEncodedProgram A O}
     (hTwin :
       (behavioralObserver (A := A) (O := O)).view p₁ =
         (behavioralObserver (A := A) (O := O)).view p₂) :
-    observerFiber (behavioralObserver (A := A) (O := O)) p₁ =
-      observerFiber (behavioralObserver (A := A) (O := O)) p₂ := by
+    encodedObserverFiber (A := A) (O := O) (behavioralObserver (A := A) (O := O)) p₁ =
+      encodedObserverFiber (A := A) (O := O) (behavioralObserver (A := A) (O := O)) p₂ := by
   funext r
-  simp [observerFiber, hTwin]
+  simp [encodedObserverFiber, hTwin]
 
-/-- Lean wrapper for `cor:canonical-pair` on the concrete functional stack. -/
+/-- Lean wrapper for `cor:canonical-pair` on the countable functional stack. -/
 theorem cor_canonical_pair :
     BeliefAdmissible (A := A) (O := O) (behavioralObserver (A := A) (O := O)) ∧
     ActionAdmissible (A := A) (O := O) (behavioralObserver (A := A) (O := O)) := by
@@ -485,85 +192,88 @@ theorem cor_canonical_pair :
   · exact observerRefines_refl _
   · exact observerRefines_refl _
 
-/-- Lean wrapper for `prop:goal-dialed` on the concrete functional stack. -/
+/-- Lean wrapper for `prop:goal-dialed` on the countable functional stack. -/
 theorem prop_goal_dialed
-    {ωA : Observer (EncodedProgram A O)} {pstar : EncodedProgram A O}
+    {ωA : Observer (CountableEncodedProgram A O)}
+    {pstar : CountableEncodedProgram A O}
     (hRef : BeliefAdmissible (A := A) (O := O) ωA) :
     goalDialConverges (A := A) (O := O) ωA pstar :=
   hRef
 
-/-- Lean wrapper for `prop:two-observer-minimizer` on the concrete functional stack. -/
+/-- Lean wrapper for `prop:two-observer-minimizer` on the countable functional stack. -/
 theorem prop_two_observer_minimizer
-    (ωB ωA : Observer (EncodedProgram A O))
-    (ν : ProgramLaw A O) (π : ActionLaw A) (h : FullHist A O)
-    (programCandidates classCandidates : List (ProgramLaw A O))
-    (hProg : programCandidates ≠ []) (hClass : classCandidates ≠ []) :
-    ∃ qmin, MinimizesOnListFloat programCandidates
-      (fun q => def_two_observer_functional ωB ωA q ν π h) qmin ∧
-      ∃ νmin, MinimizesOnListFloat classCandidates
-        (fun ν' => def_two_observer_functional ωB ωA qmin ν' π h) νmin := by
-  rcases exists_minimizerOnListFloat programCandidates
-      (fun q => def_two_observer_functional ωB ωA q ν π h) hProg with ⟨qmin, hqmin⟩
-  rcases exists_minimizerOnListFloat classCandidates
-      (fun ν' => def_two_observer_functional ωB ωA qmin ν' π h) hClass with ⟨νmin, hνmin⟩
-  exact ⟨qmin, hqmin, νmin, hνmin⟩
+    (U : CountablePrefixMachine A O)
+    (π : CountablePolicy A O) (t : Nat) (h : CountHist A O)
+    (ωB ωA : Observer (CountableEncodedProgram A O))
+    (targets : List (CountableEncodedProgram A O))
+    (hTargets : targets ≠ []) :
+    ∃ pmin, MinimizesOnListENNReal targets
+      (fun pstar => def_two_observer_functional U π t h ωB ωA pstar) pmin := by
+  exact exists_minimizerOnListENNReal targets
+    (fun pstar => def_two_observer_functional U π t h ωB ωA pstar) hTargets
 
-/-- Lean wrapper for `prop:kernel-functional-minimizer` on the concrete functional stack. -/
+/-- Lean wrapper for `prop:kernel-functional-minimizer` on the countable functional stack. -/
 theorem prop_kernel_functional_minimizer
-    (ωB ωA : Observer (EncodedProgram A O))
-    (ν : ProgramLaw A O) (refLaw : ActionLaw A) (h : FullHist A O)
+    (U : CountablePrefixMachine A O)
+    (π : CountablePolicy A O) (t : Nat) (h : CountHist A O)
+    (ωB ωA : Observer (CountableEncodedProgram A O))
+    (targets : List (CountableEncodedProgram A O))
     (kernelCandidates : List (ActionLaw A))
-    (programLawCandidates : List (ProgramLaw A O))
-    (hProg : programLawCandidates ≠ []) (hKer : kernelCandidates ≠ []) :
-    ∃ qmin, MinimizesOnListFloat programLawCandidates
-      (fun q => def_kernel_functional ωB ωA q ν refLaw refLaw h) qmin ∧
-      ∃ κmin, MinimizesOnListFloat kernelCandidates
-        (fun κ => def_kernel_functional ωB ωA qmin ν κ refLaw h) κmin := by
-  rcases exists_minimizerOnListFloat programLawCandidates
-      (fun q => def_kernel_functional ωB ωA q ν refLaw refLaw h) hProg with ⟨qmin, hqmin⟩
-  rcases exists_minimizerOnListFloat kernelCandidates
-      (fun κ => def_kernel_functional ωB ωA qmin ν κ refLaw h) hKer with ⟨κmin, hκmin⟩
-  exact ⟨qmin, hqmin, κmin, hκmin⟩
+    (hTargets : targets ≠ []) (hKer : kernelCandidates ≠ []) :
+    ∃ pmin, MinimizesOnListENNReal targets
+      (fun pstar => def_two_observer_functional U π t h ωB ωA pstar) pmin ∧
+      ∃ κmin, MinimizesOnListENNReal kernelCandidates
+        (fun κ => def_kernel_functional U π t h ωB ωA pmin κ κ) κmin := by
+  rcases exists_minimizerOnListENNReal targets
+      (fun pstar => def_two_observer_functional U π t h ωB ωA pstar) hTargets with ⟨pmin, hpmin⟩
+  rcases exists_minimizerOnListENNReal kernelCandidates
+      (fun κ => def_kernel_functional U π t h ωB ωA pmin κ κ) hKer with ⟨κmin, hκmin⟩
+  exact ⟨pmin, hpmin, κmin, hκmin⟩
 
-/-- Lean wrapper for `prop:kernel-functional-minimizer-compact` on the concrete functional stack. -/
+/-- Lean wrapper for `prop:kernel-functional-minimizer-compact` on the countable functional stack. -/
 theorem prop_kernel_functional_minimizer_compact
-    (ωB ωA : Observer (EncodedProgram A O))
-    (ν : ProgramLaw A O) (refLaw : ActionLaw A) (h : FullHist A O)
+    (U : CountablePrefixMachine A O)
+    (π : CountablePolicy A O) (t : Nat) (h : CountHist A O)
+    (ωB ωA : Observer (CountableEncodedProgram A O))
+    (targets : List (CountableEncodedProgram A O))
     (compactCandidates : List (ActionLaw A))
-    (programLawCandidates : List (ProgramLaw A O))
-    (hProg : programLawCandidates ≠ []) (hCompact : compactCandidates ≠ []) :
-    ∃ qmin, MinimizesOnListFloat programLawCandidates
-      (fun q => def_kernel_functional ωB ωA q ν refLaw refLaw h) qmin ∧
-      ∃ κmin, MinimizesOnListFloat compactCandidates
-        (fun κ => def_kernel_functional ωB ωA qmin ν κ refLaw h) κmin := by
-  rcases exists_minimizerOnListFloat programLawCandidates
-      (fun q => def_kernel_functional ωB ωA q ν refLaw refLaw h) hProg with ⟨qmin, hqmin⟩
-  rcases exists_minimizerOnListFloat compactCandidates
-      (fun κ => def_kernel_functional ωB ωA qmin ν κ refLaw h) hCompact with ⟨κmin, hκmin⟩
-  exact ⟨qmin, hqmin, κmin, hκmin⟩
+    (hTargets : targets ≠ []) (hCompact : compactCandidates ≠ []) :
+    ∃ pmin, MinimizesOnListENNReal targets
+      (fun pstar => def_two_observer_functional U π t h ωB ωA pstar) pmin ∧
+      ∃ κmin, MinimizesOnListENNReal compactCandidates
+        (fun κ => def_kernel_functional U π t h ωB ωA pmin κ κ) κmin := by
+  rcases exists_minimizerOnListENNReal targets
+      (fun pstar => def_two_observer_functional U π t h ωB ωA pstar) hTargets with ⟨pmin, hpmin⟩
+  rcases exists_minimizerOnListENNReal compactCandidates
+      (fun κ => def_kernel_functional U π t h ωB ωA pmin κ κ) hCompact with ⟨κmin, hκmin⟩
+  exact ⟨pmin, hpmin, κmin, hκmin⟩
 
-/-- Lean wrapper for `prop:belief-illtyped-below` on the concrete functional stack. -/
+/-- Lean wrapper for `prop:belief-illtyped-below` on the countable functional stack. -/
 theorem prop_belief_illtyped_below
-    {ωB : Observer (EncodedProgram A O)} {pstar : EncodedProgram A O}
+    {ωB : Observer (CountableEncodedProgram A O)}
+    {pstar : CountableEncodedProgram A O}
     (_hBelow : ActionAdmissible (A := A) (O := O) ωB)
     (hNotAbove : ¬ BeliefAdmissible (A := A) (O := O) ωB) :
     ¬ goalDialConverges (A := A) (O := O) ωB pstar :=
   hNotAbove
 
-/-- Lean wrapper for `prop:action-cap` on the concrete functional stack. -/
+/-- Lean wrapper for `prop:action-cap` on the countable functional stack. -/
 theorem prop_action_cap
-    (ωB ωA : Observer (EncodedProgram A O))
-    (q ν : ProgramLaw A O) (κ : ActionLaw A) (h : FullHist A O) :
-    def_kernel_functional ωB ωA q ν κ κ h =
-      def_two_observer_functional ωB ωA q ν κ h + ratToFloat (lawL1 κ κ) := by
+    (U : CountablePrefixMachine A O)
+    (π : CountablePolicy A O) (t : Nat) (h : CountHist A O)
+    (ωB ωA : Observer (CountableEncodedProgram A O))
+    (pstar : CountableEncodedProgram A O)
+    (κ : ActionLaw A) :
+    def_kernel_functional U π t h ωB ωA pstar κ κ =
+      def_two_observer_functional U π t h ωB ωA pstar + ratToENNReal (lawL1 κ κ) := by
   rfl
 
-/-- Lean wrapper for `thm:meeting-point` on the concrete functional stack. -/
+/-- Lean wrapper for `thm:meeting-point` on the countable functional stack. -/
 theorem thm_meeting_point :
     BeliefAdmissible (A := A) (O := O) (behavioralObserver (A := A) (O := O)) ∧
     ActionAdmissible (A := A) (O := O) (behavioralObserver (A := A) (O := O)) := by
   exact cor_canonical_pair (A := A) (O := O)
 
-end ConcretePaperFunctional
+end CountablePaperFunctional
 
 end SemanticConvergence

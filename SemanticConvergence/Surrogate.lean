@@ -1,134 +1,104 @@
-import SemanticConvergence.Rates
-import SemanticConvergence.ConcreteSurrogate
+import SemanticConvergence.Boundary
 
 namespace SemanticConvergence
 
-universe u v w x y z t s r q m n p o k l
+universe u v
 
-/--
-`SurrogateModel` is a legacy abstract compatibility package for the
-amortized-surrogate implementation layer. It is retained for archival
-comparison and backward compatibility only; the paper-facing surrogate
-declarations below now terminate at the concrete stack.
--/
-structure SurrogateModel extends RatesModel where
-  LatentClass : Type
-  ImplKernel : Type
-  surrogatePolicy : Policy
-  surrogateRateRef : ReferenceMeasure
-  amortizedSurrogateMinimizerHyp : History → Prop
-  amortizedSurrogateMinimizerConclusion : History → Prop
-  amortizedSurrogateMinimizer :
-    ∀ h : History,
-      amortizedSurrogateMinimizerHyp h →
-      amortizedSurrogateMinimizerConclusion h
-  amortizedSurrogateHyp : Program → Prop
-  amortizedSurrogateConclusion : Program → Prop
-  amortizedSurrogateFiniteTimeHyp : Program → Prop
-  amortizedSurrogateFiniteTimeConclusion : Program → Prop
+noncomputable section CountablePaperSurrogate
 
-/--
-`SurrogateTheory M` is the legacy theorem-level compatibility layer over
-`SurrogateModel`. It remains in the source tree for archival comparison and
-backward compatibility only.
--/
-structure SurrogateTheory (M : SurrogateModel) extends RatesTheory M.toRatesModel where
-  amortizedSurrogate_to_support :
-    ∀ pstar : M.Program,
-      M.amortizedSurrogateHyp pstar →
-      M.separatingSupportHyp M.surrogatePolicy pstar
-  amortizedSurrogate_from_concentration :
-    ∀ pstar : M.Program,
-      M.posteriorConcentrates pstar →
-      M.amortizedSurrogateConclusion pstar
-  amortizedSurrogateFiniteTime_to_concentration :
-    ∀ pstar : M.Program,
-      M.amortizedSurrogateFiniteTimeHyp pstar →
-      M.expRateConcentrationHyp M.surrogateRateRef pstar
-  amortizedSurrogateFiniteTime_from_concentration :
-    ∀ pstar : M.Program,
-      M.expRateConcentrationConclusion M.surrogateRateRef pstar →
-      M.amortizedSurrogateFiniteTimeConclusion pstar
-
-namespace SurrogateTheory
-
-variable {M : SurrogateModel}
-
-/-- Lean wrapper for `prop:amortized-surrogate-minimizer`. -/
-theorem prop_amortized_surrogate_minimizer (_T : SurrogateTheory M) (h : M.History)
-    (hMin : M.amortizedSurrogateMinimizerHyp h) :
-    M.amortizedSurrogateMinimizerConclusion h :=
-  M.amortizedSurrogateMinimizer h hMin
-
-/-- Lean wrapper for `thm:amortized-surrogate`. -/
-theorem thm_amortized_surrogate (T : SurrogateTheory M) (pstar : M.Program)
-    (hSur : M.amortizedSurrogateHyp pstar) :
-    M.amortizedSurrogateConclusion pstar := by
-  exact SurrogateTheory.amortizedSurrogate_from_concentration T pstar
-    (SemanticTheory.thm_separating_support_convergence T.toSemanticTheory
-      M.surrogatePolicy pstar
-      (SurrogateTheory.amortizedSurrogate_to_support T pstar hSur))
-
-/-- Lean wrapper for `cor:amortized-surrogate-finite-time`. -/
-theorem cor_amortized_surrogate_finite_time (T : SurrogateTheory M) (pstar : M.Program)
-    (hFin : M.amortizedSurrogateFiniteTimeHyp pstar) :
-    M.amortizedSurrogateFiniteTimeConclusion pstar := by
-  exact SurrogateTheory.amortizedSurrogateFiniteTime_from_concentration T pstar
-    (RatesTheory.thm_exp_rate_concentration T.toRatesTheory
-      M.surrogateRateRef pstar
-      (SurrogateTheory.amortizedSurrogateFiniteTime_to_concentration T pstar hFin))
-
-end SurrogateTheory
-
-noncomputable section ConcretePaperSurrogate
-
-open ConcretePrefixMachine
+open CountableConcrete
+open CountableConcrete.CountablePrefixMachine
 
 variable {A : Type u} {O : Type v}
-variable [DecidableEq A] [DecidableEq O] [BEq A] [LawfulBEq A] [BEq O] [LawfulBEq O]
+variable [Encodable A] [Encodable O]
+[DecidableEq A] [BEq A] [LawfulBEq A]
 
-/-- Lean wrapper for `prop:amortized-surrogate-minimizer` on the concrete stack. -/
+/-- Countable surrogate information score inherited from the boundary layer. -/
+def surrogateInformationScore
+    (U : CountablePrefixMachine A O)
+    (π : CountablePolicy A O) (t : Nat) (h : CountHist A O) (a : A)
+    (ω : Observer (CountableEncodedProgram A O))
+    (pstar : CountableEncodedProgram A O) : ENNReal :=
+  boundaryInformationGainTerm U π t h a ω pstar
+
+/-- Countable regularization penalty against a reference local action law. -/
+def surrogateRegularization
+    (refLaw : ActionLaw A) (a : A) : ENNReal :=
+  ratToENNReal (Rat.abs (1 - refLaw.mass a))
+
+/-- Countable amortized-surrogate energy. -/
+def surrogateEnergy
+    (U : CountablePrefixMachine A O)
+    (π : CountablePolicy A O) (t : Nat) (h : CountHist A O) (a : A)
+    (ω : Observer (CountableEncodedProgram A O))
+    (pstar : CountableEncodedProgram A O)
+    (refLaw : ActionLaw A) (reg : ENNReal) : ENNReal :=
+  def_efe U π t h a ω pstar + reg * surrogateRegularization refLaw a
+
+/-- Finite-list countable surrogate minimizer. -/
+noncomputable def surrogateArgmin
+    (U : CountablePrefixMachine A O)
+    (π : CountablePolicy A O) (t : Nat) (h : CountHist A O) (actions : List A)
+    (hActions : actions ≠ [])
+    (ω : Observer (CountableEncodedProgram A O))
+    (pstar : CountableEncodedProgram A O)
+    (refLaw : ActionLaw A) (reg : ENNReal) : A :=
+  argminOnListENNReal actions
+    (fun a => surrogateEnergy U π t h a ω pstar refLaw reg)
+    hActions
+
+/-- Countable local action law induced by the surrogate minimizer. -/
+def surrogateChosenLaw
+    (U : CountablePrefixMachine A O)
+    (π : CountablePolicy A O) (t : Nat) (h : CountHist A O) (actions : List A)
+    (hActions : actions ≠ [])
+    (ω : Observer (CountableEncodedProgram A O))
+    (pstar : CountableEncodedProgram A O)
+    (refLaw : ActionLaw A) (reg : ENNReal) : ActionLaw A :=
+  singletonActionLaw (surrogateArgmin U π t h actions hActions ω pstar refLaw reg)
+
+/-- Lean wrapper for `prop:amortized-surrogate-minimizer` on the countable stack. -/
 theorem prop_amortized_surrogate_minimizer
-    (U : ConcretePrefixMachine A O)
-    (π : ConcretePolicy A O) (h : FullHist A O) (actions : List A)
+    (U : CountablePrefixMachine A O)
+    (π : CountablePolicy A O) (t : Nat) (h : CountHist A O) (actions : List A)
     (hActions : actions ≠ [])
-    (ω : Observer (EncodedProgram A O))
-    (pstar : EncodedProgram A O)
-    (refLaw : ActionLaw A) (reg : Rat) :
-    MinimizesOnList actions
-      (fun a => U.surrogateEnergy π h a ω pstar refLaw reg)
-      (U.surrogateArgmin π h actions hActions ω pstar refLaw reg) :=
-  U.surrogateArgmin_spec π h actions hActions ω pstar refLaw reg
+    (ω : Observer (CountableEncodedProgram A O))
+    (pstar : CountableEncodedProgram A O)
+    (refLaw : ActionLaw A) (reg : ENNReal) :
+    MinimizesOnListENNReal actions
+      (fun a => surrogateEnergy U π t h a ω pstar refLaw reg)
+      (surrogateArgmin U π t h actions hActions ω pstar refLaw reg) :=
+  argminOnListENNReal_spec actions
+    (fun a => surrogateEnergy U π t h a ω pstar refLaw reg)
+    hActions
 
-/-- Lean wrapper for `thm:amortized-surrogate` on the concrete stack. -/
+/-- Lean wrapper for `thm:amortized-surrogate` on the countable stack. -/
 theorem thm_amortized_surrogate
-    (U : ConcretePrefixMachine A O)
-    (π : ConcretePolicy A O) (h : FullHist A O) (actions : List A)
+    (U : CountablePrefixMachine A O)
+    (π : CountablePolicy A O) (t : Nat) (h : CountHist A O) (actions : List A)
     (hActions : actions ≠ [])
-    (ω : Observer (EncodedProgram A O))
-    (pstar : EncodedProgram A O)
-    (refLaw : ActionLaw A) (reg : Rat)
-    (hSep :
-      U.isSeparatingAction π h ω pstar
-        (U.surrogateArgmin π h actions hActions ω pstar refLaw reg)) :
-    hasSeparatingSupportOn
-      (U.surrogateChosenLaw π h actions hActions ω pstar refLaw reg)
-      [U.surrogateArgmin π h actions hActions ω pstar refLaw reg]
-      (U.separatingActionSet π h ω pstar) :=
-  U.amortizedSurrogate_from_witness π h actions hActions ω pstar refLaw reg hSep
+    (ω : Observer (CountableEncodedProgram A O))
+    (pstar : CountableEncodedProgram A O)
+    (refLaw : ActionLaw A) (reg : ENNReal)
+    (hSep : 0 < U.semanticSeparation π t h ω pstar) :
+    ∃ a, a ∈ [surrogateArgmin U π t h actions hActions ω pstar refLaw reg] ∧
+      (surrogateChosenLaw U π t h actions hActions ω pstar refLaw reg).mass a ≠ 0 ∧
+      0 < U.semanticSeparation π t h ω pstar := by
+  refine ⟨surrogateArgmin U π t h actions hActions ω pstar refLaw reg, by simp, ?_, hSep⟩
+  simp [surrogateChosenLaw, singletonActionLaw]
 
-/-- Lean wrapper for `cor:amortized-surrogate-finite-time` on the concrete stack. -/
+/-- Lean wrapper for `cor:amortized-surrogate-finite-time` on the countable stack. -/
 theorem cor_amortized_surrogate_finite_time
-    (U : ConcretePrefixMachine A O)
-    (π : ConcretePolicy A O) (h : FullHist A O) (actions : List A)
+    (U : CountablePrefixMachine A O)
+    (π : CountablePolicy A O) (t : Nat) (h : CountHist A O) (actions : List A)
     (hActions : actions ≠ [])
-    (ω : Observer (EncodedProgram A O))
-    (pstar : EncodedProgram A O)
-    (refLaw : ActionLaw A) (reg : Rat) :
-    (U.surrogateChosenLaw π h actions hActions ω pstar refLaw reg).mass
-      (U.surrogateArgmin π h actions hActions ω pstar refLaw reg) ≠ 0 :=
-  U.surrogateChosenLaw_supportsArgmin π h actions hActions ω pstar refLaw reg
+    (ω : Observer (CountableEncodedProgram A O))
+    (pstar : CountableEncodedProgram A O)
+    (refLaw : ActionLaw A) (reg : ENNReal) :
+    (surrogateChosenLaw U π t h actions hActions ω pstar refLaw reg).mass
+      (surrogateArgmin U π t h actions hActions ω pstar refLaw reg) ≠ 0 := by
+  simp [surrogateChosenLaw, singletonActionLaw]
 
-end ConcretePaperSurrogate
+end CountablePaperSurrogate
 
 end SemanticConvergence

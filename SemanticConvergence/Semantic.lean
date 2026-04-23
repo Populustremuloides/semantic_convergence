@@ -1,351 +1,19 @@
 import SemanticConvergence.Belief
 import SemanticConvergence.ConcreteSemantic
+import SemanticConvergence.ConcretePosteriorDecay
 import SemanticConvergence.ConcreteRates
 import SemanticConvergence.ConcreteNoise
 
 namespace SemanticConvergence
 
-universe u v w x y z t s r q m n p o k l
-
-/--
-`SemanticModel` is a legacy abstract compatibility package for the semantic-gain,
-class-against-complement, and semantic-recovery layer. It is retained for
-archival comparison and backward compatibility only; the paper-facing semantic
-declarations below now terminate at the concrete stack.
--/
-structure SemanticModel extends BeliefModel where
-  classComplementLaw : History → ObsClass → Action → LawObs
-  semanticGain : ObsClass → Action → History → Rat
-  semanticSeparation : ObsClass → Action → History → Rat
-  promotionSupporting : Policy → Prop
-  semanticRule : { π : Policy // promotionSupporting π }
-  kernelSemanticRule : ReferenceMeasure → { π : Policy // promotionSupporting π }
-  compactKernelSemanticRule : ReferenceMeasure → { π : Policy // promotionSupporting π }
-  sepCondition : Prop
-  uniformHistoryIndependentSeparation : Prop
-  klWitnessCondition : Prop
-  eventWitnessCondition : Prop
-  kernelSepCondition : ReferenceMeasure → Prop
-  conditionalBorelCantelli : Prop
-  conditionalBorelCantelli_holds : conditionalBorelCantelli
-  cumulativeSeparationHyp : Program → Prop
-  posteriorConcentrates : Program → Prop
-  fullSupportPolicy : Policy → Prop
-  policyRecoversBehavioral : Policy → Prop
-  separatingSupportHyp : Policy → Program → Prop
-  explorationFloorHyp : Policy → Program → Prop
-  separatingSupportRateHyp : Policy → Program → Prop
-  supportRateConclusion : Policy → Program → Prop
-  finiteTimeHyp : Policy → Program → Prop
-  finiteTimeConclusion : Policy → Program → Prop
-  canonicalSelectorHyp : Program → Prop
-  kernelSemanticHyp : ReferenceMeasure → Program → Prop
-  compactActionKernelHyp : ReferenceMeasure → Program → Prop
-  compactActionKernelConclusion : ReferenceMeasure → Program → Prop
-  finiteMaximinHyp : Program → Prop
-  zeroSeparatingSupportHyp : Policy → Prop
-  zeroSupportImpossible : Policy → Prop
-  SummableSchedule : (Nat → Rat) → Prop
-  SummableSupportFailure : (Nat → Rat) → Prop
-  observerIndexedGoalDialHyp : ObserverId → Program → Prop
-  observerIndexedGoalDialPayoff : ObserverId → Program → Prop
-  posteriorOddsIdentity : ObsClass → Action → History → Prop
-  posteriorOddsIdentity_holds :
-    ∀ (c : ObsClass) (a : Action) (h : History),
-      posteriorOddsIdentity c a h
-  zeroCriterion : ObsClass → Action → History → Prop
-  zeroCriterion_holds :
-    ∀ (c : ObsClass) (a : Action) (h : History),
-      zeroCriterion c a h
-  chernoffCorrespondence : ObsClass → Action → History → Prop
-  chernoffCorrespondence_holds :
-    ∀ (c : ObsClass) (a : Action) (h : History),
-      chernoffCorrespondence c a h
-  uniformHistoryIndependentImpliesSemantic :
-    uniformHistoryIndependentSeparation → sepCondition
-  klImpliesSemanticSeparation :
-    klWitnessCondition → sepCondition
-  eventWitnessImpliesSemanticSeparation :
-    eventWitnessCondition → sepCondition
-  finiteActionKernelSeparation :
-    ∀ ref : ReferenceMeasure, sepCondition → kernelSepCondition ref
-  compactActionKernelSeparation :
-    ∀ ref : ReferenceMeasure, sepCondition → kernelSepCondition ref
-  contraction :
-    ∀ pstar : Program,
-      cumulativeSeparationHyp pstar →
-      posteriorConcentrates pstar
-  fullSupportBehavioral :
-    ∀ π : Policy, fullSupportPolicy π → policyRecoversBehavioral π
-  separatingSupportConvergence :
-    ∀ (π : Policy) (pstar : Program),
-      separatingSupportHyp π pstar →
-      posteriorConcentrates pstar
-  explorationFloorBehavioral :
-    ∀ (π : Policy) (pstar : Program),
-      explorationFloorHyp π pstar →
-      policyRecoversBehavioral π
-  explorationFloorConcentration :
-    ∀ (π : Policy) (pstar : Program),
-      explorationFloorHyp π pstar →
-      posteriorConcentrates pstar
-  separatingSupportRate :
-    ∀ (π : Policy) (pstar : Program),
-      separatingSupportRateHyp π pstar →
-      supportRateConclusion π pstar
-  separatingSupportFiniteTime :
-    ∀ (π : Policy) (pstar : Program),
-      finiteTimeHyp π pstar →
-      finiteTimeConclusion π pstar
-  canonicalSelectorSupport :
-    ∀ pstar : Program,
-      canonicalSelectorHyp pstar →
-      separatingSupportHyp semanticRule.1 pstar
-  kernelSemanticSupport :
-    ∀ (ref : ReferenceMeasure) (pstar : Program),
-      kernelSemanticHyp ref pstar →
-      separatingSupportHyp (kernelSemanticRule ref).1 pstar
-  compactActionKernel :
-    ∀ (ref : ReferenceMeasure) (pstar : Program),
-      compactActionKernelHyp ref pstar →
-      compactActionKernelConclusion ref pstar
-  finiteMaximin :
-    ∀ pstar : Program,
-      finiteMaximinHyp pstar →
-      posteriorConcentrates pstar
-  supportNecessary :
-    ∀ π : Policy,
-      zeroSeparatingSupportHyp π →
-      zeroSupportImpossible π
-  summableSupportInsufficient :
-    ∀ r : Nat → Rat,
-      SummableSchedule r →
-      SummableSupportFailure r
-  goalDialedPayoff :
-    ∀ (ωA : ObserverId) (pstar : Program),
-      observerIndexedGoalDialHyp ωA pstar →
-      observerIndexedGoalDialPayoff ωA pstar
-
-namespace SemanticModel
-
-variable (M : SemanticModel)
-
-/-- Lean wrapper for `def:class-complement`. -/
-def def_class_complement (h : M.History) (c : M.ObsClass) (a : M.Action) :
-    M.LawObs :=
-  M.classComplementLaw h c a
-
-/-- Lean wrapper for `def:semantic-gain`. -/
-def def_semantic_gain (c : M.ObsClass) (a : M.Action) (h : M.History) : Rat :=
-  M.semanticGain c a h
-
-/-- Lean wrapper for `def:semantic-separation`. -/
-def def_semantic_separation (c : M.ObsClass) (a : M.Action) (h : M.History) : Rat :=
-  M.semanticSeparation c a h
-
-/-- Lean wrapper for `def:semantic-rule`. -/
-def def_semantic_rule : M.Policy :=
-  M.semanticRule.1
-
-/-- Lean wrapper for `def:promotion-supporting`. -/
-def def_promotion_supporting (π : M.Policy) : Prop :=
-  M.promotionSupporting π
-
-/-- Lean wrapper for `def:kernel-semantic-rule`. -/
-def def_kernel_semantic_rule (ref : M.ReferenceMeasure) : M.Policy :=
-  (M.kernelSemanticRule ref).1
-
-/-- Lean wrapper for `def:sep-condition`. -/
-def def_sep_condition : Prop :=
-  M.sepCondition
-
-/-- Lean wrapper for `def:uniform-history-independent-separation`. -/
-def def_uniform_history_independent_separation : Prop :=
-  M.uniformHistoryIndependentSeparation
-
-/-- Lean wrapper for `def:kernel-sep-condition`. -/
-def def_kernel_sep_condition (ref : M.ReferenceMeasure) : Prop :=
-  M.kernelSepCondition ref
-
-end SemanticModel
-
-/--
-`SemanticTheory M` is the legacy theorem-level compatibility layer over
-`SemanticModel`. It remains in the source tree for archival comparison and
-backward compatibility only.
--/
-structure SemanticTheory (M : SemanticModel) where
-
-namespace SemanticTheory
-
-variable {M : SemanticModel}
-
-/-- Lean wrapper for `lem:odds-identity`. -/
-theorem lem_odds_identity
-    (c : M.ObsClass) (a : M.Action) (h : M.History) :
-    M.posteriorOddsIdentity c a h :=
-  M.posteriorOddsIdentity_holds c a h
-
-/-- Lean wrapper for `lem:zero-criterion`. -/
-theorem lem_zero_criterion
-    (c : M.ObsClass) (a : M.Action) (h : M.History) :
-    M.zeroCriterion c a h :=
-  M.zeroCriterion_holds c a h
-
-/-- Lean wrapper for `prop:chernoff-correspondence`. -/
-theorem prop_chernoff_correspondence
-    (c : M.ObsClass) (a : M.Action) (h : M.History) :
-    M.chernoffCorrespondence c a h :=
-  M.chernoffCorrespondence_holds c a h
-
-/-- Lean wrapper for `prop:semantic-is-promotion-supporting`. -/
-theorem prop_semantic_is_promotion_supporting :
-    M.def_promotion_supporting M.def_semantic_rule :=
-  M.semanticRule.2
-
-/-- Lean wrapper for `prop:kernel-promotion-support`. -/
-theorem prop_kernel_promotion_support (ref : M.ReferenceMeasure) :
-    M.def_promotion_supporting (M.def_kernel_semantic_rule ref) :=
-  (M.kernelSemanticRule ref).2
-
-/-- Lean wrapper for `prop:kernel-promotion-support-compact`. -/
-theorem prop_kernel_promotion_support_compact (ref : M.ReferenceMeasure) :
-    M.def_promotion_supporting (M.compactKernelSemanticRule ref) :=
-  (M.compactKernelSemanticRule ref).2
-
-/-- Lean wrapper for `prop:uniform-history-independent-implies-semantic`. -/
-theorem prop_uniform_history_independent_implies_semantic
-    (hUniform : M.def_uniform_history_independent_separation) :
-    M.def_sep_condition :=
-  M.uniformHistoryIndependentImpliesSemantic hUniform
-
-/-- Lean wrapper for `cor:kl-implies-semantic-separation`. -/
-theorem cor_kl_implies_semantic_separation
-    (hKL : M.klWitnessCondition) :
-    M.def_sep_condition :=
-  M.klImpliesSemanticSeparation hKL
-
-/-- Lean wrapper for `cor:event-witness-implies-semantic-separation`. -/
-theorem cor_event_witness_implies_semantic_separation
-    (hEvent : M.eventWitnessCondition) :
-    M.def_sep_condition :=
-  M.eventWitnessImpliesSemanticSeparation hEvent
-
-/-- Lean wrapper for `prop:finite-action-kernel-separation`. -/
-theorem prop_finite_action_kernel_separation
-    (ref : M.ReferenceMeasure)
-    (hSep : M.def_sep_condition) :
-    M.def_kernel_sep_condition ref :=
-  M.finiteActionKernelSeparation ref hSep
-
-/-- Lean wrapper for `prop:compact-action-kernel-separation`. -/
-theorem prop_compact_action_kernel_separation
-    (ref : M.ReferenceMeasure)
-    (hSep : M.def_sep_condition) :
-    M.def_kernel_sep_condition ref :=
-  M.compactActionKernelSeparation ref hSep
-
-/-- Lean wrapper for `lem:conditional-bc`. -/
-theorem lem_conditional_bc :
-    M.conditionalBorelCantelli :=
-  M.conditionalBorelCantelli_holds
-
-/-- Lean wrapper for `lem:contraction`. -/
-theorem lem_contraction (_T : SemanticTheory M) (pstar : M.Program)
-    (hContr : M.cumulativeSeparationHyp pstar) :
-    M.posteriorConcentrates pstar :=
-  M.contraction pstar hContr
-
-/-- Lean wrapper for `prop:full-support-behavioral`. -/
-theorem prop_full_support_behavioral (_T : SemanticTheory M) (π : M.Policy)
-    (hFull : M.fullSupportPolicy π) :
-    M.policyRecoversBehavioral π :=
-  M.fullSupportBehavioral π hFull
-
-/-- Lean wrapper for `thm:separating-support-convergence`. -/
-theorem thm_separating_support_convergence (_T : SemanticTheory M)
-    (π : M.Policy) (pstar : M.Program)
-    (hSupport : M.separatingSupportHyp π pstar) :
-    M.posteriorConcentrates pstar :=
-  M.separatingSupportConvergence π pstar hSupport
-
-/-- Lean wrapper for `thm:exploration-floor-behavioral`. -/
-theorem thm_exploration_floor_behavioral (_T : SemanticTheory M)
-    (π : M.Policy) (pstar : M.Program)
-    (hExplore : M.explorationFloorHyp π pstar) :
-    M.policyRecoversBehavioral π ∧ M.posteriorConcentrates pstar := by
-  exact ⟨M.explorationFloorBehavioral π pstar hExplore,
-    M.explorationFloorConcentration π pstar hExplore⟩
-
-/-- Lean wrapper for `thm:separating-support-rate`. -/
-theorem thm_separating_support_rate (_T : SemanticTheory M)
-    (π : M.Policy) (pstar : M.Program)
-    (hRate : M.separatingSupportRateHyp π pstar) :
-    M.supportRateConclusion π pstar :=
-  M.separatingSupportRate π pstar hRate
-
-/-- Lean wrapper for `cor:separating-support-finite-time`. -/
-theorem cor_separating_support_finite_time (_T : SemanticTheory M)
-    (π : M.Policy) (pstar : M.Program)
-    (hFinite : M.finiteTimeHyp π pstar) :
-    M.finiteTimeConclusion π pstar :=
-  M.separatingSupportFiniteTime π pstar hFinite
-
-/-- Lean wrapper for `thm:semantic-convergence`. -/
-theorem thm_semantic_convergence (_T : SemanticTheory M) (pstar : M.Program)
-    (hSel : M.canonicalSelectorHyp pstar) :
-    M.posteriorConcentrates pstar := by
-  exact M.separatingSupportConvergence
-    M.semanticRule.1 pstar
-    (M.canonicalSelectorSupport pstar hSel)
-
-/-- Lean wrapper for `thm:kernel-semantic-convergence`. -/
-theorem thm_kernel_semantic_convergence (_T : SemanticTheory M)
-    (ref : M.ReferenceMeasure) (pstar : M.Program)
-    (hKernel : M.kernelSemanticHyp ref pstar) :
-    M.posteriorConcentrates pstar := by
-  exact M.separatingSupportConvergence
-    (M.kernelSemanticRule ref).1 pstar
-    (M.kernelSemanticSupport ref pstar hKernel)
-
-/-- Lean wrapper for `cor:compact-action-kernel`. -/
-theorem cor_compact_action_kernel (_T : SemanticTheory M)
-    (ref : M.ReferenceMeasure) (pstar : M.Program)
-    (hCompact : M.compactActionKernelHyp ref pstar) :
-    M.compactActionKernelConclusion ref pstar :=
-  M.compactActionKernel ref pstar hCompact
-
-/-- Lean wrapper for `cor:finite-maximin`. -/
-theorem cor_finite_maximin (_T : SemanticTheory M) (pstar : M.Program)
-    (hFinite : M.finiteMaximinHyp pstar) :
-    M.posteriorConcentrates pstar :=
-  M.finiteMaximin pstar hFinite
-
-/-- Lean wrapper for `cor:support-necessary`. -/
-theorem cor_support_necessary (_T : SemanticTheory M) (π : M.Policy)
-    (hZero : M.zeroSeparatingSupportHyp π) :
-    M.zeroSupportImpossible π :=
-  M.supportNecessary π hZero
-
-/-- Lean wrapper for `thm:summable-support-insufficient`. -/
-theorem thm_summable_support_insufficient (_T : SemanticTheory M) (r : Nat → Rat)
-    (hSummable : M.SummableSchedule r) :
-    M.SummableSupportFailure r :=
-  M.summableSupportInsufficient r hSummable
-
-/-- Lean wrapper for `cor:goal-dialed-payoff`. -/
-theorem cor_goal_dialed_payoff (_T : SemanticTheory M)
-    (ωA : M.ObserverId) (pstar : M.Program)
-    (hGoal : M.observerIndexedGoalDialHyp ωA pstar) :
-    M.observerIndexedGoalDialPayoff ωA pstar :=
-  M.goalDialedPayoff ωA pstar hGoal
-
-end SemanticTheory
+universe u v
 
 noncomputable section ConcretePaperSemantic
 
 open Classical
 open ConcretePrefixMachine
+open Filter
+open scoped MeasureTheory ProbabilityTheory
 
 variable {A : Type u} {O : Type v}
 variable [DecidableEq A] [DecidableEq O] [BEq A] [LawfulBEq A] [BEq O] [LawfulBEq O]
@@ -446,20 +114,26 @@ theorem prop_chernoff_correspondence
 /-- Lean wrapper for `prop:semantic-is-promotion-supporting` on the concrete semantic stack. -/
 theorem prop_semantic_is_promotion_supporting
     (actions : List A) :
-    def_promotion_supporting (def_semantic_rule actions) actions :=
-  fullSupportActionLaw_hasSupportOn actions
+    def_promotion_supporting (def_semantic_rule actions) actions := by
+  intro a ha
+  change (fullSupportActionLaw actions).mass a ≠ 0
+  simp [fullSupportActionLaw, ha]
 
 /-- Lean wrapper for `prop:kernel-promotion-support` on the concrete semantic stack. -/
 theorem prop_kernel_promotion_support
     (refLaw : ActionLaw A) :
-    def_promotion_supporting (def_kernel_semantic_rule refLaw) refLaw.support :=
-  fullSupportActionLaw_hasSupportOn refLaw.support
+    def_promotion_supporting (def_kernel_semantic_rule refLaw) refLaw.support := by
+  intro a ha
+  change (fullSupportActionLaw refLaw.support).mass a ≠ 0
+  simp [fullSupportActionLaw, ha]
 
 /-- Lean wrapper for `prop:kernel-promotion-support-compact` on the concrete semantic stack. -/
 theorem prop_kernel_promotion_support_compact
     (refLaw : ActionLaw A) :
-    def_promotion_supporting (def_kernel_semantic_rule refLaw) refLaw.support :=
-  fullSupportActionLaw_hasSupportOn refLaw.support
+    def_promotion_supporting (def_kernel_semantic_rule refLaw) refLaw.support := by
+  intro a ha
+  change (fullSupportActionLaw refLaw.support).mass a ≠ 0
+  simp [fullSupportActionLaw, ha]
 
 /-- Lean wrapper for `prop:uniform-history-independent-implies-semantic` on the concrete stack. -/
 theorem prop_uniform_history_independent_implies_semantic
@@ -469,8 +143,9 @@ theorem prop_uniform_history_independent_implies_semantic
     (pstar : EncodedProgram A O) (actions : List A)
     (hUniform : def_uniform_history_independent_separation U π ω pstar actions)
     (h : FullHist A O) :
-    def_sep_condition U π h ω pstar actions :=
-  hUniform h
+    def_sep_condition U π h ω pstar actions := by
+  rcases hUniform h with ⟨a, ha, hSep⟩
+  exact ⟨a, ha, hSep⟩
 
 /-- Lean wrapper for `cor:kl-implies-semantic-separation` on the concrete stack. -/
 theorem cor_kl_implies_semantic_separation
@@ -479,8 +154,9 @@ theorem cor_kl_implies_semantic_separation
     (ω : Observer (EncodedProgram A O))
     (pstar : EncodedProgram A O) (actions : List A)
     (hSep : def_sep_condition U π h ω pstar actions) :
-    def_sep_condition U π h ω pstar actions :=
-  hSep
+    def_sep_condition U π h ω pstar actions := by
+  rcases hSep with ⟨a, ha, hSem⟩
+  exact ⟨a, ha, hSem⟩
 
 /-- Lean wrapper for `cor:event-witness-implies-semantic-separation` on the concrete stack. -/
 theorem cor_event_witness_implies_semantic_separation
@@ -489,8 +165,9 @@ theorem cor_event_witness_implies_semantic_separation
     (ω : Observer (EncodedProgram A O))
     (pstar : EncodedProgram A O) (actions : List A)
     (hSep : def_sep_condition U π h ω pstar actions) :
-    def_sep_condition U π h ω pstar actions :=
-  hSep
+    def_sep_condition U π h ω pstar actions := by
+  rcases hSep with ⟨a, ha, hSem⟩
+  exact ⟨a, ha, hSem⟩
 
 /-- Lean wrapper for `prop:finite-action-kernel-separation` on the concrete stack. -/
 theorem prop_finite_action_kernel_separation
@@ -501,8 +178,10 @@ theorem prop_finite_action_kernel_separation
     (pstar : EncodedProgram A O)
     {a : A} (ha : a ∈ actions)
     (hSep : U.isSeparatingAction π h ω pstar a) :
-    def_kernel_sep_condition U π h ω pstar actions (fullSupportActionLaw actions) :=
-  U.fullSupportActionLaw_hasSeparatingSupportOn actions π h ω pstar ha hSep
+    def_kernel_sep_condition U π h ω pstar actions (fullSupportActionLaw actions) := by
+  refine ⟨a, ha, ?_, hSep⟩
+  change (fullSupportActionLaw actions).mass a ≠ 0
+  simp [fullSupportActionLaw, ha]
 
 /-- Lean wrapper for `prop:compact-action-kernel-separation` on the concrete stack. -/
 theorem prop_compact_action_kernel_separation
@@ -513,8 +192,10 @@ theorem prop_compact_action_kernel_separation
     (pstar : EncodedProgram A O)
     {a : A} (ha : a ∈ actions)
     (hSep : U.isSeparatingAction π h ω pstar a) :
-    def_kernel_sep_condition U π h ω pstar actions (fullSupportActionLaw actions) :=
-  U.fullSupportActionLaw_hasSeparatingSupportOn actions π h ω pstar ha hSep
+    def_kernel_sep_condition U π h ω pstar actions (fullSupportActionLaw actions) := by
+  refine ⟨a, ha, ?_, hSep⟩
+  change (fullSupportActionLaw actions).mass a ≠ 0
+  simp [fullSupportActionLaw, ha]
 
 /-- Lean wrapper for `cor:noise-left-invertible-history-independent` on the concrete stack. -/
 theorem cor_noise_left_invertible_history_independent :
@@ -522,8 +203,16 @@ theorem cor_noise_left_invertible_history_independent :
   ConcretePrefixMachine.identityChannel_is_supportLeftInvertible (O := O)
 
 /-- Lean wrapper for `lem:conditional-bc` on the concrete semantic stack. -/
-theorem lem_conditional_bc : True := by
-  trivial
+theorem lem_conditional_bc
+    {Ω : Type*} {m0 : MeasurableSpace Ω}
+    {μ : MeasureTheory.Measure Ω} [MeasureTheory.IsFiniteMeasure μ]
+    {ℱ : MeasureTheory.Filtration ℕ m0}
+    {s : ℕ → Set Ω}
+    (hs : ∀ n, MeasurableSet[ℱ n] (s n)) :
+    ∀ᵐ ω ∂μ, ω ∈ limsup s atTop ↔
+      Tendsto (fun n => ∑ k ∈ Finset.range n,
+        (μ[(s (k + 1)).indicator (1 : Ω → ℝ) | ℱ k]) ω) atTop atTop := by
+  simpa using MeasureTheory.ae_mem_limsup_atTop_iff (μ := μ) (ℱ := ℱ) hs
 
 /-- Lean wrapper for `lem:contraction` on the concrete semantic stack. -/
 theorem lem_contraction
@@ -532,15 +221,93 @@ theorem lem_contraction
     (ω : Observer (EncodedProgram A O))
     (pstar : EncodedProgram A O) (actions : List A)
     (hSep : def_sep_condition U π h ω pstar actions) :
-    ∃ a, a ∈ actions ∧ U.isSeparatingAction π h ω pstar a :=
-  hSep
+    ∃ a, a ∈ actions ∧ U.isSeparatingAction π h ω pstar a := by
+  rcases hSep with ⟨a, ha, hSem⟩
+  exact ⟨a, ha, hSem⟩
 
 /-- Lean wrapper for `prop:full-support-behavioral` on the concrete semantic stack. -/
 theorem prop_full_support_behavioral
     (κ : ActionLaw A) (actions : List A)
     (hFull : hasSupportOn κ actions) :
-    def_promotion_supporting κ actions :=
-  hFull
+    def_promotion_supporting κ actions := by
+  intro a ha
+  exact hFull a ha
+
+/--
+Concrete one-step posterior concentration: some supported separating action admits an
+observation that is impossible under the observer-fiber complement while remaining
+possible inside the target observer fiber.
+-/
+def oneStepPosteriorConcentrates
+    (U : ConcretePrefixMachine A O)
+    (π : ConcretePolicy A O) (h : FullHist A O)
+    (ω : Observer (EncodedProgram A O))
+    (pstar : EncodedProgram A O)
+    (actions : List A) (κ : ActionLaw A) : Prop :=
+  ∃ a, a ∈ actions ∧ κ.mass a ≠ 0 ∧ U.isSeparatingAction π h ω pstar a ∧
+    ∃ o,
+      (U.predictiveLawInClass π h a (U.observerFiber ω pstar)).mass o ≠ 0 ∧
+      (U.predictiveLawOutsideClass π h a (U.observerFiber ω pstar)).mass o = 0 ∧
+      U.oneStepComplementPosteriorMass π h a (U.observerFiber ω pstar) o = 0
+
+/--
+Concrete one-step residual posterior concentration on the positive-support substrate.
+
+This packages the smoothed observer-fiber witness used in the strong Section 6 route:
+the support-floor action, a canonical support-union reference law, the induced softening
+scale, strictly positive smoothed class/complement masses at the witness observation, a
+strict residual likelihood-ratio contraction, and the resulting one-step residual-odds
+decay bound.
+-/
+def oneStepResidualPosteriorConcentrates
+    (U : ConcretePrefixMachine A O)
+    (π : ConcretePolicy A O) (h : FullHist A O)
+    (ω : Observer (EncodedProgram A O))
+    (pstar : EncodedProgram A O)
+    (actions : List A) (κ : ActionLaw A) (δ : Rat) : Prop :=
+  ∃ a o refLaw ε,
+    a ∈ actions ∧
+    κ.mass a ≠ 0 ∧
+    U.isSeparatingAction π h ω pstar a ∧
+    refLaw =
+      ConcreteLaw.positiveReferenceLaw
+        (supportUnion
+          (U.predictiveLawInClass π h a (U.observerFiber ω pstar))
+          (U.predictiveLawOutsideClass π h a (U.observerFiber ω pstar))) ∧
+    ε = posteriorDecayFactor δ *
+      (U.predictiveLawInClass π h a (U.observerFiber ω pstar)).mass o / 2 ∧
+    0 < ε ∧
+    0 <
+      (U.softPredictiveLawInClass π h a (U.observerFiber ω pstar) refLaw ε).mass o ∧
+    0 <
+      (U.softPredictiveLawOutsideClass π h a (U.observerFiber ω pstar) refLaw ε).mass o ∧
+    ((U.softPredictiveLawOutsideClass π h a (U.observerFiber ω pstar) refLaw ε).mass o /
+      (U.softPredictiveLawInClass π h a (U.observerFiber ω pstar) refLaw ε).mass o) < 1 ∧
+    U.softOneStepObserverFiberResidualOdds π h a ω pstar refLaw ε o ≤
+      posteriorDecayFactor δ * U.residualObserverFiberPosteriorOdds π h ω pstar
+
+/-- Concrete realization of a separating-support schedule by a family of local action laws. -/
+def supportScheduleRealized
+    (U : ConcretePrefixMachine A O)
+    (π : ConcretePolicy A O) (h : FullHist A O)
+    (ω : Observer (EncodedProgram A O))
+    (pstar : EncodedProgram A O)
+    (actions : List A) (κs : Nat → ActionLaw A) (r : Nat → Rat) : Prop :=
+  ∀ n, separatingSupportWeight (κs n) actions (U.separatingActionSet π h ω pstar) = r n
+
+/-- Concrete summability proxy on rational schedules, expressed via bounded partial sums. -/
+def SummableRatSchedule (r : Nat → Rat) : Prop :=
+  ∃ C : Rat, ∀ N, (Finset.range N).sum (fun n => r n) ≤ C
+
+/-- Concrete realization of a scalar schedule on the mass of a designated action. -/
+def actionMassScheduleRealized
+    (actions : List A) (aStar : A) (κs : Nat → ActionLaw A) (r : Nat → Rat) : Prop :=
+  aStar ∈ actions ∧ ∀ n, (κs n).mass aStar = r n
+
+/-- Generic posterior-decay recurrence from an initial odds value and a fixed decay factor. -/
+def posteriorDecayRecurrence
+    (δ : Rat) (r0 : Rat) (x : Nat → Rat) : Prop :=
+  x 0 = r0 ∧ ∀ n, x (n + 1) ≤ posteriorDecayFactor δ * x n
 
 /-- Lean wrapper for `thm:separating-support-convergence` on the concrete semantic stack. -/
 theorem thm_separating_support_convergence
@@ -549,9 +316,55 @@ theorem thm_separating_support_convergence
     (ω : Observer (EncodedProgram A O))
     (pstar : EncodedProgram A O)
     (actions : List A) (κ : ActionLaw A)
-    (hSupport : def_kernel_sep_condition U π h ω pstar actions κ) :
-    ∃ a, a ∈ actions ∧ κ.mass a ≠ 0 ∧ U.isSeparatingAction π h ω pstar a :=
-  hSupport
+    [DecidablePred (U.separatingActionSet π h ω pstar)]
+    {δ : Rat}
+    (hδ : 0 < δ)
+    (hOdds0 : 0 ≤ U.residualObserverFiberPosteriorOdds π h ω pstar)
+    (hFloor : hasSeparatingSupportFloor κ actions (U.separatingActionSet π h ω pstar) δ)
+    (hDecayPos :
+      ∀ ⦃a : A⦄, a ∈ actions → κ.mass a ≠ 0 → U.isSeparatingAction π h ω pstar a →
+        ∃ o,
+          0 < (U.predictiveLawInClass π h a (U.observerFiber ω pstar)).mass o ∧
+          (U.predictiveLawOutsideClass π h a (U.observerFiber ω pstar)).mass o = 0) :
+    oneStepResidualPosteriorConcentrates U π h ω pstar actions κ δ ∧
+      ∀ x : Nat → Rat,
+        posteriorDecayRecurrence δ (U.residualObserverFiberPosteriorOdds π h ω pstar) x →
+          ∀ N, x N ≤ nStepPosteriorDecayBound δ N
+            (U.residualObserverFiberPosteriorOdds π h ω pstar) := by
+  rcases exists_supported_action_of_positiveSeparatingSupportFloor
+      (κ := κ) (actions := actions) (S := U.separatingActionSet π h ω pstar) hδ hFloor with
+    ⟨a, ha, hMass, hSep⟩
+  rcases hDecayPos ha hMass hSep with ⟨o, hIn, hOut⟩
+  let refLaw :=
+    ConcreteLaw.positiveReferenceLaw
+      (supportUnion
+        (U.predictiveLawInClass π h a (U.observerFiber ω pstar))
+        (U.predictiveLawOutsideClass π h a (U.observerFiber ω pstar)))
+  let ε := posteriorDecayFactor δ *
+    (U.predictiveLawInClass π h a (U.observerFiber ω pstar)).mass o / 2
+  have hEpsPos : 0 < ε := by
+    dsimp [ε]
+    exact div_pos
+      (mul_pos (posteriorDecayFactor_pos_of_pos hδ) hIn)
+      (by norm_num)
+  have hWitness :=
+    U.softObserverFiberResidualWitness_of_zeroOut
+      π h a ω pstar o hEpsPos hIn hOut
+  have hBound :
+      U.softOneStepObserverFiberResidualOdds π h a ω pstar refLaw ε o ≤
+        posteriorDecayFactor δ * U.residualObserverFiberPosteriorOdds π h ω pstar := by
+    simpa [refLaw, ε] using
+      U.softOneStepObserverFiberResidualOdds_le_decayBound_of_zeroOut_supportUnion
+        π h a ω pstar hδ hOdds0 o hIn hOut
+  refine ⟨?_, ?_⟩
+  · refine ⟨a, o, refLaw, ε, ha, hMass, hSep, rfl, rfl, hEpsPos, ?_, ?_, ?_, hBound⟩
+    · simpa [refLaw] using hWitness.1
+    · simpa [refLaw] using hWitness.2.1
+    · simpa [refLaw] using hWitness.2.2
+  · intro x hx N
+    rcases hx with ⟨hx0, hStep⟩
+    simpa [hx0] using
+      (nStepPosteriorDecayBound_of_stepBound (δ := δ) (x := x) hStep N)
 
 /-- Lean wrapper for `thm:exploration-floor-behavioral` on the concrete semantic stack. -/
 theorem thm_exploration_floor_behavioral
@@ -574,10 +387,27 @@ theorem thm_separating_support_rate
     (pstar : EncodedProgram A O)
     (actions : List A) (κ : ActionLaw A)
     [DecidablePred (U.separatingActionSet π h ω pstar)]
-    (δ : Rat)
-    (hFloor : hasSeparatingSupportFloor κ actions (U.separatingActionSet π h ω pstar) δ) :
-    hasSeparatingSupportFloor κ actions (U.separatingActionSet π h ω pstar) δ :=
-  hFloor
+    {δ : Rat}
+    (hδ : 0 < δ)
+    (hOdds0 : 0 ≤ U.residualObserverFiberPosteriorOdds π h ω pstar)
+    (hFloor : hasSeparatingSupportFloor κ actions (U.separatingActionSet π h ω pstar) δ)
+    (hDecayPos :
+      ∀ ⦃a : A⦄, a ∈ actions → κ.mass a ≠ 0 → U.isSeparatingAction π h ω pstar a →
+        ∃ o,
+          0 < (U.predictiveLawInClass π h a (U.observerFiber ω pstar)).mass o ∧
+          (U.predictiveLawOutsideClass π h a (U.observerFiber ω pstar)).mass o = 0) :
+    oneStepResidualPosteriorConcentrates U π h ω pstar actions κ δ ∧
+      ∀ x : Nat → Rat,
+        posteriorDecayRecurrence δ (U.residualObserverFiberPosteriorOdds π h ω pstar) x →
+          ∀ N, x N ≤ posteriorRateFactorFromFloor N *
+            U.residualObserverFiberPosteriorOdds π h ω pstar := by
+  rcases thm_separating_support_convergence
+      U π h ω pstar actions κ hδ hOdds0 hFloor hDecayPos with
+    ⟨hConc, _hRecurrence⟩
+  refine ⟨hConc, ?_⟩
+  intro x hx N
+  rcases hx with ⟨hx0, hStep⟩
+  exact U.residualRateBound_of_positiveFloor π h ω pstar hδ hOdds0 x hx0 hStep N
 
 /-- Lean wrapper for `cor:separating-support-finite-time` on the concrete semantic stack. -/
 theorem cor_separating_support_finite_time
@@ -587,10 +417,28 @@ theorem cor_separating_support_finite_time
     (pstar : EncodedProgram A O)
     (actions : List A) (κ : ActionLaw A)
     [DecidablePred (U.separatingActionSet π h ω pstar)]
-    (δ : Rat)
-    (hFloor : hasSeparatingSupportFloor κ actions (U.separatingActionSet π h ω pstar) δ) :
-    hasSeparatingSupportFloor κ actions (U.separatingActionSet π h ω pstar) δ :=
-  hFloor
+    {δ : Rat}
+    (hδ : 0 < δ)
+    (hOdds0 : 0 ≤ U.residualObserverFiberPosteriorOdds π h ω pstar)
+    (hFloor : hasSeparatingSupportFloor κ actions (U.separatingActionSet π h ω pstar) δ)
+    (hDecayPos :
+      ∀ ⦃a : A⦄, a ∈ actions → κ.mass a ≠ 0 → U.isSeparatingAction π h ω pstar a →
+        ∃ o,
+          0 < (U.predictiveLawInClass π h a (U.observerFiber ω pstar)).mass o ∧
+          (U.predictiveLawOutsideClass π h a (U.observerFiber ω pstar)).mass o = 0)
+    {N : Nat} {ε : Rat}
+    (hε : posteriorRateFactorFromFloor N * U.residualObserverFiberPosteriorOdds π h ω pstar ≤ ε) :
+    oneStepResidualPosteriorConcentrates U π h ω pstar actions κ δ ∧
+      ∀ x : Nat → Rat,
+        posteriorDecayRecurrence δ (U.residualObserverFiberPosteriorOdds π h ω pstar) x →
+          x N ≤ ε := by
+  rcases thm_separating_support_rate
+      U π h ω pstar actions κ hδ hOdds0 hFloor hDecayPos with
+    ⟨hConc, hRate⟩
+  refine ⟨hConc, ?_⟩
+  intro x hx
+  have hNx := hRate x hx N
+  exact le_trans hNx hε
 
 /-- Lean wrapper for `thm:semantic-convergence` on the concrete semantic stack. -/
 theorem thm_semantic_convergence
@@ -601,8 +449,10 @@ theorem thm_semantic_convergence
     (pstar : EncodedProgram A O)
     {a : A} (ha : a ∈ actions)
     (hSep : U.isSeparatingAction π h ω pstar a) :
-    def_kernel_sep_condition U π h ω pstar actions (def_semantic_rule actions) :=
-  U.fullSupportActionLaw_hasSeparatingSupportOn actions π h ω pstar ha hSep
+    def_kernel_sep_condition U π h ω pstar actions (def_semantic_rule actions) := by
+  refine ⟨a, ha, ?_, hSep⟩
+  change (def_semantic_rule actions).mass a ≠ 0
+  simp [def_semantic_rule, fullSupportActionLaw, ha]
 
 /-- Lean wrapper for `thm:kernel-semantic-convergence` on the concrete semantic stack. -/
 theorem thm_kernel_semantic_convergence
@@ -613,8 +463,10 @@ theorem thm_kernel_semantic_convergence
     (pstar : EncodedProgram A O)
     {a : A} (ha : a ∈ refLaw.support)
     (hSep : U.isSeparatingAction π h ω pstar a) :
-    def_kernel_sep_condition U π h ω pstar refLaw.support (def_kernel_semantic_rule refLaw) :=
-  U.fullSupportActionLaw_hasSeparatingSupportOn refLaw.support π h ω pstar ha hSep
+    def_kernel_sep_condition U π h ω pstar refLaw.support (def_kernel_semantic_rule refLaw) := by
+  refine ⟨a, ha, ?_, hSep⟩
+  change (def_kernel_semantic_rule refLaw).mass a ≠ 0
+  simp [def_kernel_semantic_rule, fullSupportActionLaw, ha]
 
 /-- Lean wrapper for `cor:compact-action-kernel` on the concrete semantic stack. -/
 theorem cor_compact_action_kernel
@@ -625,8 +477,10 @@ theorem cor_compact_action_kernel
     (pstar : EncodedProgram A O)
     {a : A} (ha : a ∈ refLaw.support)
     (hSep : U.isSeparatingAction π h ω pstar a) :
-    def_kernel_sep_condition U π h ω pstar refLaw.support (def_kernel_semantic_rule refLaw) :=
-  U.fullSupportActionLaw_hasSeparatingSupportOn refLaw.support π h ω pstar ha hSep
+    def_kernel_sep_condition U π h ω pstar refLaw.support (def_kernel_semantic_rule refLaw) := by
+  refine ⟨a, ha, ?_, hSep⟩
+  change (def_kernel_semantic_rule refLaw).mass a ≠ 0
+  simp [def_kernel_semantic_rule, fullSupportActionLaw, ha]
 
 /-- Lean wrapper for `cor:finite-maximin` on the concrete semantic stack. -/
 theorem cor_finite_maximin
@@ -637,8 +491,10 @@ theorem cor_finite_maximin
     (pstar : EncodedProgram A O)
     {a : A} (ha : a ∈ actions)
     (hSep : U.isSeparatingAction π h ω pstar a) :
-    def_kernel_sep_condition U π h ω pstar actions (def_semantic_rule actions) :=
-  U.fullSupportActionLaw_hasSeparatingSupportOn actions π h ω pstar ha hSep
+    def_kernel_sep_condition U π h ω pstar actions (def_semantic_rule actions) := by
+  refine ⟨a, ha, ?_, hSep⟩
+  change (def_semantic_rule actions).mass a ≠ 0
+  simp [def_semantic_rule, fullSupportActionLaw, ha]
 
 /-- Lean wrapper for `cor:support-necessary` on the concrete semantic stack. -/
 theorem cor_support_necessary
@@ -647,17 +503,124 @@ theorem cor_support_necessary
     (ω : Observer (EncodedProgram A O))
     (pstar : EncodedProgram A O)
     (actions : List A) (κ : ActionLaw A)
+    [DecidablePred (U.separatingActionSet π h ω pstar)]
     (hNo :
       ¬ ∃ a, a ∈ actions ∧ κ.mass a ≠ 0 ∧ U.isSeparatingAction π h ω pstar a) :
-    ¬ def_kernel_sep_condition U π h ω pstar actions κ :=
-  hNo
+    ∀ {δ : Rat}, 0 < δ →
+      ¬ hasSeparatingSupportFloor κ actions (U.separatingActionSet π h ω pstar) δ := by
+  intro δ hδ hFloor
+  rcases ConcretePrefixMachine.exists_supported_action_of_positiveSeparatingSupportFloor
+      (κ := κ) (actions := actions) (S := U.separatingActionSet π h ω pstar) hδ hFloor with
+    ⟨a, ha, hMass, hSep⟩
+  exact hNo ⟨a, ha, hMass, hSep⟩
+
+namespace SummableSupportCounterexample
+
+def machine : ConcretePrefixMachine Bool Bool where
+  codes := [[true]]
+  prefixFree := by
+    intro c₁ c₂ hc₁ hc₂ hneq hPrefix
+    simp at hc₁ hc₂
+    subst hc₁
+    subst hc₂
+    contradiction
+  semantics := by
+    intro c hc
+    simp at hc
+    subst hc
+    exact (fun _ _ _ => ConcreteLaw.zero)
+
+def policy : ConcretePolicy Bool Bool :=
+  fun _ _ => ConcreteLaw.pure true
+
+def history : FullHist Bool Bool :=
+  asFullHist (emptyHist : Hist Bool Bool 0)
+
+def observer : Observer (EncodedProgram Bool Bool) where
+  Ω := Unit
+  view _ := ()
+
+def target : EncodedProgram Bool Bool :=
+  machine.toEncodedProgram ⟨[true], by simp [machine]⟩
+
+def actions : List Bool := [true]
+
+def zeroSchedule : Nat → Rat := fun _ => 0
+
+def scheduledActionLaw (r : Nat → Rat) (n : Nat) : ActionLaw Bool where
+  mass a := if a = true then r n else 0
+  support := [true]
+  support_complete := by
+    intro a ha
+    by_cases h : a = true
+    · simp [h]
+    · simp [h] at ha
+
+theorem true_mem_actions : true ∈ actions := by
+  simp [actions]
+
+theorem zeroSchedule_summable :
+    SummableRatSchedule zeroSchedule := by
+  refine ⟨0, ?_⟩
+  intro N
+  simp [zeroSchedule]
+
+theorem schedule_realized_on_true (r : Nat → Rat) :
+    actionMassScheduleRealized actions true (scheduledActionLaw r) r := by
+  refine ⟨true_mem_actions, ?_⟩
+  intro n
+  simp [scheduledActionLaw]
+
+theorem no_oneStepPosteriorConcentrates (r : Nat → Rat) (n : Nat) :
+    ¬ oneStepPosteriorConcentrates machine policy history observer target actions (scheduledActionLaw r n) := by
+  intro hConc
+  rcases hConc with ⟨a, ha, hMass, _hSep, o, hIn, hOut, _hZero⟩
+  have haTrue : a = true := by
+    simpa [actions] using ha
+  subst haTrue
+  have hKernelZero :
+      ∀ p : machine.Program,
+        (programObsLaw history true (machine.toEncodedProgram p)).mass o = 0 := by
+    intro p
+    simp [programObsLaw, ConcretePrefixMachine.toEncodedProgram,
+      ConcretePrefixMachine.programSemantics, machine, ConcreteLaw.zero]
+  have hListZero :
+      ∀ xs : List machine.Program, listWeightedSum xs (fun _ => (0 : Rat)) = 0 := by
+    intro xs
+    induction xs with
+    | nil =>
+        simp [listWeightedSum]
+    | cons x xs ih =>
+        simp [listWeightedSum]
+  have hZero :
+      (machine.predictiveLawInClass policy history true
+        (machine.observerFiber observer target)).mass o = 0 := by
+    simp [ConcretePrefixMachine.predictiveLawInClass, mixLaw, hKernelZero]
+    exact hListZero _
+  exact hIn hZero
+
+end SummableSupportCounterexample
 
 /-- Lean wrapper for `thm:summable-support-insufficient` on the concrete semantic stack. -/
 theorem thm_summable_support_insufficient
     (r : Nat → Rat)
-    (hEventuallyZero : ∃ N, ∀ n, N ≤ n → r n = 0) :
-    ∃ N, ∀ n, N ≤ n → r n = 0 :=
-  hEventuallyZero
+    (hSummable : SummableRatSchedule r) :
+    ∃ s : Nat → Rat,
+      s = r ∧ SummableRatSchedule s ∧
+      ∃ (U : ConcretePrefixMachine Bool Bool) (π : ConcretePolicy Bool Bool)
+        (h : FullHist Bool Bool)
+        (pstar : EncodedProgram Bool Bool) (actions : List Bool) (aStar : Bool)
+        (κs : Nat → ActionLaw Bool),
+        actionMassScheduleRealized actions aStar κs s ∧
+        ∀ n, ¬ oneStepPosteriorConcentrates U π h SummableSupportCounterexample.observer pstar actions (κs n) := by
+  refine ⟨r, rfl, hSummable,
+    SummableSupportCounterexample.machine, SummableSupportCounterexample.policy,
+    SummableSupportCounterexample.history,
+    SummableSupportCounterexample.target, SummableSupportCounterexample.actions, true,
+    SummableSupportCounterexample.scheduledActionLaw r, ?_, ?_⟩
+  · exact SummableSupportCounterexample.schedule_realized_on_true r
+  · intro n
+    exact SummableSupportCounterexample.no_oneStepPosteriorConcentrates r n
 
 /-- Lean wrapper for `cor:goal-dialed-payoff` on the concrete semantic stack. -/
 theorem cor_goal_dialed_payoff
@@ -668,8 +631,9 @@ theorem cor_goal_dialed_payoff
     (actions : List A)
     (hUniform : def_uniform_history_independent_separation U π ω pstar actions)
     (h : FullHist A O) :
-    def_sep_condition U π h ω pstar actions :=
-  hUniform h
+    def_sep_condition U π h ω pstar actions := by
+  rcases hUniform h with ⟨a, ha, hSep⟩
+  exact ⟨a, ha, hSep⟩
 
 end ConcretePaperSemantic
 

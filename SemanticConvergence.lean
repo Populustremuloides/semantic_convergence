@@ -3,9 +3,7 @@ Top-level import surface for the project.
 
 The concrete `Concrete*` modules are the active first-principles foundation.
 The paper-facing theorem modules remain imported for their canonical wrapper
-names; any retained abstract `...Model` / `...Theory` APIs inside those files
-are legacy compatibility scaffolding only and are not part of the active trust
-boundary.
+names, and those modules now terminate directly at the concrete stack.
 -/
 
 import SemanticConvergence.Foundations
@@ -15,6 +13,7 @@ import SemanticConvergence.ConcreteHierarchy
 import SemanticConvergence.ConcreteFunctional
 import SemanticConvergence.ConcreteBelief
 import SemanticConvergence.ConcreteSemantic
+import SemanticConvergence.ConcretePosteriorDecay
 import SemanticConvergence.ConcreteRates
 import SemanticConvergence.ConcreteNoise
 import SemanticConvergence.ConcreteSelfReference

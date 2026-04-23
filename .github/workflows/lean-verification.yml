@@ -1,0 +1,77 @@
+name: Lean Verification
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Cache Lean artifacts
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.elan
+            ~/.cache/mathlib
+            .lake/packages
+            .lake/build
+          key: ${{ runner.os }}-lean-${{ hashFiles('lean-toolchain', 'lakefile.lean', 'lake-manifest.json') }}
+          restore-keys: |
+            ${{ runner.os }}-lean-
+
+      - name: Install elan
+        run: |
+          curl -sSfL https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh | sh -s -- -y
+          echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
+
+      - name: Show toolchain
+        run: |
+          lean --version
+          lake --version
+
+      - name: Fetch Lake dependencies
+        run: lake update
+
+      - name: Fetch Mathlib cache
+        run: lake exe cache get
+
+      - name: Build Lean project
+        run: lake build
+
+      - name: Check generator syntax
+        run: python3 -m py_compile scripts/generate_formalization_manifest.py
+
+      - name: Regenerate verification artifacts
+        run: python3 scripts/generate_formalization_manifest.py
+
+      - name: Ensure generated artifacts are committed
+        run: git diff --exit-code
+
+      - name: Upload verification artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: lean-verification-artifacts
+          path: |
+            formalization_manifest.md
+            formalization_audit.md
+            formalization_bridge.md
+            lean_theorem_census.md
+            lean_proof_audit.md
+            lean_concrete_theorem_audit.md
+            lean_verification_progress.md
+            lean_axiom_audit.md
+            SemanticConvergence/Manifest.lean
+            SemanticConvergence/AxiomAudit.lean

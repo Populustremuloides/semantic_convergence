@@ -1,3 +1,4 @@
+import Mathlib
 import SemanticConvergence.Foundations
 
 namespace SemanticConvergence
@@ -312,6 +313,62 @@ def reachableKernelSetoid (R : ReachablePairPred A O) : Setoid (ConcreteProgram 
       exact kernelEqOnReachablePairs_trans R
 
 end PathLaws
+
+namespace CountableConcrete
+
+/-- Countable finite histories, modeled as lists of action-observation events. -/
+abbrev CountHistEvent (A : Type u) (O : Type v) := HistEvent A O
+
+/-- Countable finite histories for the Mathlib-backed substrate. -/
+abbrev CountHist (A : Type u) (O : Type v) := List (CountHistEvent A O)
+
+/-- Append one interaction event to the end of a countable finite history. -/
+def appendEvent {A : Type u} {O : Type v}
+    (h : CountHist A O) (e : CountHistEvent A O) : CountHist A O :=
+  h ++ [e]
+
+theorem appendEvent_length {A : Type u} {O : Type v}
+    (h : CountHist A O) (e : CountHistEvent A O) :
+    (appendEvent h e).length = h.length + 1 := by
+  simp [appendEvent]
+
+/-- PMF-valued policies on the countable-history substrate. -/
+abbrev CountablePolicy (A : Type u) (O : Type v) := CountHist A O → PMF A
+
+/-- One-step PMF-valued environment kernels on the countable-history substrate. -/
+abbrev CountableKernel (A : Type u) (O : Type v) := CountHist A O → A → PMF O
+
+/-- Countable programs are one-step observation kernels. -/
+abbrev CountableProgram (A : Type u) (O : Type v) := CountableKernel A O
+
+/--
+Finite-horizon path law on the countable-history substrate, expressed as a PMF on
+lists of interaction events.
+-/
+def histPMF {A : Type u} {O : Type v}
+    (π : CountablePolicy A O) (κ : CountableKernel A O) : Nat → PMF (CountHist A O)
+  | 0 => PMF.pure []
+  | t + 1 =>
+      (histPMF π κ t).bind fun h =>
+        (π h).bind fun a =>
+          (κ h a).bind fun o =>
+            PMF.pure (appendEvent h (a, o))
+
+/-- Reachability in the countable-history PMF substrate. -/
+def reachableHist {A : Type u} {O : Type v}
+    (π : CountablePolicy A O) (κ : CountableKernel A O)
+    (t : Nat) (h : CountHist A O) : Prop :=
+  histPMF π κ t h ≠ 0
+
+/-- PMF support-membership implies reachability, by definition. -/
+theorem reachableHist_iff_ne_zero {A : Type u} {O : Type v}
+    (π : CountablePolicy A O) (κ : CountableKernel A O)
+    (t : Nat) (h : CountHist A O) :
+    reachableHist π κ t h ↔ histPMF π κ t h ≠ 0 := by
+  rfl
+
+end CountableConcrete
+
 end
 
 end SemanticConvergence

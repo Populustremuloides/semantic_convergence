@@ -3,10 +3,23 @@
 This document fixes the target meaning of "first-principles formalization" for
 `semantic_convergence_interactive_learning.tex`.
 
-It is intentionally stricter than the current paper-to-Lean coverage notion.
-The current repo already has exact Lean counterparts for all core manuscript
-items. That does **not** yet mean those items are reduced to a concrete
-foundational stack.
+The repo has now reached full manuscript coverage and a concrete-stack
+trust-boundary closure and semantic-audit closure: the generated status
+artifacts report `106/106` derived manuscript items,
+`106/106` concrete-stack items, `semanticAuditClosed = true`, and
+`fullyFirstPrinciples = true`. The separate axiom audit in
+[lean_axiom_audit.md](/Users/brianbrown/Documents/Claude/Projects/algorithmic_free_energy/lean_axiom_audit.md)
+records the exact dependency profile of each declaration and now distinguishes
+canonical-baseline rows, expected `native_decide` auxiliaries,
+lighter-than-baseline rows, and genuine drift rows.
+
+The phase-by-phase sections below are retained as implementation history. When
+those historical notes conflict with the generated artifacts in
+[formalization_manifest.md](/Users/brianbrown/Documents/Claude/Projects/algorithmic_free_energy/formalization_manifest.md),
+[formalization_audit.md](/Users/brianbrown/Documents/Claude/Projects/algorithmic_free_energy/formalization_audit.md),
+[formalization_bridge.md](/Users/brianbrown/Documents/Claude/Projects/algorithmic_free_energy/formalization_bridge.md),
+or [lean_axiom_audit.md](/Users/brianbrown/Documents/Claude/Projects/algorithmic_free_energy/lean_axiom_audit.md),
+the generated artifacts are authoritative.
 
 ## Current distinction
 
@@ -25,6 +38,34 @@ The live status for both notions is tracked in:
 - [formalization_manifest.md](/Users/brianbrown/Documents/Claude/Projects/algorithmic_free_energy/formalization_manifest.md)
 - [formalization_audit.md](/Users/brianbrown/Documents/Claude/Projects/algorithmic_free_energy/formalization_audit.md)
 - [Manifest.lean](/Users/brianbrown/Documents/Claude/Projects/algorithmic_free_energy/SemanticConvergence/Manifest.lean)
+
+## Current Section 6 Lean scope
+
+The exact Lean names and their current concrete scope are:
+
+- `SemanticConvergence.thm_separating_support_convergence`
+  This proves a concrete positive-support residual-odds witness: a
+  supported separating action, a canonical support-union reference law, a
+  floor-dependent softening scale, a one-step residual-odds contraction, and a
+  generic `N`-step recurrence bound under a positive separating-support floor
+  and a nonnegative initial residual-odds hypothesis.
+- `SemanticConvergence.thm_separating_support_rate`
+  This upgrades that concrete recurrence to an explicit positive-floor
+  `N`-step residual-odds rate bound.
+- `SemanticConvergence.cor_separating_support_finite_time`
+  This turns that positive-floor rate bound into a concrete finite-
+  time `x N ≤ ε` consequence.
+- `SemanticConvergence.thm_semantic_convergence`
+  This certifies the selector-side realization inside the closed semantic
+  theorem stack.
+- `SemanticConvergence.thm_kernel_semantic_convergence`
+  This certifies the kernel-side realization inside the closed semantic theorem
+  stack.
+
+When the manuscript or repo prose speaks about Lean coverage of the Section~6
+stack, those exact declarations are the authoritative Lean-side objects.
+They now realize the strong concrete support/rate stack used by the final
+first-principles closure pass.
 
 ## Target concrete foundation
 
@@ -54,25 +95,11 @@ The target first-principles stack for this project is:
 - Self-reference objects: concrete finite-time observers and induced
   self-referential policies built from the same concrete policy/history stack.
 
-## Legacy abstract compatibility APIs
+## Trust boundary
 
-The repo still contains the older theorem-bearing abstract interfaces in files
-such as:
-
-- [Functional.lean](/Users/brianbrown/Documents/Claude/Projects/algorithmic_free_energy/SemanticConvergence/Functional.lean)
-- [Belief.lean](/Users/brianbrown/Documents/Claude/Projects/algorithmic_free_energy/SemanticConvergence/Belief.lean)
-- [Semantic.lean](/Users/brianbrown/Documents/Claude/Projects/algorithmic_free_energy/SemanticConvergence/Semantic.lean)
-- [Rates.lean](/Users/brianbrown/Documents/Claude/Projects/algorithmic_free_energy/SemanticConvergence/Rates.lean)
-- [Noise.lean](/Users/brianbrown/Documents/Claude/Projects/algorithmic_free_energy/SemanticConvergence/Noise.lean)
-- [SelfReference.lean](/Users/brianbrown/Documents/Claude/Projects/algorithmic_free_energy/SemanticConvergence/SelfReference.lean)
-- [Boundary.lean](/Users/brianbrown/Documents/Claude/Projects/algorithmic_free_energy/SemanticConvergence/Boundary.lean)
-- [Surrogate.lean](/Users/brianbrown/Documents/Claude/Projects/algorithmic_free_energy/SemanticConvergence/Surrogate.lean)
-
-Those interfaces are now retained only for archival comparison and
-backward-compatibility. As of the Phase 10 closure pass, no manifest-tracked
-paper declaration depends on them anymore. The active trust boundary is the
-concrete stack recorded in the generated manifest and audit, not these retained
-legacy APIs.
+The paper-facing theorem files now terminate directly at the concrete stack.
+There is no remaining theorem-bearing abstract `...Model` / `...Theory` layer
+in the active proof boundary for manifest-tracked manuscript declarations.
 
 ## Phase 1 concrete core
 
@@ -98,21 +125,25 @@ later phases to build on, instead of only abstract placeholders.
 The second concrete reduction layer now lives in
 [ConcretePrior.lean](/Users/brianbrown/Documents/Claude/Projects/algorithmic_free_energy/SemanticConvergence/ConcretePrior.lean).
 
-That file introduces:
+That file now introduces two layers:
 
-- concrete binary codewords
-- prefix and prefix-free code-domain structure
-- a concrete finite-domain prefix machine with explicit semantics on accepted codes
-- a concrete universal prior on machine-domain programs from code lengths
-- concrete machine mixtures under a fixed policy
-- concrete class prior mass and semantic-complexity scaffolding
-- prefix-extension structure for machine-to-machine re-encodings
+- the older finite-domain prefix-machine scaffold retained for compatibility with
+  the already-migrated paper-facing wrappers
+- a new Mathlib-backed countable substrate with:
+  - enumerable prefix machines `Nat → Option BitCode`
+  - countable encoded programs
+  - `ℝ≥0∞` prefix weights from code lengths
+  - PMF-style finite-horizon likelihoods on countable histories
+  - unnormalized posterior weights on the countable machine domain
 
-This still does not make the paper first-principles complete. The paper-facing
-belief theorems in [Belief.lean](/Users/brianbrown/Documents/Claude/Projects/algorithmic_free_energy/SemanticConvergence/Belief.lean)
-remain stated over the abstract `BeliefModel`. But the repo now has a real
-prefix-machine/prior layer for those later phases to target, rather than only a
-symbolic prior API.
+The architectural decision for the punch list's item 9 is now fixed as Path A:
+the repo is broadening the Lean to the paper's intended countable/probabilistic
+setting rather than paper-scoping the issue away. This still does not make the
+paper first-principles complete, because the paper-facing belief theorems in
+[Belief.lean](/Users/brianbrown/Documents/Claude/Projects/algorithmic_free_energy/SemanticConvergence/Belief.lean)
+remain stated over the abstract `BeliefModel`. But the repo now has a genuine
+Mathlib-backed countable machine/prior substrate for the later substantive
+probabilistic phases to target.
 
 ## Phase 3 concrete hierarchy layer
 

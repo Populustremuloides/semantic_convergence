@@ -172,6 +172,91 @@ theorem PrefixExtension.translatedPrior_formula {U V : ConcretePrefixMachine A O
 
 end ConcretePrefixMachine
 
+namespace CountableConcrete
+
+variable {A : Type u} {O : Type v}
+
+/--
+Countable encoded programs: explicit code together with a PMF-valued one-step
+environment kernel on countable finite histories.
+-/
+structure CountableEncodedProgram (A : Type u) (O : Type v) where
+  code : BitCode
+  kernel : CountableProgram A O
+
+/-- Countable prefix machine presented by an enumerable code domain. -/
+structure CountablePrefixMachine (A : Type u) (O : Type v) where
+  codeAt : Nat → Option BitCode
+  prefixFree :
+    ∀ {m n : Nat} {cm cn : BitCode},
+      m ≠ n →
+      codeAt m = some cm →
+      codeAt n = some cn →
+      ¬ codeIsPrefix cm cn
+  semantics :
+    ∀ n c, codeAt n = some c → CountableProgram A O
+
+namespace CountablePrefixMachine
+
+/-- Valid program indices in the enumerable machine domain. -/
+abbrev Program (U : CountablePrefixMachine A O) := { n : Nat // ∃ c, U.codeAt n = some c }
+
+/-- Underlying codeword for a countable machine-domain program. -/
+def programCode (U : CountablePrefixMachine A O) (p : U.Program) : BitCode :=
+  Classical.choose p.2
+
+/-- Proof that the chosen code really appears at the chosen program index. -/
+def programCode_spec (U : CountablePrefixMachine A O) (p : U.Program) :
+    U.codeAt p.1 = some (U.programCode p) :=
+  Classical.choose_spec p.2
+
+/-- Concrete PMF-valued semantics attached to a countable machine-domain program. -/
+def programSemantics (U : CountablePrefixMachine A O) (p : U.Program) :
+    CountableProgram A O :=
+  U.semantics p.1 (U.programCode p) (U.programCode_spec p)
+
+/-- Forget a countable machine-domain program down to its encoded semantic content. -/
+def toEncodedProgram (U : CountablePrefixMachine A O) (p : U.Program) :
+    CountableEncodedProgram A O where
+  code := U.programCode p
+  kernel := U.programSemantics p
+
+/--
+Real-valued prefix weight on a codeword, viewed in `ℝ≥0∞` so it can participate in PMF-
+style countable sums without collapsing back to the old rational substrate.
+-/
+def codeWeightENNReal (c : BitCode) : ENNReal :=
+  ENNReal.ofReal ((1 / 2 : ℝ) ^ c.length)
+
+/-- Countable universal prior weight on an enumerable machine-domain program. -/
+def universalWeight (U : CountablePrefixMachine A O) (p : U.Program) : ENNReal :=
+  codeWeightENNReal (U.programCode p)
+
+/-- Finite-horizon likelihood of a realized countable history under a machine program. -/
+def likelihood (U : CountablePrefixMachine A O)
+    [Encodable A] [Encodable O]
+    (π : CountablePolicy A O) (t : Nat) (h : CountHist A O) (p : U.Program) : ENNReal :=
+  CountableConcrete.histPMF π (U.programSemantics p) t h
+
+/--
+Unnormalized posterior weight on the countable machine domain. This is the Bayesian core
+object for the broadened countable substrate; later phases can normalize it when they
+need a genuine posterior PMF.
+-/
+def posteriorWeight (U : CountablePrefixMachine A O)
+    [Encodable A] [Encodable O]
+    (π : CountablePolicy A O) (t : Nat) (h : CountHist A O) (p : U.Program) : ENNReal :=
+  U.universalWeight p * U.likelihood π t h p
+
+/-- Same index, same code, by construction. -/
+theorem toEncodedProgram_code (U : CountablePrefixMachine A O) (p : U.Program) :
+    (U.toEncodedProgram p).code = U.programCode p := by
+  rfl
+
+end CountablePrefixMachine
+
+end CountableConcrete
+
 end
 
 end SemanticConvergence

@@ -1,6 +1,0 @@
-name = "SemanticConvergence"
-version = "0.1.0"
-defaultTargets = ["SemanticConvergence"]
-
-[[lean_lib]]
-name = "SemanticConvergence"

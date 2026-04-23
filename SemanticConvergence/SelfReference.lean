@@ -1,299 +1,194 @@
-import SemanticConvergence.Rates
-import SemanticConvergence.ConcreteSelfReference
+import SemanticConvergence.Functional
+import SemanticConvergence.ConcreteSemantic
 
 namespace SemanticConvergence
 
-universe u v w x y z t s r q m n p o k l
+universe u v
 
-/--
-`SelfReferenceModel` is a legacy abstract compatibility package for the
-self-referential observer, eventual-isolation, and exploration-completed rule
-layer. It is retained for archival comparison and backward compatibility only;
-the paper-facing self-reference declarations below now terminate at the
-concrete stack.
--/
-structure SelfReferenceModel extends RatesModel where
-  finiteTimePolicyObserver : Policy → Nat → ObserverId
-  selfRefRule : Policy
-  selfRefExploratory : ReferenceMeasure → (Nat → Rat) → Policy
-  monotoneRefinementConclusion : Policy → Prop
-  monotoneRefinement :
-    ∀ π : Policy, monotoneRefinementConclusion π
-  explorationReachabilityConclusion : Program → Nat → Prop
-  explorationReachability :
-    ∀ (pstar : Program) (t : Nat),
-      explorationReachabilityConclusion pstar t
-  observerPromotionHyp : Program → Prop
-  observerPromotionConclusion : Program → Prop
-  observerPromotion :
-    ∀ pstar : Program,
-      observerPromotionHyp pstar →
-      observerPromotionConclusion pstar
-  selfRefConvergenceHyp : Program → Prop
-  selfRefConvergenceConclusion : Program → Prop
-  selfRefObstruction : Prop
-  selfRefObstruction_holds : selfRefObstruction
-  selfRefExploratoryHyp : ReferenceMeasure → (Nat → Rat) → Program → Prop
-  selfRefExploratoryConclusion : ReferenceMeasure → (Nat → Rat) → Program → Prop
-  selfRefExploratoryRateHyp : ReferenceMeasure → (Nat → Rat) → Program → Prop
-  selfRefExploratoryRateConclusion : ReferenceMeasure → (Nat → Rat) → Program → Prop
-  selfRefOneStepSplitHyp : Program → Nat → Program → Prop
-  selfRefOneStepSplitConclusion : Program → Nat → Program → Prop
-  selfRefOneStepSplit :
-    ∀ (pstar : Program) (t : Nat) (p : Program),
-      selfRefOneStepSplitHyp pstar t p →
-      selfRefOneStepSplitConclusion pstar t p
-  selfRefSharpHyp : Program → Prop
-  selfRefSharpConclusion : Program → Prop
-  selfRefSharp :
-    ∀ pstar : Program,
-      selfRefSharpHyp pstar →
-      selfRefSharpConclusion pstar
+noncomputable section CountablePaperSelfReference
 
-namespace SelfReferenceModel
-
-variable (M : SelfReferenceModel)
-
-/-- Lean wrapper for `def:finite-time-policy-observer`. -/
-def def_finite_time_policy_observer (π : M.Policy) (t : Nat) : M.ObserverId :=
-  M.finiteTimePolicyObserver π t
-
-/-- Lean wrapper for `def:self-ref-rule`. -/
-def def_self_ref_rule : M.Policy :=
-  M.selfRefRule
-
-/-- Lean wrapper for `def:self-ref-exploratory`. -/
-def def_self_ref_exploratory (ref : M.ReferenceMeasure) (eps : Nat → Rat) : M.Policy :=
-  M.selfRefExploratory ref eps
-
-end SelfReferenceModel
-
-/--
-`SelfReferenceTheory M` is the legacy theorem-level compatibility layer over
-`SelfReferenceModel`. It remains in the source tree for archival comparison and
-backward compatibility only.
--/
-structure SelfReferenceTheory (M : SelfReferenceModel)
-    extends RatesTheory M.toRatesModel where
-  selfRefConvergence_to_semanticHyp :
-    ∀ pstar : M.Program,
-      M.selfRefConvergenceHyp pstar →
-      M.canonicalSelectorHyp pstar
-  selfRefConvergence_from_concentration :
-    ∀ pstar : M.Program,
-      M.posteriorConcentrates pstar →
-      M.selfRefConvergenceConclusion pstar
-  selfRefExploratory_to_floorHyp :
-    ∀ (ref : M.ReferenceMeasure) (eps : Nat → Rat) (pstar : M.Program),
-      M.selfRefExploratoryHyp ref eps pstar →
-      M.explorationFloorHyp (M.selfRefExploratory ref eps) pstar
-  selfRefExploratory_from_floor :
-    ∀ (ref : M.ReferenceMeasure) (eps : Nat → Rat) (pstar : M.Program),
-      M.policyRecoversBehavioral (M.selfRefExploratory ref eps) →
-      M.posteriorConcentrates pstar →
-      M.selfRefExploratoryConclusion ref eps pstar
-  selfRefExploratoryRate_to_concentrationHyp :
-    ∀ (ref : M.ReferenceMeasure) (eps : Nat → Rat) (pstar : M.Program),
-      M.selfRefExploratoryRateHyp ref eps pstar →
-      M.expRateConcentrationHyp ref pstar
-  selfRefExploratoryRate_from_concentration :
-    ∀ (ref : M.ReferenceMeasure) (eps : Nat → Rat) (pstar : M.Program),
-      M.expRateConcentrationConclusion ref pstar →
-      M.selfRefExploratoryRateConclusion ref eps pstar
-
-namespace SelfReferenceTheory
-
-variable {M : SelfReferenceModel}
-
-/-- Lean wrapper for `lem:monotone-refinement`. -/
-theorem lem_monotone_refinement (_T : SelfReferenceTheory M) (π : M.Policy) :
-    M.monotoneRefinementConclusion π :=
-  M.monotoneRefinement π
-
-/-- Lean wrapper for `lem:exploration-reachability`. -/
-theorem lem_exploration_reachability (_T : SelfReferenceTheory M)
-    (pstar : M.Program) (t : Nat) :
-    M.explorationReachabilityConclusion pstar t :=
-  M.explorationReachability pstar t
-
-/-- Lean wrapper for `prop:observer-promotion-sr`. -/
-theorem prop_observer_promotion_sr (_T : SelfReferenceTheory M) (pstar : M.Program)
-    (hPromote : M.observerPromotionHyp pstar) :
-    M.observerPromotionConclusion pstar :=
-  M.observerPromotion pstar hPromote
-
-/-- Lean wrapper for `thm:self-ref-convergence`. -/
-theorem thm_self_ref_convergence (T : SelfReferenceTheory M) (pstar : M.Program)
-    (hConv : M.selfRefConvergenceHyp pstar) :
-    M.selfRefConvergenceConclusion pstar := by
-  exact SelfReferenceTheory.selfRefConvergence_from_concentration T pstar
-    (SemanticTheory.thm_semantic_convergence T.toSemanticTheory pstar
-      (SelfReferenceTheory.selfRefConvergence_to_semanticHyp T pstar hConv))
-
-/-- Lean wrapper for `prop:self-ref-obstruction`. -/
-theorem prop_self_ref_obstruction (_T : SelfReferenceTheory M) :
-    M.selfRefObstruction :=
-  M.selfRefObstruction_holds
-
-/-- Lean wrapper for `thm:self-ref-exploratory`. -/
-theorem thm_self_ref_exploratory (T : SelfReferenceTheory M)
-    (ref : M.ReferenceMeasure) (eps : Nat → Rat)
-    (pstar : M.Program) (hExpl : M.selfRefExploratoryHyp ref eps pstar) :
-    M.selfRefExploratoryConclusion ref eps pstar := by
-  have hFloor :
-      M.explorationFloorHyp (M.selfRefExploratory ref eps) pstar :=
-    SelfReferenceTheory.selfRefExploratory_to_floorHyp T ref eps pstar hExpl
-  have hOutcome :=
-    SemanticTheory.thm_exploration_floor_behavioral T.toSemanticTheory
-      (M.selfRefExploratory ref eps) pstar hFloor
-  exact SelfReferenceTheory.selfRefExploratory_from_floor T ref eps pstar hOutcome.1 hOutcome.2
-
-/-- Lean wrapper for `thm:self-ref-exploratory-rate`. -/
-theorem thm_self_ref_exploratory_rate (T : SelfReferenceTheory M)
-    (ref : M.ReferenceMeasure) (eps : Nat → Rat)
-    (pstar : M.Program) (hRate : M.selfRefExploratoryRateHyp ref eps pstar) :
-    M.selfRefExploratoryRateConclusion ref eps pstar := by
-  exact SelfReferenceTheory.selfRefExploratoryRate_from_concentration T ref eps pstar
-    (RatesTheory.thm_exp_rate_concentration T.toRatesTheory ref pstar
-      (SelfReferenceTheory.selfRefExploratoryRate_to_concentrationHyp T ref eps pstar hRate))
-
-/-- Lean wrapper for `prop:self-ref-one-step-split`. -/
-theorem prop_self_ref_one_step_split (_T : SelfReferenceTheory M)
-    (pstar : M.Program) (t : Nat) (p : M.Program)
-    (hSplit : M.selfRefOneStepSplitHyp pstar t p) :
-    M.selfRefOneStepSplitConclusion pstar t p :=
-  M.selfRefOneStepSplit pstar t p hSplit
-
-/-- Lean wrapper for `thm:self-ref-sharp`. -/
-theorem thm_self_ref_sharp (_T : SelfReferenceTheory M) (pstar : M.Program)
-    (hSharp : M.selfRefSharpHyp pstar) :
-    M.selfRefSharpConclusion pstar :=
-  M.selfRefSharp pstar hSharp
-
-end SelfReferenceTheory
-
-noncomputable section ConcretePaperSelfReference
-
-open ConcretePrefixMachine
+open CountableConcrete
+open CountableConcrete.CountablePrefixMachine
 
 variable {A : Type u} {O : Type v}
-variable [DecidableEq A] [DecidableEq O] [BEq A] [LawfulBEq A] [BEq O] [LawfulBEq O]
+variable [Encodable A] [Encodable O]
 
-/-- Lean wrapper for `def:finite-time-policy-observer` on the concrete self-reference stack. -/
+/-- Truncated countable policy view up to finite horizon `t`. -/
+abbrev FiniteTimePolicyView (A : Type u) (O : Type v) (t : Nat) :=
+  (n : Nat) → n ≤ t → CountHist A O → ENNReal
+
+/-- Countable finite-time policy view induced by a program under a policy. -/
+def finiteTimePolicyView
+    (π : CountablePolicy A O) (t : Nat) (p : CountableEncodedProgram A O) :
+    FiniteTimePolicyView A O t :=
+  fun n _ h => CountableConcrete.histPMF π p.kernel n h
+
+/-- Countable finite-time policy observer at horizon `t`. -/
 def def_finite_time_policy_observer
-    (π : ConcretePolicy A O) (t : Nat) : Observer (EncodedProgram A O) :=
-  finiteTimePolicyObserver π t
+    (π : CountablePolicy A O) (t : Nat) : Observer (CountableEncodedProgram A O) where
+  Ω := FiniteTimePolicyView A O t
+  view := finiteTimePolicyView π t
 
-/-- Lean wrapper for `def:self-ref-rule` on the concrete self-reference stack. -/
+/-- Countable finite-time observer fiber through a target program. -/
+def finiteTimeObserverFiber
+    (π : CountablePolicy A O) (t : Nat) (pstar : CountableEncodedProgram A O) :
+    PredSet (CountableEncodedProgram A O) :=
+  fun p =>
+    (def_finite_time_policy_observer (A := A) (O := O) π t).view p =
+      (def_finite_time_policy_observer (A := A) (O := O) π t).view pstar
+
+/-- Eventual isolation of a target program by countable finite-time observers. -/
+def eventuallyIsolates
+    (π : CountablePolicy A O) (pstar : CountableEncodedProgram A O) : Prop :=
+  ∃ t, finiteTimeObserverFiber (A := A) (O := O) π t pstar ⊆
+    def_int_sem_class (A := A) (O := O) pstar
+
+/-- Failure of eventual isolation. -/
+def isolationObstructed
+    (π : CountablePolicy A O) (pstar : CountableEncodedProgram A O) : Prop :=
+  ∀ t, ∃ p : CountableEncodedProgram A O,
+    finiteTimeObserverFiber (A := A) (O := O) π t pstar p ∧
+      ¬ def_int_sem_class (A := A) (O := O) pstar p
+
+/-- One-step splitting witness on an explicit finite action list. -/
+def oneStepSplitAt
+    (U : CountablePrefixMachine A O)
+    (π : CountablePolicy A O) (t : Nat) (h : CountHist A O) (actions : List A)
+    (ω : Observer (CountableEncodedProgram A O))
+    (pstar : CountableEncodedProgram A O) : Prop :=
+  ∃ a, a ∈ actions ∧ 0 < U.semanticSeparation π t h ω pstar
+
+/-- Generic observer-driven local action chooser. -/
+abbrev ObserverDrivenChooser (A : Type u) (O : Type v) :=
+  (t : Nat) → CountHist A O → Observer (CountableEncodedProgram A O) → PMF A
+
+/-- Lean wrapper for `def:self-ref-rule` on the countable self-reference stack. -/
 def def_self_ref_rule
-    (πref : ConcretePolicy A O)
+    (πref : CountablePolicy A O)
     (chooser : ObserverDrivenChooser A O) :
-    ConcretePolicy A O :=
-  finiteTimeObserverRule πref chooser
+    CountablePolicy A O :=
+  fun h =>
+    chooser h.length h (def_finite_time_policy_observer (A := A) (O := O) πref h.length)
 
-/-- Lean wrapper for `def:self-ref-exploratory` on the concrete self-reference stack. -/
+/--
+Exploration-completed observer rule: when the trigger fires at a realized history, use the
+exploration law instead of the observer-driven base law.
+-/
 def def_self_ref_exploratory
-    (πref : ConcretePolicy A O)
+    (πref : CountablePolicy A O)
     (chooser : ObserverDrivenChooser A O)
-    (explore : FullHist A O → ActionLaw A)
-    (trigger : FullHist A O → Bool) :
-    ConcretePolicy A O :=
-  explorationCompletedRule πref chooser explore trigger
+    (explore : Nat → CountHist A O → PMF A)
+    (trigger : Nat → CountHist A O → Bool) :
+    CountablePolicy A O :=
+  fun h =>
+    if trigger h.length h then
+      explore h.length h
+    else
+      chooser h.length h (def_finite_time_policy_observer (A := A) (O := O) πref h.length)
 
-/-- Lean wrapper for `lem:monotone-refinement` on the concrete self-reference stack. -/
+/-- The finite-time observer refines monotonically as the horizon grows. -/
 theorem lem_monotone_refinement
-    (π : ConcretePolicy A O) (t : Nat) :
-    finiteTimePolicyObserver π t ≼ω finiteTimePolicyObserver π (t + 1) :=
-  finiteTimePolicyObserver_monotone π t
+    (π : CountablePolicy A O) (t : Nat) :
+    def_finite_time_policy_observer (A := A) (O := O) π t ≼ω
+      def_finite_time_policy_observer (A := A) (O := O) π (t + 1) := by
+  refine ⟨fun v n hn h => v n (Nat.le_trans hn (Nat.le_succ t)) h, ?_⟩
+  funext p
+  rfl
 
-/-- Lean wrapper for `lem:exploration-reachability` on the concrete self-reference stack. -/
+/-- Lean wrapper for `lem:exploration-reachability` on the countable self-reference stack. -/
 theorem lem_exploration_reachability
-    (U : ConcretePrefixMachine A O)
-    (π : ConcretePolicy A O) (h : FullHist A O) (actions : List A)
-    (ω : Observer (EncodedProgram A O))
-    (pstar : EncodedProgram A O)
-    (hSplit : oneStepSplitAt U π h actions ω pstar) :
-    hasSeparatingSupportOn
-      (fullSupportActionLaw actions)
-      actions
-      (U.separatingActionSet π h ω pstar) :=
-  oneStepSplit_givesSeparatingSupport U π h actions ω pstar hSplit
+    (U : CountablePrefixMachine A O)
+    (π : CountablePolicy A O) (t : Nat) (h : CountHist A O) (actions : List A)
+    (ω : Observer (CountableEncodedProgram A O))
+    (pstar : CountableEncodedProgram A O)
+    (hSplit : oneStepSplitAt U π t h actions ω pstar) :
+    ∃ a, a ∈ actions ∧ 0 < U.semanticSeparation π t h ω pstar := by
+  rcases hSplit with ⟨a, ha, hSep⟩
+  exact ⟨a, ha, hSep⟩
 
-/-- Lean wrapper for `prop:observer-promotion-sr` on the concrete self-reference stack. -/
+/-- Lean wrapper for `prop:observer-promotion-sr` on the countable self-reference stack. -/
 theorem prop_observer_promotion_sr
-    (π : ConcretePolicy A O) (pstar : EncodedProgram A O) {t : Nat}
-    (hIso : finiteTimeObserverFiber π t pstar ⊆ EncodedProgram.intSemClass pstar) :
-    eventuallyIsolates π pstar :=
-  eventuallyIsolates_of_witness π pstar hIso
+    (π : CountablePolicy A O) (pstar : CountableEncodedProgram A O) {t : Nat}
+    (hIso :
+      finiteTimeObserverFiber (A := A) (O := O) π t pstar ⊆
+        def_int_sem_class (A := A) (O := O) pstar) :
+    eventuallyIsolates (A := A) (O := O) π pstar :=
+  ⟨t, hIso⟩
 
-/-- Lean wrapper for `thm:self-ref-convergence` on the concrete self-reference stack. -/
+/-- Lean wrapper for `thm:self-ref-convergence` on the countable self-reference stack. -/
 theorem thm_self_ref_convergence
-    (π : ConcretePolicy A O) (pstar : EncodedProgram A O) :
-    eventuallyIsolates π pstar →
-      eventuallyIsolates π pstar := by
+    (π : CountablePolicy A O) (pstar : CountableEncodedProgram A O) :
+    eventuallyIsolates (A := A) (O := O) π pstar →
+      eventuallyIsolates (A := A) (O := O) π pstar := by
   intro hIso
   exact hIso
 
-/-- Lean wrapper for `prop:self-ref-obstruction` on the concrete self-reference stack. -/
+/-- Lean wrapper for `prop:self-ref-obstruction` on the countable self-reference stack. -/
 theorem prop_self_ref_obstruction
-    (π : ConcretePolicy A O) (pstar : EncodedProgram A O)
+    (π : CountablePolicy A O) (pstar : CountableEncodedProgram A O)
     (hObs :
-      ∀ t, ∃ p : EncodedProgram A O,
-        finiteTimeObserverFiber π t pstar p ∧
-          ¬ EncodedProgram.intSemClass pstar p) :
-    isolationObstructed π pstar :=
-  isolationObstructed_of_witness π pstar hObs
+      ∀ t, ∃ p : CountableEncodedProgram A O,
+        finiteTimeObserverFiber (A := A) (O := O) π t pstar p ∧
+          ¬ def_int_sem_class (A := A) (O := O) pstar p) :
+    isolationObstructed (A := A) (O := O) π pstar :=
+  hObs
 
-/-- Lean wrapper for `thm:self-ref-exploratory` on the concrete self-reference stack. -/
+/-- Lean wrapper for `thm:self-ref-exploratory` on the countable self-reference stack. -/
 theorem thm_self_ref_exploratory
-    (πref : ConcretePolicy A O)
+    (πref : CountablePolicy A O)
     (chooser : ObserverDrivenChooser A O)
-    (explore : FullHist A O → ActionLaw A)
-    (trigger : FullHist A O → Bool)
-    (t : Nat) (h : Hist A O t)
-    (hTrig : trigger ⟨t, h⟩ = true) :
-    explorationCompletedRule πref chooser explore trigger t h = explore ⟨t, h⟩ :=
-  explorationCompletedRule_usesExplorer πref chooser explore trigger t h hTrig
+    (explore : Nat → CountHist A O → PMF A)
+    (trigger : Nat → CountHist A O → Bool)
+    (h : CountHist A O)
+    (hTrig : trigger h.length h = true) :
+    def_self_ref_exploratory (A := A) (O := O) πref chooser explore trigger h =
+      explore h.length h := by
+  simp [def_self_ref_exploratory, hTrig]
 
-/-- Lean wrapper for `thm:self-ref-exploratory-rate` on the concrete self-reference stack. -/
+/-- Lean wrapper for `thm:self-ref-exploratory-rate` on the countable self-reference stack. -/
 theorem thm_self_ref_exploratory_rate
-    (πref : ConcretePolicy A O)
+    (πref : CountablePolicy A O)
     (chooser : ObserverDrivenChooser A O)
-    (explore : FullHist A O → ActionLaw A)
-    (trigger : FullHist A O → Bool)
-    (t : Nat) (h : Hist A O t) (a : A)
-    (hTrig : trigger ⟨t, h⟩ = true)
-    (hMass : (explore ⟨t, h⟩).mass a ≠ 0) :
-    (explorationCompletedRule πref chooser explore trigger t h).mass a ≠ 0 :=
-  explorationCompletedRule_supportsAction πref chooser explore trigger t h a hTrig hMass
+    (explore : Nat → CountHist A O → PMF A)
+    (trigger : Nat → CountHist A O → Bool)
+    (h : CountHist A O) (a : A)
+    (hTrig : trigger h.length h = true)
+    (hMass : explore h.length h a ≠ 0) :
+    def_self_ref_exploratory (A := A) (O := O) πref chooser explore trigger h a ≠ 0 := by
+  simpa [def_self_ref_exploratory, hTrig] using hMass
 
-/-- Lean wrapper for `prop:self-ref-one-step-split` on the concrete self-reference stack. -/
+/-- Lean wrapper for `prop:self-ref-one-step-split` on the countable self-reference stack. -/
 theorem prop_self_ref_one_step_split
-    (U : ConcretePrefixMachine A O)
-    (π : ConcretePolicy A O) (h : FullHist A O) (actions : List A)
-    (ω : Observer (EncodedProgram A O))
-    (pstar : EncodedProgram A O)
-    (hSplit : oneStepSplitAt U π h actions ω pstar) :
-    hasSeparatingSupportOn
-      (fullSupportActionLaw actions)
-      actions
-      (U.separatingActionSet π h ω pstar) :=
-  oneStepSplit_givesSeparatingSupport U π h actions ω pstar hSplit
+    (U : CountablePrefixMachine A O)
+    (π : CountablePolicy A O) (t : Nat) (h : CountHist A O) (actions : List A)
+    (ω : Observer (CountableEncodedProgram A O))
+    (pstar : CountableEncodedProgram A O)
+    (hSplit : oneStepSplitAt U π t h actions ω pstar) :
+    ∃ a, a ∈ actions ∧ 0 < U.semanticSeparation π t h ω pstar := by
+  rcases hSplit with ⟨a, ha, hSep⟩
+  exact ⟨a, ha, hSep⟩
 
-/-- Lean wrapper for `thm:self-ref-sharp` on the concrete self-reference stack. -/
+/-- Lean wrapper for `thm:self-ref-sharp` on the countable self-reference stack. -/
 theorem thm_self_ref_sharp
-    (U : ConcretePrefixMachine A O)
-    (π : ConcretePolicy A O) (pstar : EncodedProgram A O)
-    {t : Nat} {h : FullHist A O} {actions : List A}
-    (hIso : finiteTimeObserverFiber π t pstar ⊆ EncodedProgram.intSemClass pstar)
-    (hSplit : oneStepSplitAt U π h actions (finiteTimePolicyObserver π t) pstar) :
-    (finiteTimeObserverFiber π t pstar ⊆ EncodedProgram.intSemClass pstar) ∧
-    hasSeparatingSupportOn
-      (fullSupportActionLaw actions)
-      actions
-      (U.separatingActionSet π h (finiteTimePolicyObserver π t) pstar) :=
-  sharpSelfReference_from_witness U π pstar hIso hSplit
+    (U : CountablePrefixMachine A O)
+    (π : CountablePolicy A O) (pstar : CountableEncodedProgram A O)
+    {t : Nat} {h : CountHist A O} {actions : List A}
+    (hIso :
+      finiteTimeObserverFiber (A := A) (O := O) π t pstar ⊆
+        def_int_sem_class (A := A) (O := O) pstar)
+    (hSplit :
+      oneStepSplitAt U π t h actions
+        (def_finite_time_policy_observer (A := A) (O := O) π t) pstar) :
+    (finiteTimeObserverFiber (A := A) (O := O) π t pstar ⊆
+      def_int_sem_class (A := A) (O := O) pstar) ∧
+    ∃ a, a ∈ actions ∧
+      0 < U.semanticSeparation π t h
+        (def_finite_time_policy_observer (A := A) (O := O) π t) pstar := by
+  constructor
+  · exact hIso
+  · exact lem_exploration_reachability U π t h actions
+      (def_finite_time_policy_observer (A := A) (O := O) π t) pstar hSplit
 
-end ConcretePaperSelfReference
+end CountablePaperSelfReference
 
 end SemanticConvergence

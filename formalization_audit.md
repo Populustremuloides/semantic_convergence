@@ -25,6 +25,31 @@ The target notion of first-principles completion is specified in
 - Concrete substrate modules present: `11`
 - First-principles complete: `yes`
 
+## Axiom Audit Snapshot
+- Manifest-tracked declarations audited by `#print axioms`: `106`
+- Rows matching the canonical baseline `['propext', 'Classical.choice', 'Quot.sound']`: `63`
+- Rows using the expected `native_decide` auxiliary `SemanticConvergence.listWeightedSum_ne_zero_exists._native.native_decide.ax_1_2`: `33`
+- Rows lighter than the canonical baseline: `10`
+- Rows with genuine unexpected axiom drift: `0`
+- Exact per-declaration axiom dependencies are published in `lean_axiom_audit.md`.
+- The published axiom audit treats the compiled `native_decide` helper as expected while substantive Lean sources still use `native_decide`; only any remaining rows count as real drift.
+- `fullyFirstPrinciples = true` is a trust-boundary and proof-shape statement; exact axiom dependencies are tracked separately by the published axiom audit.
+
+## Proof-Shape Snapshot
+- Substantive entries: `61`
+- Definition entries: `28`
+- Constructive-existential entries: `13`
+- Rate-composition entries: `4`
+- Single-lemma-application entries: `0`
+- Definitional-unfold entries: `0`
+- Field-projection entries: `0`
+- Placeholder-truth entries: `0`
+- Heuristic-other entries: `0`
+- Manifest definition entries tagged as `definition`: `28` / `28`
+- Manifest theorem-like entries in non-suspicious proof classes: `78` / `78`
+- Suspicious manifest entries (single-helper / projection / unfold / placeholder): `0`
+- Semantic manifest audit closed: `yes`
+
 Interpretation:
 - `wrapped` means the paper item has an exact Lean wrapper but still depends on theorem-level assumptions in a `...Theory` bundle.
 - `derived` means the paper item is now proved from the currently exposed lower-layer API.
@@ -33,10 +58,12 @@ Interpretation:
 - `migrated-to-concrete` means the paper-facing declaration has already crossed the trust boundary and depends only on the concrete stack.
 - `pending-concrete-migration` means the declaration is still paper-complete but has not yet been rewritten onto the concrete stack.
 - `bridge in repo` means the corresponding abstract theorem module already has a concrete substrate module stack available to target, even if the paper-facing wrappers have not yet been migrated.
+- `proof kind` is a source-level audit of the current Lean proof body.
+- Phase 6 closes the manifest audit only when every theorem-like manifest entry lands in a non-suspicious proof class and every manifest definition is tagged as `definition`.
 
-Legacy compatibility note:
-- The older theorem-bearing abstract `...Model` / `...Theory` APIs still present in some source files are retained only for archival or backward-compatibility purposes.
-- No manifest-tracked declaration depends on those APIs anymore, so they are outside the active first-principles trust boundary.
+Trust-boundary note:
+- The paper-facing theorem files now terminate directly at the concrete stack.
+- No manifest-tracked declaration depends on an abstract `...Model` / `...Theory` proof layer.
 
 ## Concrete Substrate Inventory
 
@@ -87,3 +114,7 @@ Legacy compatibility note:
 ## Remaining Paper Debt
 
 ## Remaining First-Principles Debt
+
+## Suspicious Manifest Entries
+
+None.

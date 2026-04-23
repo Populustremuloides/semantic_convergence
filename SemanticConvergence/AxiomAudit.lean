@@ -1,0 +1,117 @@
+import SemanticConvergence
+
+/-
+Generated per-declaration axiom audit for every manifest-tracked item.
+Run this file directly with:
+
+`lake env lean SemanticConvergence/AxiomAudit.lean`
+
+The generated markdown report `lean_axiom_audit.md` is built by parsing the
+output of the `#print axioms` commands below.
+-/
+#print axioms SemanticConvergence.def_history_compat
+#print axioms SemanticConvergence.def_policy_pred
+#print axioms SemanticConvergence.def_int_sem_class
+#print axioms SemanticConvergence.def_observer
+#print axioms SemanticConvergence.lem_nesting
+#print axioms SemanticConvergence.prop_refinement_chain
+#print axioms SemanticConvergence.lem_observable_quotient
+#print axioms SemanticConvergence.def_history_recoverable
+#print axioms SemanticConvergence.thm_factor_through_quotient
+#print axioms SemanticConvergence.lem_fit_gap
+#print axioms SemanticConvergence.thm_policy_gap
+#print axioms SemanticConvergence.lem_syntactic_gap
+#print axioms SemanticConvergence.thm_strict_hierarchy
+#print axioms SemanticConvergence.def_bhat_omega
+#print axioms SemanticConvergence.def_raw_two_observer_functional
+#print axioms SemanticConvergence.def_two_observer_functional
+#print axioms SemanticConvergence.prop_two_observer_minimizer
+#print axioms SemanticConvergence.def_kernel_functional
+#print axioms SemanticConvergence.prop_kernel_functional_minimizer
+#print axioms SemanticConvergence.prop_kernel_functional_minimizer_compact
+#print axioms SemanticConvergence.def_meeting_point_shorthand
+#print axioms SemanticConvergence.prop_belief_invariance_above
+#print axioms SemanticConvergence.prop_belief_illtyped_below
+#print axioms SemanticConvergence.prop_action_cap
+#print axioms SemanticConvergence.cor_twins_frozen_ratio
+#print axioms SemanticConvergence.thm_meeting_point
+#print axioms SemanticConvergence.cor_canonical_pair
+#print axioms SemanticConvergence.prop_goal_dialed
+#print axioms SemanticConvergence.def_universal_prior
+#print axioms SemanticConvergence.lem_prior_invariance
+#print axioms SemanticConvergence.lem_prior_necessity
+#print axioms SemanticConvergence.def_afe
+#print axioms SemanticConvergence.lem_variational
+#print axioms SemanticConvergence.lem_kl_necessity
+#print axioms SemanticConvergence.lem_merging
+#print axioms SemanticConvergence.def_class_complement
+#print axioms SemanticConvergence.def_semantic_gain
+#print axioms SemanticConvergence.lem_odds_identity
+#print axioms SemanticConvergence.def_semantic_separation
+#print axioms SemanticConvergence.lem_zero_criterion
+#print axioms SemanticConvergence.prop_chernoff_correspondence
+#print axioms SemanticConvergence.def_semantic_rule
+#print axioms SemanticConvergence.def_promotion_supporting
+#print axioms SemanticConvergence.prop_semantic_is_promotion_supporting
+#print axioms SemanticConvergence.def_kernel_semantic_rule
+#print axioms SemanticConvergence.prop_kernel_promotion_support
+#print axioms SemanticConvergence.prop_kernel_promotion_support_compact
+#print axioms SemanticConvergence.def_decodable_channel
+#print axioms SemanticConvergence.prop_noise_immunity
+#print axioms SemanticConvergence.def_left_invertible_channel
+#print axioms SemanticConvergence.prop_noise_left_invertible
+#print axioms SemanticConvergence.prop_noise_decoding
+#print axioms SemanticConvergence.cor_noise_transfer
+#print axioms SemanticConvergence.cor_noise_left_invertible_history_independent
+#print axioms SemanticConvergence.def_sep_condition
+#print axioms SemanticConvergence.def_uniform_history_independent_separation
+#print axioms SemanticConvergence.prop_uniform_history_independent_implies_semantic
+#print axioms SemanticConvergence.cor_kl_implies_semantic_separation
+#print axioms SemanticConvergence.cor_event_witness_implies_semantic_separation
+#print axioms SemanticConvergence.def_kernel_sep_condition
+#print axioms SemanticConvergence.prop_finite_action_kernel_separation
+#print axioms SemanticConvergence.prop_compact_action_kernel_separation
+#print axioms SemanticConvergence.lem_conditional_bc
+#print axioms SemanticConvergence.lem_contraction
+#print axioms SemanticConvergence.prop_full_support_behavioral
+#print axioms SemanticConvergence.thm_separating_support_convergence
+#print axioms SemanticConvergence.thm_exploration_floor_behavioral
+#print axioms SemanticConvergence.thm_separating_support_rate
+#print axioms SemanticConvergence.cor_separating_support_finite_time
+#print axioms SemanticConvergence.thm_semantic_convergence
+#print axioms SemanticConvergence.thm_kernel_semantic_convergence
+#print axioms SemanticConvergence.cor_compact_action_kernel
+#print axioms SemanticConvergence.cor_finite_maximin
+#print axioms SemanticConvergence.cor_support_necessary
+#print axioms SemanticConvergence.thm_summable_support_insufficient
+#print axioms SemanticConvergence.lem_one_step_drift
+#print axioms SemanticConvergence.prop_exp_rate
+#print axioms SemanticConvergence.lem_one_step_drift_kernel
+#print axioms SemanticConvergence.prop_kernel_exp_rate
+#print axioms SemanticConvergence.thm_exp_rate_concentration
+#print axioms SemanticConvergence.cor_goal_dialed_payoff
+#print axioms SemanticConvergence.def_finite_time_policy_observer
+#print axioms SemanticConvergence.lem_monotone_refinement
+#print axioms SemanticConvergence.def_self_ref_rule
+#print axioms SemanticConvergence.lem_exploration_reachability
+#print axioms SemanticConvergence.prop_observer_promotion_sr
+#print axioms SemanticConvergence.thm_self_ref_convergence
+#print axioms SemanticConvergence.prop_self_ref_obstruction
+#print axioms SemanticConvergence.def_self_ref_exploratory
+#print axioms SemanticConvergence.thm_self_ref_exploratory
+#print axioms SemanticConvergence.thm_self_ref_exploratory_rate
+#print axioms SemanticConvergence.prop_self_ref_one_step_split
+#print axioms SemanticConvergence.thm_self_ref_sharp
+#print axioms SemanticConvergence.prop_boundary_identity
+#print axioms SemanticConvergence.def_efe
+#print axioms SemanticConvergence.lem_risk_ig
+#print axioms SemanticConvergence.cor_efe_specialization
+#print axioms SemanticConvergence.def_afe_principle
+#print axioms SemanticConvergence.lem_info_decomp
+#print axioms SemanticConvergence.thm_afe_near_miss
+#print axioms SemanticConvergence.thm_observer_promotion_failure
+#print axioms SemanticConvergence.cor_observer_promotion_universal
+#print axioms SemanticConvergence.cor_promotion_contrast
+#print axioms SemanticConvergence.prop_amortized_surrogate_minimizer
+#print axioms SemanticConvergence.thm_amortized_surrogate
+#print axioms SemanticConvergence.cor_amortized_surrogate_finite_time
