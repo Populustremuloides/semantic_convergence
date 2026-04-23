@@ -13,7 +13,7 @@ variable {A : Type u} {O : Type v}
 variable [DecidableEq A] [DecidableEq O] [BEq A] [LawfulBEq A] [BEq O] [LawfulBEq O]
 
 /-- Lean wrapper for `lem:one-step-drift` on the concrete rate stack. -/
-theorem lem_one_step_drift
+theorem lem_one_step_drift_deterministic
     (U : ConcretePrefixMachine A O)
     (π : ConcretePolicy A O) (h h' : FullHist A O)
     (ω : Observer (EncodedProgram A O))
@@ -31,7 +31,7 @@ theorem lem_one_step_drift
     (δ := δ) hδ hOdds0 hx0 hStep N
 
 /-- Lean wrapper for `prop:exp-rate` on the concrete rate stack. -/
-theorem prop_exp_rate
+theorem prop_exp_rate_deterministic
     (U : ConcretePrefixMachine A O)
     (π : ConcretePolicy A O) (h : FullHist A O)
     (ω : Observer (EncodedProgram A O))
@@ -50,7 +50,7 @@ theorem prop_exp_rate
   simpa using hBound
 
 /-- Lean wrapper for `lem:one-step-drift-kernel` on the concrete rate stack. -/
-theorem lem_one_step_drift_kernel
+theorem lem_one_step_drift_kernel_deterministic
     (U : ConcretePrefixMachine A O)
     (π : ConcretePolicy A O) (h h' : FullHist A O)
     (ω : Observer (EncodedProgram A O))
@@ -76,7 +76,7 @@ theorem lem_one_step_drift_kernel
     simpa [hOddsEq] using hBound
 
 /-- Lean wrapper for `prop:kernel-exp-rate` on the concrete rate stack. -/
-theorem prop_kernel_exp_rate
+theorem prop_kernel_exp_rate_deterministic
     (U : ConcretePrefixMachine A O)
     (π : ConcretePolicy A O) (h : FullHist A O)
     (ω : Observer (EncodedProgram A O))
@@ -101,7 +101,7 @@ theorem prop_kernel_exp_rate
   simpa [hOddsEq] using hBound
 
 /-- Lean wrapper for `thm:exp-rate-concentration` on the concrete rate stack. -/
-theorem thm_exp_rate_concentration
+theorem thm_exp_rate_concentration_deterministic
     (U : ConcretePrefixMachine A O)
     (π : ConcretePolicy A O) (h : FullHist A O)
     (ω : Observer (EncodedProgram A O))
@@ -115,9 +115,307 @@ theorem thm_exp_rate_concentration
       ∀ N, x N ≤ posteriorRateFactorFromFloor N *
         U.residualObserverFiberPosteriorOdds π h ω q := by
   have hRate :=
-    prop_exp_rate U π h ω p hδ hOdds0
-  exact prop_kernel_exp_rate U π h ω hView hRate
+    prop_exp_rate_deterministic U π h ω p hδ hOdds0
+  exact prop_kernel_exp_rate_deterministic U π h ω hView hRate
 
 end ConcretePaperRates
+
+noncomputable section CountablePaperRates
+
+open CountableConcrete
+open CountableConcrete.CountablePrefixMachine
+open ConcretePrefixMachine
+
+variable {A : Type u} {O : Type v}
+variable [Encodable A] [Encodable O]
+
+/-- Internal witness-transport helper for `lem:one-step-drift`. -/
+theorem lem_one_step_drift_of_witness
+    (U : CountablePrefixMachine A O)
+    (π : CountablePolicy A O) (penv : U.Program)
+    (ω : Observer (CountableEncodedProgram A O))
+    (pstar : CountableEncodedProgram A O)
+    (δ : Rat) (T : Nat)
+    (hWitness :
+      U.HasSupportwiseResidualContractionWitness π penv ω pstar δ T) :
+    ∀ᵐ ξ ∂(U.trajectoryLaw π penv T).toMeasure,
+      ∀ n, n < T →
+        U.residualObserverFiberProcess π ω pstar (n + 1) ξ ≤
+          posteriorDecayFactorENNReal δ * U.residualObserverFiberProcess π ω pstar n ξ := by
+  have hSupportwise :
+      U.HasSupportwiseResidualRecurrence π penv ω pstar δ T :=
+    U.hasSupportwiseResidualRecurrence_of_witness π penv ω pstar δ T hWitness
+  exact U.ae_residualObserverFiberRecurrence_of_supportwise π penv ω pstar δ T
+    hSupportwise
+
+/-- Bridged first-principles wrapper for `lem:one-step-drift`. -/
+theorem lem_one_step_drift
+    [DecidableEq A] [DecidableEq O] [BEq A] [LawfulBEq A] [BEq O] [LawfulBEq O]
+    (U : ConcretePrefixMachine A O)
+    (π : ConcretePolicy A O) (hπ : ProbabilisticPolicy π)
+    (hSem : ∀ c hc, ProbabilisticKernel (U.semantics c hc))
+    (penv pstar : U.Program)
+    (ω : Observer (EncodedProgram A O))
+    (δ : Rat) (T : Nat)
+    (hBridge :
+      ∀ ξ n,
+        (U.toCountablePrefixMachine hSem).residualObserverFiberProcess
+            (toCountablePolicy π hπ) (U.liftObserver ω)
+            (U.toCountableEncodedProgram hSem pstar) n ξ =
+          ENNReal.ofReal
+            (U.residualObserverFiberPosteriorOdds π (prefixFullHist ξ n) ω
+              (U.toEncodedProgram pstar) : ℝ))
+    (hStep :
+      ∀ ξ, ξ ∈ ((U.toCountablePrefixMachine hSem).trajectoryLaw
+        (toCountablePolicy π hπ) (U.toCountableProgram hSem penv) T).support →
+        ∀ n, n < T →
+          U.residualObserverFiberPosteriorOdds π (prefixFullHist ξ (n + 1)) ω
+              (U.toEncodedProgram pstar) ≤
+            posteriorDecayFactor δ *
+              U.residualObserverFiberPosteriorOdds π (prefixFullHist ξ n) ω
+                (U.toEncodedProgram pstar)) :
+    ∀ᵐ ξ ∂((U.toCountablePrefixMachine hSem).trajectoryLaw
+        (toCountablePolicy π hπ) (U.toCountableProgram hSem penv) T).toMeasure,
+      ∀ n, n < T →
+        (U.toCountablePrefixMachine hSem).residualObserverFiberProcess
+            (toCountablePolicy π hπ) (U.liftObserver ω)
+            (U.toCountableEncodedProgram hSem pstar) (n + 1) ξ ≤
+          posteriorDecayFactorENNReal δ *
+            (U.toCountablePrefixMachine hSem).residualObserverFiberProcess
+              (toCountablePolicy π hπ) (U.liftObserver ω)
+              (U.toCountableEncodedProgram hSem pstar) n ξ := by
+  exact thm_separating_support_convergence U π hπ hSem penv pstar ω δ T hBridge hStep
+
+/-- Internal witness-transport helper for `prop:exp-rate`. -/
+theorem prop_exp_rate_of_witness
+    (U : CountablePrefixMachine A O)
+    (π : CountablePolicy A O) (penv : U.Program)
+    (ω : Observer (CountableEncodedProgram A O))
+    (pstar : CountableEncodedProgram A O)
+    (δ : Rat) (T : Nat)
+    (hWitness :
+      U.HasSupportwiseResidualContractionWitness π penv ω pstar δ T) :
+    ∀ᵐ ξ ∂(U.trajectoryLaw π penv T).toMeasure,
+      ∀ N, N ≤ T →
+        U.residualObserverFiberProcess π ω pstar N ξ ≤
+          posteriorDecayFactorENNReal δ ^ N *
+            U.initialResidualObserverFiberOdds π ω pstar := by
+  have hSupportwise :
+      U.HasSupportwiseResidualRecurrence π penv ω pstar δ T :=
+    U.hasSupportwiseResidualRecurrence_of_witness π penv ω pstar δ T hWitness
+  exact U.ae_residualObserverFiberRateBound_of_supportwise π penv ω pstar δ T
+    hSupportwise
+
+/-- Lean wrapper for `lem:one-step-drift-kernel` on the countable probabilistic rate stack. -/
+theorem lem_one_step_drift_kernel
+    (U : CountablePrefixMachine A O)
+    (π : CountablePolicy A O) (penv : U.Program)
+    (ω : Observer (CountableEncodedProgram A O))
+    {p q : CountableEncodedProgram A O}
+    (δ : Rat) (T : Nat)
+    (hView : ω.view p = ω.view q) :
+    U.HasSupportwiseResidualContractionWitness π penv ω p δ T →
+      U.HasSupportwiseResidualContractionWitness π penv ω q δ T := by
+  intro hWitness
+  exact U.hasSupportwiseResidualContractionWitness_of_sameView π penv ω δ T hView hWitness
+
+/-- Bridged first-principles wrapper for `prop:exp-rate`. -/
+theorem prop_exp_rate
+    [DecidableEq A] [DecidableEq O] [BEq A] [LawfulBEq A] [BEq O] [LawfulBEq O]
+    (U : ConcretePrefixMachine A O)
+    (π : ConcretePolicy A O) (hπ : ProbabilisticPolicy π)
+    (hSem : ∀ c hc, ProbabilisticKernel (U.semantics c hc))
+    (penv pstar : U.Program)
+    (ω : Observer (EncodedProgram A O))
+    (δ : Rat) (T : Nat)
+    (hBridge :
+      ∀ ξ n,
+        (U.toCountablePrefixMachine hSem).residualObserverFiberProcess
+            (toCountablePolicy π hπ) (U.liftObserver ω)
+            (U.toCountableEncodedProgram hSem pstar) n ξ =
+          ENNReal.ofReal
+            (U.residualObserverFiberPosteriorOdds π (prefixFullHist ξ n) ω
+              (U.toEncodedProgram pstar) : ℝ))
+    (hStep :
+      ∀ ξ, ξ ∈ ((U.toCountablePrefixMachine hSem).trajectoryLaw
+        (toCountablePolicy π hπ) (U.toCountableProgram hSem penv) T).support →
+        ∀ n, n < T →
+          U.residualObserverFiberPosteriorOdds π (prefixFullHist ξ (n + 1)) ω
+              (U.toEncodedProgram pstar) ≤
+            posteriorDecayFactor δ *
+              U.residualObserverFiberPosteriorOdds π (prefixFullHist ξ n) ω
+                (U.toEncodedProgram pstar)) :
+    ∀ᵐ ξ ∂((U.toCountablePrefixMachine hSem).trajectoryLaw
+        (toCountablePolicy π hπ) (U.toCountableProgram hSem penv) T).toMeasure,
+      ∀ N, N ≤ T →
+        (U.toCountablePrefixMachine hSem).residualObserverFiberProcess
+            (toCountablePolicy π hπ) (U.liftObserver ω)
+            (U.toCountableEncodedProgram hSem pstar) N ξ ≤
+          posteriorDecayFactorENNReal δ ^ N *
+            (U.toCountablePrefixMachine hSem).initialResidualObserverFiberOdds
+              (toCountablePolicy π hπ) (U.liftObserver ω)
+              (U.toCountableEncodedProgram hSem pstar) := by
+  exact thm_separating_support_rate U π hπ hSem penv pstar ω δ T hBridge hStep
+
+/-- Internal witness-transport helper for `prop:kernel-exp-rate`. -/
+theorem prop_kernel_exp_rate_of_witness
+    (U : CountablePrefixMachine A O)
+    (π : CountablePolicy A O) (penv : U.Program)
+    (ω : Observer (CountableEncodedProgram A O))
+    {p q : CountableEncodedProgram A O}
+    (δ : Rat) (T : Nat)
+    (hView : ω.view p = ω.view q)
+    (hWitness :
+      U.HasSupportwiseResidualContractionWitness π penv ω p δ T) :
+    ∀ᵐ ξ ∂(U.trajectoryLaw π penv T).toMeasure,
+      ∀ N, N ≤ T →
+        U.residualObserverFiberProcess π ω q N ξ ≤
+          posteriorDecayFactorENNReal δ ^ N *
+            U.initialResidualObserverFiberOdds π ω q := by
+  have hWitness' := lem_one_step_drift_kernel U π penv ω δ T hView hWitness
+  exact prop_exp_rate_of_witness U π penv ω q δ T hWitness'
+
+/-- Bridged first-principles wrapper for `prop:kernel-exp-rate`. -/
+theorem prop_kernel_exp_rate
+    [DecidableEq A] [DecidableEq O] [BEq A] [LawfulBEq A] [BEq O] [LawfulBEq O]
+    (U : ConcretePrefixMachine A O)
+    (π : ConcretePolicy A O) (hπ : ProbabilisticPolicy π)
+    (hSem : ∀ c hc, ProbabilisticKernel (U.semantics c hc))
+    (penv : U.Program)
+    (ω : Observer (EncodedProgram A O))
+    {p q : U.Program}
+    (δ : Rat) (T : Nat)
+    (hView : ω.view (U.toEncodedProgram p) = ω.view (U.toEncodedProgram q))
+    (hBridge :
+      ∀ ξ n,
+        (U.toCountablePrefixMachine hSem).residualObserverFiberProcess
+            (toCountablePolicy π hπ) (U.liftObserver ω)
+            (U.toCountableEncodedProgram hSem p) n ξ =
+          ENNReal.ofReal
+            (U.residualObserverFiberPosteriorOdds π (prefixFullHist ξ n) ω
+              (U.toEncodedProgram p) : ℝ))
+    (hStep :
+      ∀ ξ, ξ ∈ ((U.toCountablePrefixMachine hSem).trajectoryLaw
+        (toCountablePolicy π hπ) (U.toCountableProgram hSem penv) T).support →
+        ∀ n, n < T →
+          U.residualObserverFiberPosteriorOdds π (prefixFullHist ξ (n + 1)) ω
+              (U.toEncodedProgram p) ≤
+            posteriorDecayFactor δ *
+              U.residualObserverFiberPosteriorOdds π (prefixFullHist ξ n) ω
+                (U.toEncodedProgram p)) :
+    ∀ᵐ ξ ∂((U.toCountablePrefixMachine hSem).trajectoryLaw
+        (toCountablePolicy π hπ) (U.toCountableProgram hSem penv) T).toMeasure,
+      ∀ N, N ≤ T →
+        (U.toCountablePrefixMachine hSem).residualObserverFiberProcess
+            (toCountablePolicy π hπ) (U.liftObserver ω)
+            (U.toCountableEncodedProgram hSem q) N ξ ≤
+          posteriorDecayFactorENNReal δ ^ N *
+            (U.toCountablePrefixMachine hSem).initialResidualObserverFiberOdds
+              (toCountablePolicy π hπ) (U.liftObserver ω)
+              (U.toCountableEncodedProgram hSem q) := by
+  let Uc := U.toCountablePrefixMachine hSem
+  let πc := toCountablePolicy π hπ
+  let penvc := U.toCountableProgram hSem penv
+  let ωc := U.liftObserver ω
+  let pc := U.toCountableEncodedProgram hSem p
+  let qc := U.toCountableEncodedProgram hSem q
+  have hWitness :
+      Uc.HasSupportwiseResidualContractionWitness πc penvc ωc pc δ T := by
+    simpa [Uc, πc, penvc, ωc, pc] using
+      U.hasSupportwiseResidualContractionWitness_of_prefixwiseResidualDecay
+        π hπ hSem penv p ω δ T hBridge hStep
+  have hViewCountable : ωc.view pc = ωc.view qc := by
+    exact (U.liftObserver_sameView_toCountableEncodedProgram_iff ω hSem p q).2 hView
+  have hWitness' := lem_one_step_drift_kernel Uc πc penvc ωc δ T hViewCountable hWitness
+  simpa [Uc, πc, penvc, ωc, qc] using
+    prop_exp_rate_of_witness Uc πc penvc ωc qc δ T hWitness'
+
+/-- Internal witness-transport helper for `thm:exp-rate-concentration`. -/
+theorem thm_exp_rate_concentration_of_witness
+    (U : CountablePrefixMachine A O)
+    (π : CountablePolicy A O) (penv : U.Program)
+    (ω : Observer (CountableEncodedProgram A O))
+    {p q : CountableEncodedProgram A O}
+    (δ : Rat) (T : Nat)
+    (hView : ω.view p = ω.view q)
+    (hWitness :
+      U.HasSupportwiseResidualContractionWitness π penv ω p δ T)
+    (hInitTop : U.initialResidualObserverFiberOdds π ω p ≠ ⊤) :
+    ∀ᵐ ξ ∂(U.trajectoryLaw π penv T).toMeasure,
+      ∀ N, N ≤ T →
+        (1 + posteriorDecayFactorENNReal δ ^ N *
+          U.initialResidualObserverFiberOdds π ω q)⁻¹ ≤
+          U.observerFiberPosteriorShareProcess π ω q N ξ := by
+  have hWitness' := lem_one_step_drift_kernel U π penv ω δ T hView hWitness
+  have hInitEq := U.initialResidualObserverFiberOdds_eq_of_sameView π ω hView
+  have hInitTop' : U.initialResidualObserverFiberOdds π ω q ≠ ⊤ := by
+    simpa [hInitEq] using hInitTop
+  exact cor_separating_support_finite_time_of_witness U π penv ω q δ T hWitness' hInitTop'
+
+/-- Bridged first-principles wrapper for `thm:exp-rate-concentration`. -/
+theorem thm_exp_rate_concentration
+    [DecidableEq A] [DecidableEq O] [BEq A] [LawfulBEq A] [BEq O] [LawfulBEq O]
+    (U : ConcretePrefixMachine A O)
+    (π : ConcretePolicy A O) (hπ : ProbabilisticPolicy π)
+    (hSem : ∀ c hc, ProbabilisticKernel (U.semantics c hc))
+    (penv : U.Program)
+    (ω : Observer (EncodedProgram A O))
+    {p q : U.Program}
+    (δ : Rat) (T : Nat)
+    (hView : ω.view (U.toEncodedProgram p) = ω.view (U.toEncodedProgram q))
+    (hBridge :
+      ∀ ξ n,
+        (U.toCountablePrefixMachine hSem).residualObserverFiberProcess
+            (toCountablePolicy π hπ) (U.liftObserver ω)
+            (U.toCountableEncodedProgram hSem p) n ξ =
+          ENNReal.ofReal
+            (U.residualObserverFiberPosteriorOdds π (prefixFullHist ξ n) ω
+              (U.toEncodedProgram p) : ℝ))
+    (hStep :
+      ∀ ξ, ξ ∈ ((U.toCountablePrefixMachine hSem).trajectoryLaw
+        (toCountablePolicy π hπ) (U.toCountableProgram hSem penv) T).support →
+        ∀ n, n < T →
+          U.residualObserverFiberPosteriorOdds π (prefixFullHist ξ (n + 1)) ω
+              (U.toEncodedProgram p) ≤
+            posteriorDecayFactor δ *
+              U.residualObserverFiberPosteriorOdds π (prefixFullHist ξ n) ω
+                (U.toEncodedProgram p))
+    (hInitTop :
+      (U.toCountablePrefixMachine hSem).initialResidualObserverFiberOdds
+          (toCountablePolicy π hπ) (U.liftObserver ω)
+          (U.toCountableEncodedProgram hSem p) ≠ ⊤) :
+    ∀ᵐ ξ ∂((U.toCountablePrefixMachine hSem).trajectoryLaw
+        (toCountablePolicy π hπ) (U.toCountableProgram hSem penv) T).toMeasure,
+      ∀ N, N ≤ T →
+        (1 + posteriorDecayFactorENNReal δ ^ N *
+          (U.toCountablePrefixMachine hSem).initialResidualObserverFiberOdds
+            (toCountablePolicy π hπ) (U.liftObserver ω)
+            (U.toCountableEncodedProgram hSem q))⁻¹ ≤
+          (U.toCountablePrefixMachine hSem).observerFiberPosteriorShareProcess
+            (toCountablePolicy π hπ) (U.liftObserver ω)
+            (U.toCountableEncodedProgram hSem q) N ξ := by
+  let Uc := U.toCountablePrefixMachine hSem
+  let πc := toCountablePolicy π hπ
+  let penvc := U.toCountableProgram hSem penv
+  let ωc := U.liftObserver ω
+  let pc := U.toCountableEncodedProgram hSem p
+  let qc := U.toCountableEncodedProgram hSem q
+  have hWitness :
+      Uc.HasSupportwiseResidualContractionWitness πc penvc ωc pc δ T := by
+    simpa [Uc, πc, penvc, ωc, pc] using
+      U.hasSupportwiseResidualContractionWitness_of_prefixwiseResidualDecay
+        π hπ hSem penv p ω δ T hBridge hStep
+  have hViewCountable : ωc.view pc = ωc.view qc := by
+    exact (U.liftObserver_sameView_toCountableEncodedProgram_iff ω hSem p q).2 hView
+  have hWitness' := lem_one_step_drift_kernel Uc πc penvc ωc δ T hViewCountable hWitness
+  have hInitEq := Uc.initialResidualObserverFiberOdds_eq_of_sameView πc ωc hViewCountable
+  have hInitTop' :
+      Uc.initialResidualObserverFiberOdds πc ωc qc ≠ ⊤ := by
+    intro hTop
+    exact hInitTop (hInitEq.trans hTop)
+  simpa [Uc, πc, penvc, ωc, qc] using
+    cor_separating_support_finite_time_of_witness Uc πc penvc ωc qc δ T hWitness' hInitTop'
+
+end CountablePaperRates
 
 end SemanticConvergence

@@ -44,17 +44,18 @@ The live status for both notions is tracked in:
 The exact Lean names and their current concrete scope are:
 
 - `SemanticConvergence.thm_separating_support_convergence`
-  This proves a concrete positive-support residual-odds witness: a
-  supported separating action, a canonical support-union reference law, a
-  floor-dependent softening scale, a one-step residual-odds contraction, and a
-  generic `N`-step recurrence bound under a positive separating-support floor
-  and a nonnegative initial residual-odds hypothesis.
+  This proves the probabilistic one-step residual-odds contraction on the
+  realized trajectory law by bridging the deterministic soft-substrate
+  contraction into the countable realized process: almost surely, the next-step
+  residual observer-fiber odds are bounded by the floor-dependent contraction
+  factor times the current residual odds.
 - `SemanticConvergence.thm_separating_support_rate`
-  This upgrades that concrete recurrence to an explicit positive-floor
-  `N`-step residual-odds rate bound.
+  This upgrades that contraction to an almost-sure positive-floor `N`-step
+  residual-odds rate bound on the realized process through the same explicit
+  bridge.
 - `SemanticConvergence.cor_separating_support_finite_time`
-  This turns that positive-floor rate bound into a concrete finite-
-  time `x N ≤ ε` consequence.
+  This turns that rate bound into an almost-sure lower bound on the realized
+  observer-fiber posterior share at horizon `N` on the same bridged process.
 - `SemanticConvergence.thm_semantic_convergence`
   This certifies the selector-side realization inside the closed semantic
   theorem stack.
@@ -65,7 +66,9 @@ The exact Lean names and their current concrete scope are:
 When the manuscript or repo prose speaks about Lean coverage of the Section~6
 stack, those exact declarations are the authoritative Lean-side objects.
 They now realize the strong concrete support/rate stack used by the final
-first-principles closure pass.
+first-principles closure pass, with the probabilistic realized-trajectory
+theorems derived from the deterministic concrete substrate through an explicit
+Lean bridge.
 
 ## Target concrete foundation
 

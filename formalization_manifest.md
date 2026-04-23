@@ -30,19 +30,19 @@ Migration conventions:
 - Abstract-interface: `0`
 - Migrated-to-concrete: `106`
 - Pending concrete migration: `0`
-- Axiom-audit rows matching the canonical baseline `['propext', 'Classical.choice', 'Quot.sound']`: `63`
-- Axiom-audit rows using the expected `native_decide` auxiliary `SemanticConvergence.listWeightedSum_ne_zero_exists._native.native_decide.ax_1_2`: `33`
+- Axiom-audit rows matching the canonical baseline `['propext', 'Classical.choice', 'Quot.sound']`: `64`
+- Axiom-audit rows using the expected `native_decide` auxiliary `SemanticConvergence.listWeightedSum_ne_zero_exists._native.native_decide.ax_1_2`: `32`
 - Axiom-audit rows lighter than the canonical baseline: `10`
 - Axiom-audit rows with genuine unexpected drift: `0`
 - Exact per-declaration axiom dependencies are published in `lean_axiom_audit.md`.
 - While substantive sources still use `native_decide`, the generated axiom audit treats the corresponding compiled helper axiom as expected rather than as drift.
 
 Proof-shape snapshot:
-- `substantive`: `61`
+- `substantive`: `64`
 - `definition`: `28`
-- `constructive-existential`: `13`
-- `rate-composition`: `4`
-- `single-lemma-application`: `0`
+- `constructive-existential`: `10`
+- `rate-composition`: `2`
+- `single-lemma-application`: `2`
 - `definitional-unfold`: `0`
 - `field-projection`: `0`
 - `placeholder-truth`: `0`
@@ -115,18 +115,18 @@ Proof-shape snapshot:
 | 63 | lemma | `lem:conditional-bc` | Conditional Borel--Cantelli | 1919-1922 | `SemanticConvergence.Semantic` | `lem_conditional_bc` | `SemanticConvergence.lem_conditional_bc` | `derived` | `concrete-stack` | `migrated-to-concrete` | `substantive` |
 | 64 | lemma | `lem:contraction` | Cumulative separation drives posterior odds to zero | 1928-1937 | `SemanticConvergence.Semantic` | `lem_contraction` | `SemanticConvergence.lem_contraction` | `derived` | `concrete-stack` | `migrated-to-concrete` | `constructive-existential` |
 | 65 | proposition | `prop:full-support-behavioral` | Full-support policies recover the behavioral observer | 1961-1973 | `SemanticConvergence.Semantic` | `prop_full_support_behavioral` | `SemanticConvergence.prop_full_support_behavioral` | `derived` | `concrete-stack` | `migrated-to-concrete` | `substantive` |
-| 66 | theorem | `thm:separating-support-convergence` | Sufficient conditions for semantic recovery | 2014-2043 | `SemanticConvergence.Semantic` | `thm_separating_support_convergence` | `SemanticConvergence.thm_separating_support_convergence` | `derived` | `concrete-stack` | `migrated-to-concrete` | `constructive-existential` |
+| 66 | theorem | `thm:separating-support-convergence` | Sufficient conditions for semantic recovery | 2014-2043 | `SemanticConvergence.Semantic` | `thm_separating_support_convergence` | `SemanticConvergence.thm_separating_support_convergence` | `derived` | `concrete-stack` | `migrated-to-concrete` | `substantive` |
 | 67 | theorem | `thm:exploration-floor-behavioral` | Full-support exploration floors recover the behavioral target | 2075-2097 | `SemanticConvergence.Semantic` | `thm_exploration_floor_behavioral` | `SemanticConvergence.thm_exploration_floor_behavioral` | `derived` | `concrete-stack` | `migrated-to-concrete` | `constructive-existential` |
-| 68 | theorem | `thm:separating-support-rate` | Rates from cumulative separating-action support | 2126-2181 | `SemanticConvergence.Semantic` | `thm_separating_support_rate` | `SemanticConvergence.thm_separating_support_rate` | `derived` | `concrete-stack` | `migrated-to-concrete` | `constructive-existential` |
-| 69 | corollary | `cor:separating-support-finite-time` | Explicit finite-time recovery guarantee | 2272-2284 | `SemanticConvergence.Semantic` | `cor_separating_support_finite_time` | `SemanticConvergence.cor_separating_support_finite_time` | `derived` | `concrete-stack` | `migrated-to-concrete` | `constructive-existential` |
+| 68 | theorem | `thm:separating-support-rate` | Rates from cumulative separating-action support | 2126-2181 | `SemanticConvergence.Semantic` | `thm_separating_support_rate` | `SemanticConvergence.thm_separating_support_rate` | `derived` | `concrete-stack` | `migrated-to-concrete` | `substantive` |
+| 69 | corollary | `cor:separating-support-finite-time` | Explicit finite-time recovery guarantee | 2272-2284 | `SemanticConvergence.Semantic` | `cor_separating_support_finite_time` | `SemanticConvergence.cor_separating_support_finite_time` | `derived` | `concrete-stack` | `migrated-to-concrete` | `substantive` |
 | 70 | theorem | `thm:semantic-convergence` | Canonical selector realization of semantic convergence | 2323-2338 | `SemanticConvergence.Semantic` | `thm_semantic_convergence` | `SemanticConvergence.thm_semantic_convergence` | `derived` | `concrete-stack` | `migrated-to-concrete` | `substantive` |
 | 71 | theorem | `thm:kernel-semantic-convergence` | Kernel-functional semantic convergence | 2383-2398 | `SemanticConvergence.Semantic` | `thm_kernel_semantic_convergence` | `SemanticConvergence.thm_kernel_semantic_convergence` | `derived` | `concrete-stack` | `migrated-to-concrete` | `substantive` |
 | 72 | corollary | `cor:compact-action-kernel` | Compact-action extension of the kernel theorem and rates | 2421-2455 | `SemanticConvergence.Semantic` | `cor_compact_action_kernel` | `SemanticConvergence.cor_compact_action_kernel` | `derived` | `concrete-stack` | `migrated-to-concrete` | `substantive` |
 | 73 | corollary | `cor:finite-maximin` | Finite-class deterministic specialization | 2489-2500 | `SemanticConvergence.Semantic` | `cor_finite_maximin` | `SemanticConvergence.cor_finite_maximin` | `derived` | `concrete-stack` | `migrated-to-concrete` | `substantive` |
 | 74 | theorem | `cor:support-necessary` | Zero separating support makes semantic recovery impossible | 2521-2529 | `SemanticConvergence.Semantic` | `cor_support_necessary` | `SemanticConvergence.cor_support_necessary` | `derived` | `concrete-stack` | `migrated-to-concrete` | `constructive-existential` |
 | 75 | theorem | `thm:summable-support-insufficient` | Summable separating support is insufficient | 2546-2572 | `SemanticConvergence.Semantic` | `thm_summable_support_insufficient` | `SemanticConvergence.thm_summable_support_insufficient` | `derived` | `concrete-stack` | `migrated-to-concrete` | `constructive-existential` |
-| 76 | lemma | `lem:one-step-drift` | Canonical selector one-step drift | 2644-2656 | `SemanticConvergence.Rates` | `lem_one_step_drift` | `SemanticConvergence.lem_one_step_drift` | `derived` | `concrete-stack` | `migrated-to-concrete` | `rate-composition` |
-| 77 | proposition | `prop:exp-rate` | Positive-floor exponential rate, expectation form | 2683-2702 | `SemanticConvergence.Rates` | `prop_exp_rate` | `SemanticConvergence.prop_exp_rate` | `derived` | `concrete-stack` | `migrated-to-concrete` | `rate-composition` |
+| 76 | lemma | `lem:one-step-drift` | Canonical selector one-step drift | 2644-2656 | `SemanticConvergence.Rates` | `lem_one_step_drift` | `SemanticConvergence.lem_one_step_drift` | `derived` | `concrete-stack` | `migrated-to-concrete` | `single-lemma-application` |
+| 77 | proposition | `prop:exp-rate` | Positive-floor exponential rate, expectation form | 2683-2702 | `SemanticConvergence.Rates` | `prop_exp_rate` | `SemanticConvergence.prop_exp_rate` | `derived` | `concrete-stack` | `migrated-to-concrete` | `single-lemma-application` |
 | 78 | lemma | `lem:one-step-drift-kernel` | Kernel one-step drift | 2714-2726 | `SemanticConvergence.Rates` | `lem_one_step_drift_kernel` | `SemanticConvergence.lem_one_step_drift_kernel` | `derived` | `concrete-stack` | `migrated-to-concrete` | `substantive` |
 | 79 | proposition | `prop:kernel-exp-rate` | Same-view transfer of the positive-floor exponential rate | 2757-2777 | `SemanticConvergence.Rates` | `prop_kernel_exp_rate` | `SemanticConvergence.prop_kernel_exp_rate` | `derived` | `concrete-stack` | `migrated-to-concrete` | `rate-composition` |
 | 80 | theorem | `thm:exp-rate-concentration` | Finite-time positive-floor rate transfer | 2789-2823 | `SemanticConvergence.Rates` | `thm_exp_rate_concentration` | `SemanticConvergence.thm_exp_rate_concentration` | `derived` | `concrete-stack` | `migrated-to-concrete` | `rate-composition` |

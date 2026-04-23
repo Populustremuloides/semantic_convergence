@@ -53,7 +53,7 @@ theorem prop_noise_decoding
   exact ⟨decode, hdecode⟩
 
 /-- Lean wrapper for `cor:noise-transfer` on the concrete noise stack. -/
-theorem cor_noise_transfer
+theorem cor_noise_transfer_deterministic
     (U : ConcretePrefixMachine A O)
     (π : ConcretePolicy A O) (h : FullHist A O) (a : A)
     (ω : Observer (EncodedProgram A O))
@@ -73,8 +73,92 @@ theorem cor_noise_transfer
           U.residualObserverFiberPosteriorOdds π h ω q) := by
   refine ⟨prop_noise_decoding K hDec, ?_, ?_⟩
   · exact prop_noise_immunity U π h a ω K hView
-  · exact thm_exp_rate_concentration U π h ω hδ hOdds0 hView
+  · exact thm_exp_rate_concentration_deterministic U π h ω hδ hOdds0 hView
 
 end ConcretePaperNoise
+
+noncomputable section CountablePaperNoise
+
+open CountableConcrete
+open CountableConcrete.CountablePrefixMachine
+open ConcretePrefixMachine
+
+variable {A : Type u} {O : Type v} {O' : Type w}
+variable [Encodable A] [Encodable O]
+variable [DecidableEq O'] [BEq O'] [LawfulBEq O']
+
+/-- Internal witness-transport helper for `cor:noise-transfer`. -/
+theorem cor_noise_transfer_of_witness
+    (K : ObsChannel O O')
+    (hDec : def_decodable_channel K)
+    (U : CountablePrefixMachine A O)
+    (π : CountablePolicy A O) (penv : U.Program)
+    (ω : Observer (CountableEncodedProgram A O))
+    {p q : CountableEncodedProgram A O}
+    (δ : Rat) (T : Nat)
+    (hView : ω.view p = ω.view q)
+    (hWitness :
+      U.HasSupportwiseResidualContractionWitness π penv ω p δ T)
+    (hInitTop : U.initialResidualObserverFiberOdds π ω p ≠ ⊤) :
+    def_left_invertible_channel K ∧
+      ∀ᵐ ξ ∂(U.trajectoryLaw π penv T).toMeasure,
+        ∀ N, N ≤ T →
+          (1 + posteriorDecayFactorENNReal δ ^ N *
+            U.initialResidualObserverFiberOdds π ω q)⁻¹ ≤
+            U.observerFiberPosteriorShareProcess π ω q N ξ := by
+  rcases hDec with ⟨decode, hdecode⟩
+  refine ⟨⟨decode, hdecode⟩, ?_⟩
+  exact thm_exp_rate_concentration_of_witness U π penv ω δ T hView hWitness hInitTop
+
+/-- Bridged first-principles wrapper for `cor:noise-transfer`. -/
+theorem cor_noise_transfer
+    [DecidableEq A] [DecidableEq O] [BEq A] [LawfulBEq A] [BEq O] [LawfulBEq O]
+    (K : ObsChannel O O')
+    (hDec : def_decodable_channel K)
+    (U : ConcretePrefixMachine A O)
+    (π : ConcretePolicy A O) (hπ : ProbabilisticPolicy π)
+    (hSem : ∀ c hc, ProbabilisticKernel (U.semantics c hc))
+    (penv : U.Program)
+    (ω : Observer (EncodedProgram A O))
+    {p q : U.Program}
+    (δ : Rat) (T : Nat)
+    (hView : ω.view (U.toEncodedProgram p) = ω.view (U.toEncodedProgram q))
+    (hBridge :
+      ∀ ξ n,
+        (U.toCountablePrefixMachine hSem).residualObserverFiberProcess
+            (toCountablePolicy π hπ) (U.liftObserver ω)
+            (U.toCountableEncodedProgram hSem p) n ξ =
+          ENNReal.ofReal
+            (U.residualObserverFiberPosteriorOdds π (prefixFullHist ξ n) ω
+              (U.toEncodedProgram p) : ℝ))
+    (hStep :
+      ∀ ξ, ξ ∈ ((U.toCountablePrefixMachine hSem).trajectoryLaw
+        (toCountablePolicy π hπ) (U.toCountableProgram hSem penv) T).support →
+        ∀ n, n < T →
+          U.residualObserverFiberPosteriorOdds π (prefixFullHist ξ (n + 1)) ω
+              (U.toEncodedProgram p) ≤
+            posteriorDecayFactor δ *
+              U.residualObserverFiberPosteriorOdds π (prefixFullHist ξ n) ω
+                (U.toEncodedProgram p))
+    (hInitTop :
+      (U.toCountablePrefixMachine hSem).initialResidualObserverFiberOdds
+          (toCountablePolicy π hπ) (U.liftObserver ω)
+          (U.toCountableEncodedProgram hSem p) ≠ ⊤) :
+    def_left_invertible_channel K ∧
+      ∀ᵐ ξ ∂((U.toCountablePrefixMachine hSem).trajectoryLaw
+          (toCountablePolicy π hπ) (U.toCountableProgram hSem penv) T).toMeasure,
+        ∀ N, N ≤ T →
+          (1 + posteriorDecayFactorENNReal δ ^ N *
+            (U.toCountablePrefixMachine hSem).initialResidualObserverFiberOdds
+              (toCountablePolicy π hπ) (U.liftObserver ω)
+              (U.toCountableEncodedProgram hSem q))⁻¹ ≤
+            (U.toCountablePrefixMachine hSem).observerFiberPosteriorShareProcess
+              (toCountablePolicy π hπ) (U.liftObserver ω)
+              (U.toCountableEncodedProgram hSem q) N ξ := by
+  rcases hDec with ⟨decode, hdecode⟩
+  refine ⟨⟨decode, hdecode⟩, ?_⟩
+  exact thm_exp_rate_concentration U π hπ hSem penv ω δ T hView hBridge hStep hInitTop
+
+end CountablePaperNoise
 
 end SemanticConvergence

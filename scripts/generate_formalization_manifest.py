@@ -73,6 +73,20 @@ TITLE_OVERRIDES = {
     "thm:exp-rate-concentration": "Finite-time positive-floor rate transfer",
 }
 
+MANIFEST_ENTRY_COMMENTS = {
+    "thm:separating-support-convergence": [
+        "    /-",
+        "    `thm:separating-support-convergence` names the countable probabilistic",
+        "    Section 6 theorem on `CountablePrefixMachine` and realized trajectory laws.",
+        "    Its current proof path is first-principles: the probabilistic theorem",
+        "    is derived from the deterministic `ConcretePrefixMachine` soft-substrate",
+        "    contraction through the explicit bridge layer in",
+        "    `ConcreteSubstrateBridge`, and the selector/kernel realizations are",
+        "    then rethreaded through that bridged theorem stack.",
+        "    -/",
+    ],
+}
+
 SUSPICIOUS_PROOF_KINDS = {
     "placeholder-truth",
     "definitional-unfold",
@@ -775,8 +789,6 @@ def parse_lean_declarations() -> list[LeanDecl]:
             if end_match:
                 end_name = end_match.group(1)
                 if end_name is not None:
-                    while namespace_stack and namespace_stack[-1] != end_name:
-                        namespace_stack.pop()
                     if namespace_stack and namespace_stack[-1] == end_name:
                         namespace_stack.pop()
                 continue
@@ -1994,6 +2006,9 @@ def render_lean(entries: list[dict[str, object]]) -> str:
         "  [",
     ]
     for entry in entries:
+        comment_lines = MANIFEST_ENTRY_COMMENTS.get(str(entry["label"]), [])
+        if comment_lines:
+            lines.extend(comment_lines)
         lines.extend(
             [
                 "    { texLabel := " + lean_string(str(entry["label"])),

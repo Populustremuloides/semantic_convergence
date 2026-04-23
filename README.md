@@ -18,7 +18,7 @@ and classifies deviations from the canonical baseline.
 - `fullyFirstPrinciples = true`
 - `semanticAuditClosed = true`
 - `0` manifest-tracked entries are in suspicious proof classes
-- `lean_axiom_audit.md` currently reports `63` canonical-baseline rows, `33`
+- `lean_axiom_audit.md` currently reports `72` canonical-baseline rows, `24`
   expected `native_decide`-auxiliary rows, `10` lighter-than-baseline rows,
   and `0` genuine unexpected drift rows
 - `lean_axiom_audit.md` records the actual per-declaration axiom dependencies
@@ -26,15 +26,17 @@ and classifies deviations from the canonical baseline.
 Section 6 status note:
 
 - `SemanticConvergence.thm_separating_support_convergence` currently proves a
-  concrete positive-support residual-odds witness: a supported separating
-  action, a canonical support-union reference law, a floor-dependent softening
-  scale, a one-step residual-odds contraction, and the induced generic `N`-step
-  recurrence bound.
+  probabilistic one-step residual-odds contraction on the realized trajectory
+  law, derived from the deterministic soft-substrate contraction through the
+  explicit concrete-to-countable bridge in
+  `SemanticConvergence.ConcreteSubstrateBridge`: almost surely, each next-step
+  residual observer-fiber odds value is bounded by the floor-dependent
+  contraction factor times the current one.
 - `SemanticConvergence.thm_separating_support_rate` and
-  `SemanticConvergence.cor_separating_support_finite_time` currently add an
-  explicit positive-floor `N`-step rate bound and the corresponding concrete
-  finite-time `x N ≤ ε` consequence for recurrences on the residual observer-
-  fiber odds.
+  `SemanticConvergence.cor_separating_support_finite_time` currently add the
+  corresponding almost-sure `N`-step residual-odds rate bound and almost-sure
+  lower bound on the realized observer-fiber posterior share on the same
+  bridged realized process.
 - `SemanticConvergence.thm_semantic_convergence` and
   `SemanticConvergence.thm_kernel_semantic_convergence` currently certify the
   corresponding selector and kernel realizations inside that closed semantic

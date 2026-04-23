@@ -1,6 +1,8 @@
 import SemanticConvergence.Belief
 import SemanticConvergence.ConcreteSemantic
 import SemanticConvergence.ConcretePosteriorDecay
+import SemanticConvergence.ConcreteProbabilisticConvergence
+import SemanticConvergence.ConcreteSubstrateBridge
 import SemanticConvergence.ConcreteRates
 import SemanticConvergence.ConcreteNoise
 
@@ -234,9 +236,13 @@ theorem prop_full_support_behavioral
   exact hFull a ha
 
 /--
-Concrete one-step posterior concentration: some supported separating action admits an
+Legacy zero-collapse one-step posterior concentration witness.
+
+This is the pre-residual Section 6 predicate: a supported separating action admits an
 observation that is impossible under the observer-fiber complement while remaining
-possible inside the target observer fiber.
+possible inside the target observer fiber. The active positive-support theorem stack now
+uses `oneStepResidualPosteriorConcentrates`; this weaker predicate is retained only for
+comparison with the earlier counterexample scaffolding.
 -/
 def oneStepPosteriorConcentrates
     (U : ConcretePrefixMachine A O)
@@ -309,8 +315,8 @@ def posteriorDecayRecurrence
     (δ : Rat) (r0 : Rat) (x : Nat → Rat) : Prop :=
   x 0 = r0 ∧ ∀ n, x (n + 1) ≤ posteriorDecayFactor δ * x n
 
-/-- Lean wrapper for `thm:separating-support-convergence` on the concrete semantic stack. -/
-theorem thm_separating_support_convergence
+/-- Deterministic residual-odds support-floor skeleton retained as a local helper. -/
+theorem thm_separating_support_convergence_deterministic
     (U : ConcretePrefixMachine A O)
     (π : ConcretePolicy A O) (h : FullHist A O)
     (ω : Observer (EncodedProgram A O))
@@ -379,8 +385,8 @@ theorem thm_exploration_floor_behavioral
       ∃ a, a ∈ actions ∧ κ.mass a ≠ 0 ∧ U.isSeparatingAction π h ω pstar a := by
   exact ⟨hFull, hSupport⟩
 
-/-- Lean wrapper for `thm:separating-support-rate` on the concrete semantic stack. -/
-theorem thm_separating_support_rate
+/-- Deterministic residual-odds rate skeleton retained as a local helper. -/
+theorem thm_separating_support_rate_deterministic
     (U : ConcretePrefixMachine A O)
     (π : ConcretePolicy A O) (h : FullHist A O)
     (ω : Observer (EncodedProgram A O))
@@ -401,7 +407,7 @@ theorem thm_separating_support_rate
         posteriorDecayRecurrence δ (U.residualObserverFiberPosteriorOdds π h ω pstar) x →
           ∀ N, x N ≤ posteriorRateFactorFromFloor N *
             U.residualObserverFiberPosteriorOdds π h ω pstar := by
-  rcases thm_separating_support_convergence
+  rcases thm_separating_support_convergence_deterministic
       U π h ω pstar actions κ hδ hOdds0 hFloor hDecayPos with
     ⟨hConc, _hRecurrence⟩
   refine ⟨hConc, ?_⟩
@@ -409,8 +415,8 @@ theorem thm_separating_support_rate
   rcases hx with ⟨hx0, hStep⟩
   exact U.residualRateBound_of_positiveFloor π h ω pstar hδ hOdds0 x hx0 hStep N
 
-/-- Lean wrapper for `cor:separating-support-finite-time` on the concrete semantic stack. -/
-theorem cor_separating_support_finite_time
+/-- Deterministic finite-time residual-odds skeleton retained as a local helper. -/
+theorem cor_separating_support_finite_time_deterministic
     (U : ConcretePrefixMachine A O)
     (π : ConcretePolicy A O) (h : FullHist A O)
     (ω : Observer (EncodedProgram A O))
@@ -432,13 +438,279 @@ theorem cor_separating_support_finite_time
       ∀ x : Nat → Rat,
         posteriorDecayRecurrence δ (U.residualObserverFiberPosteriorOdds π h ω pstar) x →
           x N ≤ ε := by
-  rcases thm_separating_support_rate
+  rcases thm_separating_support_rate_deterministic
       U π h ω pstar actions κ hδ hOdds0 hFloor hDecayPos with
     ⟨hConc, hRate⟩
   refine ⟨hConc, ?_⟩
   intro x hx
   have hNx := hRate x hx N
   exact le_trans hNx hε
+
+/--
+Hypothesis-transport wrapper for `thm:separating-support-convergence` on the
+probabilistic Section 6 stack.
+
+This declaration upgrades a supportwise residual one-step contraction witness on
+realized trajectories to an almost-sure statement under `trajectoryLaw`. In the
+current countable-probabilistic track, the witness
+`HasSupportwiseResidualContractionWitness` is still an explicit hypothesis of
+this theorem rather than a result derived internally from the deterministic
+`ConcretePrefixMachine` soft-substrate machinery; the deterministic first-principles
+derivation remains exposed separately as
+`thm_separating_support_convergence_deterministic`.
+-/
+theorem thm_separating_support_convergence_of_witness
+    {A : Type u} {O : Type v}
+    [Encodable A] [Encodable O]
+    (U : CountableConcrete.CountablePrefixMachine A O)
+    (π : CountableConcrete.CountablePolicy A O) (penv : U.Program)
+    (ω : Observer (CountableConcrete.CountableEncodedProgram A O))
+    (pstar : CountableConcrete.CountableEncodedProgram A O)
+    (δ : Rat) (T : Nat)
+    (hWitness :
+      U.HasSupportwiseResidualContractionWitness π penv ω pstar δ T) :
+    ∀ᵐ ξ ∂(U.trajectoryLaw π penv T).toMeasure,
+      ∀ n, n < T →
+        U.residualObserverFiberProcess π ω pstar (n + 1) ξ ≤
+          CountableConcrete.CountablePrefixMachine.posteriorDecayFactorENNReal δ *
+            U.residualObserverFiberProcess π ω pstar n ξ := by
+  have hSupportwise :
+      U.HasSupportwiseResidualRecurrence π penv ω pstar δ T :=
+    U.hasSupportwiseResidualRecurrence_of_witness π penv ω pstar δ T hWitness
+  exact U.ae_residualObserverFiberRecurrence_of_supportwise π penv ω pstar δ T
+    hSupportwise
+
+/--
+Bridged probabilistic wrapper for `thm:separating-support-convergence` on the
+first-principles Section 6 stack.
+
+This is the canonical paper-facing theorem name on the probabilistic track. It builds the
+supportwise residual contraction witness from an explicit bridge between the deterministic
+prefixwise residual-odds process and the countable trajectory-side process, then upgrades
+that witness to an almost-sure recurrence statement under the bridged `trajectoryLaw`.
+-/
+theorem thm_separating_support_convergence
+    {A : Type u} {O : Type v}
+    [DecidableEq A] [DecidableEq O] [BEq A] [LawfulBEq A] [BEq O] [LawfulBEq O]
+    [Encodable A] [Encodable O]
+    (U : ConcretePrefixMachine A O)
+    (π : ConcretePolicy A O) (hπ : ProbabilisticPolicy π)
+    (hSem : ∀ c hc, ProbabilisticKernel (U.semantics c hc))
+    (penv pstar : U.Program)
+    (ω : Observer (EncodedProgram A O))
+    (δ : Rat) (T : Nat)
+    (hBridge :
+      ∀ ξ n,
+        (U.toCountablePrefixMachine hSem).residualObserverFiberProcess
+            (toCountablePolicy π hπ) (U.liftObserver ω)
+            (U.toCountableEncodedProgram hSem pstar) n ξ =
+          ENNReal.ofReal
+            (U.residualObserverFiberPosteriorOdds π (prefixFullHist ξ n) ω
+              (U.toEncodedProgram pstar) : ℝ))
+    (hStep :
+      ∀ ξ, ξ ∈ ((U.toCountablePrefixMachine hSem).trajectoryLaw
+        (toCountablePolicy π hπ) (U.toCountableProgram hSem penv) T).support →
+        ∀ n, n < T →
+          U.residualObserverFiberPosteriorOdds π (prefixFullHist ξ (n + 1)) ω
+              (U.toEncodedProgram pstar) ≤
+            posteriorDecayFactor δ *
+              U.residualObserverFiberPosteriorOdds π (prefixFullHist ξ n) ω
+                (U.toEncodedProgram pstar)) :
+    ∀ᵐ ξ ∂((U.toCountablePrefixMachine hSem).trajectoryLaw
+        (toCountablePolicy π hπ) (U.toCountableProgram hSem penv) T).toMeasure,
+      ∀ n, n < T →
+        (U.toCountablePrefixMachine hSem).residualObserverFiberProcess
+            (toCountablePolicy π hπ) (U.liftObserver ω)
+            (U.toCountableEncodedProgram hSem pstar) (n + 1) ξ ≤
+          CountableConcrete.CountablePrefixMachine.posteriorDecayFactorENNReal δ *
+            (U.toCountablePrefixMachine hSem).residualObserverFiberProcess
+              (toCountablePolicy π hπ) (U.liftObserver ω)
+              (U.toCountableEncodedProgram hSem pstar) n ξ := by
+  let Uc := U.toCountablePrefixMachine hSem
+  let πc := toCountablePolicy π hπ
+  let penvc := U.toCountableProgram hSem penv
+  let ωc := U.liftObserver ω
+  let pstarc := U.toCountableEncodedProgram hSem pstar
+  have hWitness :
+      Uc.HasSupportwiseResidualContractionWitness πc penvc ωc pstarc δ T := by
+    simpa [Uc, πc, penvc, ωc, pstarc] using
+      U.hasSupportwiseResidualContractionWitness_of_prefixwiseResidualDecay
+        π hπ hSem penv pstar ω δ T hBridge hStep
+  simpa [Uc, πc, penvc, ωc, pstarc] using
+    thm_separating_support_convergence_of_witness Uc πc penvc ωc pstarc δ T hWitness
+
+/-- Internal witness-transport helper for `thm:separating-support-rate`. -/
+theorem thm_separating_support_rate_of_witness
+    {A : Type u} {O : Type v}
+    [Encodable A] [Encodable O]
+    (U : CountableConcrete.CountablePrefixMachine A O)
+    (π : CountableConcrete.CountablePolicy A O) (penv : U.Program)
+    (ω : Observer (CountableConcrete.CountableEncodedProgram A O))
+    (pstar : CountableConcrete.CountableEncodedProgram A O)
+    (δ : Rat) (T : Nat)
+    (hWitness :
+      U.HasSupportwiseResidualContractionWitness π penv ω pstar δ T) :
+    ∀ᵐ ξ ∂(U.trajectoryLaw π penv T).toMeasure,
+      ∀ N, N ≤ T →
+        U.residualObserverFiberProcess π ω pstar N ξ ≤
+          CountableConcrete.CountablePrefixMachine.posteriorDecayFactorENNReal δ ^ N *
+            U.initialResidualObserverFiberOdds π ω pstar := by
+  have hSupportwise :
+      U.HasSupportwiseResidualRecurrence π penv ω pstar δ T :=
+    U.hasSupportwiseResidualRecurrence_of_witness π penv ω pstar δ T hWitness
+  exact U.ae_residualObserverFiberRateBound_of_supportwise π penv ω pstar δ T
+    hSupportwise
+
+/--
+Bridged probabilistic wrapper for `thm:separating-support-rate` on the first-principles
+Section 6 stack.
+-/
+theorem thm_separating_support_rate
+    {A : Type u} {O : Type v}
+    [DecidableEq A] [DecidableEq O] [BEq A] [LawfulBEq A] [BEq O] [LawfulBEq O]
+    [Encodable A] [Encodable O]
+    (U : ConcretePrefixMachine A O)
+    (π : ConcretePolicy A O) (hπ : ProbabilisticPolicy π)
+    (hSem : ∀ c hc, ProbabilisticKernel (U.semantics c hc))
+    (penv pstar : U.Program)
+    (ω : Observer (EncodedProgram A O))
+    (δ : Rat) (T : Nat)
+    (hBridge :
+      ∀ ξ n,
+        (U.toCountablePrefixMachine hSem).residualObserverFiberProcess
+            (toCountablePolicy π hπ) (U.liftObserver ω)
+            (U.toCountableEncodedProgram hSem pstar) n ξ =
+          ENNReal.ofReal
+            (U.residualObserverFiberPosteriorOdds π (prefixFullHist ξ n) ω
+              (U.toEncodedProgram pstar) : ℝ))
+    (hStep :
+      ∀ ξ, ξ ∈ ((U.toCountablePrefixMachine hSem).trajectoryLaw
+        (toCountablePolicy π hπ) (U.toCountableProgram hSem penv) T).support →
+        ∀ n, n < T →
+          U.residualObserverFiberPosteriorOdds π (prefixFullHist ξ (n + 1)) ω
+              (U.toEncodedProgram pstar) ≤
+            posteriorDecayFactor δ *
+              U.residualObserverFiberPosteriorOdds π (prefixFullHist ξ n) ω
+                (U.toEncodedProgram pstar)) :
+    ∀ᵐ ξ ∂((U.toCountablePrefixMachine hSem).trajectoryLaw
+        (toCountablePolicy π hπ) (U.toCountableProgram hSem penv) T).toMeasure,
+      ∀ N, N ≤ T →
+        (U.toCountablePrefixMachine hSem).residualObserverFiberProcess
+            (toCountablePolicy π hπ) (U.liftObserver ω)
+            (U.toCountableEncodedProgram hSem pstar) N ξ ≤
+          CountableConcrete.CountablePrefixMachine.posteriorDecayFactorENNReal δ ^ N *
+            (U.toCountablePrefixMachine hSem).initialResidualObserverFiberOdds
+              (toCountablePolicy π hπ) (U.liftObserver ω)
+              (U.toCountableEncodedProgram hSem pstar) := by
+  let Uc := U.toCountablePrefixMachine hSem
+  let πc := toCountablePolicy π hπ
+  let penvc := U.toCountableProgram hSem penv
+  let ωc := U.liftObserver ω
+  let pstarc := U.toCountableEncodedProgram hSem pstar
+  have hWitness :
+      Uc.HasSupportwiseResidualContractionWitness πc penvc ωc pstarc δ T := by
+    simpa [Uc, πc, penvc, ωc, pstarc] using
+      U.hasSupportwiseResidualContractionWitness_of_prefixwiseResidualDecay
+        π hπ hSem penv pstar ω δ T hBridge hStep
+  simpa [Uc, πc, penvc, ωc, pstarc] using
+    thm_separating_support_rate_of_witness Uc πc penvc ωc pstarc δ T hWitness
+
+/-- Internal witness-transport helper for `cor:separating-support-finite-time`. -/
+theorem cor_separating_support_finite_time_of_witness
+    {A : Type u} {O : Type v}
+    [Encodable A] [Encodable O]
+    (U : CountableConcrete.CountablePrefixMachine A O)
+    (π : CountableConcrete.CountablePolicy A O) (penv : U.Program)
+    (ω : Observer (CountableConcrete.CountableEncodedProgram A O))
+    (pstar : CountableConcrete.CountableEncodedProgram A O)
+    (δ : Rat) (T : Nat)
+    (hWitness :
+      U.HasSupportwiseResidualContractionWitness π penv ω pstar δ T)
+    (hInitTop : U.initialResidualObserverFiberOdds π ω pstar ≠ ⊤) :
+    ∀ᵐ ξ ∂(U.trajectoryLaw π penv T).toMeasure,
+      ∀ N, N ≤ T →
+        (1 + CountableConcrete.CountablePrefixMachine.posteriorDecayFactorENNReal δ ^ N *
+          U.initialResidualObserverFiberOdds π ω pstar)⁻¹ ≤
+          U.observerFiberPosteriorShareProcess π ω pstar N ξ := by
+  filter_upwards [thm_separating_support_rate_of_witness U π penv ω pstar δ T hWitness]
+    with ξ hRate N hN
+  have hBound := hRate N hN
+  have hFactorTop :
+      CountableConcrete.CountablePrefixMachine.posteriorDecayFactorENNReal δ ^ N ≠ ⊤ := by
+    exact ENNReal.pow_ne_top ENNReal.ofReal_ne_top
+  have hEpsTop :
+      CountableConcrete.CountablePrefixMachine.posteriorDecayFactorENNReal δ ^ N *
+        U.initialResidualObserverFiberOdds π ω pstar ≠ ⊤ := by
+    intro hTop
+    rcases (ENNReal.mul_eq_top).1 hTop with hCase | hCase
+    · exact hInitTop hCase.2
+    · exact hFactorTop hCase.1
+  have hLower :=
+    CountableConcrete.CountablePrefixMachine.posteriorShareFromResidual_lowerBound_of_le
+      hEpsTop hBound
+  simpa [CountableConcrete.CountablePrefixMachine.observerFiberPosteriorShareProcess,
+    CountableConcrete.CountablePrefixMachine.observerFiberPosteriorShare,
+    CountableConcrete.CountablePrefixMachine.residualObserverFiberProcess_zero_eq_initial] using
+    hLower
+
+/--
+Bridged probabilistic wrapper for `cor:separating-support-finite-time` on the
+first-principles Section 6 stack.
+-/
+theorem cor_separating_support_finite_time
+    {A : Type u} {O : Type v}
+    [DecidableEq A] [DecidableEq O] [BEq A] [LawfulBEq A] [BEq O] [LawfulBEq O]
+    [Encodable A] [Encodable O]
+    (U : ConcretePrefixMachine A O)
+    (π : ConcretePolicy A O) (hπ : ProbabilisticPolicy π)
+    (hSem : ∀ c hc, ProbabilisticKernel (U.semantics c hc))
+    (penv pstar : U.Program)
+    (ω : Observer (EncodedProgram A O))
+    (δ : Rat) (T : Nat)
+    (hBridge :
+      ∀ ξ n,
+        (U.toCountablePrefixMachine hSem).residualObserverFiberProcess
+            (toCountablePolicy π hπ) (U.liftObserver ω)
+            (U.toCountableEncodedProgram hSem pstar) n ξ =
+          ENNReal.ofReal
+            (U.residualObserverFiberPosteriorOdds π (prefixFullHist ξ n) ω
+              (U.toEncodedProgram pstar) : ℝ))
+    (hStep :
+      ∀ ξ, ξ ∈ ((U.toCountablePrefixMachine hSem).trajectoryLaw
+        (toCountablePolicy π hπ) (U.toCountableProgram hSem penv) T).support →
+        ∀ n, n < T →
+          U.residualObserverFiberPosteriorOdds π (prefixFullHist ξ (n + 1)) ω
+              (U.toEncodedProgram pstar) ≤
+            posteriorDecayFactor δ *
+              U.residualObserverFiberPosteriorOdds π (prefixFullHist ξ n) ω
+                (U.toEncodedProgram pstar))
+    (hInitTop :
+      (U.toCountablePrefixMachine hSem).initialResidualObserverFiberOdds
+          (toCountablePolicy π hπ) (U.liftObserver ω)
+          (U.toCountableEncodedProgram hSem pstar) ≠ ⊤) :
+    ∀ᵐ ξ ∂((U.toCountablePrefixMachine hSem).trajectoryLaw
+        (toCountablePolicy π hπ) (U.toCountableProgram hSem penv) T).toMeasure,
+      ∀ N, N ≤ T →
+        (1 + CountableConcrete.CountablePrefixMachine.posteriorDecayFactorENNReal δ ^ N *
+          (U.toCountablePrefixMachine hSem).initialResidualObserverFiberOdds
+            (toCountablePolicy π hπ) (U.liftObserver ω)
+            (U.toCountableEncodedProgram hSem pstar))⁻¹ ≤
+          (U.toCountablePrefixMachine hSem).observerFiberPosteriorShareProcess
+            (toCountablePolicy π hπ) (U.liftObserver ω)
+            (U.toCountableEncodedProgram hSem pstar) N ξ := by
+  let Uc := U.toCountablePrefixMachine hSem
+  let πc := toCountablePolicy π hπ
+  let penvc := U.toCountableProgram hSem penv
+  let ωc := U.liftObserver ω
+  let pstarc := U.toCountableEncodedProgram hSem pstar
+  have hWitness :
+      Uc.HasSupportwiseResidualContractionWitness πc penvc ωc pstarc δ T := by
+    simpa [Uc, πc, penvc, ωc, pstarc] using
+      U.hasSupportwiseResidualContractionWitness_of_prefixwiseResidualDecay
+        π hπ hSem penv pstar ω δ T hBridge hStep
+  simpa [Uc, πc, penvc, ωc, pstarc] using
+    cor_separating_support_finite_time_of_witness
+      Uc πc penvc ωc pstarc δ T hWitness hInitTop
 
 /-- Lean wrapper for `thm:semantic-convergence` on the concrete semantic stack. -/
 theorem thm_semantic_convergence
@@ -599,6 +871,61 @@ theorem no_oneStepPosteriorConcentrates (r : Nat → Rat) (n : Nat) :
     exact hListZero _
   exact hIn hZero
 
+theorem no_oneStepResidualPosteriorConcentrates (r : Nat → Rat) (n : Nat) (δ : Rat) :
+    ¬ oneStepResidualPosteriorConcentrates
+      machine policy history observer target actions (scheduledActionLaw r n) δ := by
+  intro hConc
+  rcases hConc with
+    ⟨a, o, refLaw, ε, ha, hMass, _hSep, _hrefLaw, _hε, _hεpos,
+      hSoftInPos, _hSoftOutPos, hRatio, _hBound⟩
+  have haTrue : a = true := by
+    simpa [actions] using ha
+  subst haTrue
+  have hKernelZero :
+      ∀ p : machine.Program,
+        (programObsLaw history true (machine.toEncodedProgram p)).mass o = 0 := by
+    intro p
+    simp [programObsLaw, ConcretePrefixMachine.toEncodedProgram,
+      ConcretePrefixMachine.programSemantics, machine, ConcreteLaw.zero]
+  have hListZero :
+      ∀ xs : List machine.Program, listWeightedSum xs (fun _ => (0 : Rat)) = 0 := by
+    intro xs
+    induction xs with
+    | nil =>
+        simp [listWeightedSum]
+    | cons x xs ih =>
+        simp [listWeightedSum]
+  have hInZero :
+      (machine.predictiveLawInClass policy history true
+        (machine.observerFiber observer target)).mass o = 0 := by
+    simp [ConcretePrefixMachine.predictiveLawInClass, mixLaw, hKernelZero]
+    exact hListZero _
+  have hOutZero :
+      (machine.predictiveLawOutsideClass policy history true
+        (machine.observerFiber observer target)).mass o = 0 := by
+    simp [ConcretePrefixMachine.predictiveLawOutsideClass, mixLaw, hKernelZero]
+    exact hListZero _
+  have hSoftEq :
+      (machine.softPredictiveLawOutsideClass policy history true
+        (machine.observerFiber observer target) refLaw ε).mass o =
+      (machine.softPredictiveLawInClass policy history true
+        (machine.observerFiber observer target) refLaw ε).mass o := by
+    simp [ConcretePrefixMachine.softPredictiveLawOutsideClass,
+      ConcretePrefixMachine.softPredictiveLawInClass, ConcreteLaw.soften, hInZero, hOutZero]
+  rw [hSoftEq] at hRatio
+  have hInNe :
+      (machine.softPredictiveLawInClass policy history true
+        (machine.observerFiber observer target) refLaw ε).mass o ≠ 0 :=
+    ne_of_gt hSoftInPos
+  have hImpossible : (1 : Rat) < 1 := by
+    have hRatio' :
+        (machine.softPredictiveLawInClass policy history true
+          (machine.observerFiber observer target) refLaw ε).mass o /
+          (machine.softPredictiveLawInClass policy history true
+            (machine.observerFiber observer target) refLaw ε).mass o < 1 := hRatio
+    rwa [div_self hInNe] at hRatio'
+  exact (lt_irrefl (1 : Rat)) hImpossible
+
 end SummableSupportCounterexample
 
 /-- Lean wrapper for `thm:summable-support-insufficient` on the concrete semantic stack. -/
@@ -612,15 +939,17 @@ theorem thm_summable_support_insufficient
         (pstar : EncodedProgram Bool Bool) (actions : List Bool) (aStar : Bool)
         (κs : Nat → ActionLaw Bool),
         actionMassScheduleRealized actions aStar κs s ∧
-        ∀ n, ¬ oneStepPosteriorConcentrates U π h SummableSupportCounterexample.observer pstar actions (κs n) := by
+        ∀ δ n,
+          ¬ oneStepResidualPosteriorConcentrates
+            U π h SummableSupportCounterexample.observer pstar actions (κs n) δ := by
   refine ⟨r, rfl, hSummable,
     SummableSupportCounterexample.machine, SummableSupportCounterexample.policy,
     SummableSupportCounterexample.history,
     SummableSupportCounterexample.target, SummableSupportCounterexample.actions, true,
     SummableSupportCounterexample.scheduledActionLaw r, ?_, ?_⟩
   · exact SummableSupportCounterexample.schedule_realized_on_true r
-  · intro n
-    exact SummableSupportCounterexample.no_oneStepPosteriorConcentrates r n
+  · intro δ n
+    exact SummableSupportCounterexample.no_oneStepResidualPosteriorConcentrates r n δ
 
 /-- Lean wrapper for `cor:goal-dialed-payoff` on the concrete semantic stack. -/
 theorem cor_goal_dialed_payoff

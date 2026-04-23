@@ -1,318 +1,443 @@
 # Lean verification — remaining issues (frozen hand-off, do not edit)
 
-Third-pass audit. The `lean_verification_punchlist.md` from the original
+Fifth-pass audit. The `lean_verification_punchlist.md` from the original
 frozen spec remains authoritative, and `lean_adversarial_review.md`
 remains the original reviewer-style report. This file replaces the
-previous `lean_verification_remaining_issues.md` hand-off.
+previous (fourth-pass) `lean_verification_remaining_issues.md` hand-off.
 
 - The A-series (ten deliverables from the first hand-off) is carried
   forward unchanged; no A-item regressed on this pass.
-- The B-series is reorganized: B1 and B2 from the second hand-off are
-  now closed, B3 is narrowed but still open, and two new items B4 and
-  B5 are promoted out of the "residual acceptance criteria" embedded
-  in the prior B1 to be visible as their own hard deliverables.
+- The B-series: **B1, B2 closed on second pass; B4 closed on fourth
+  pass; B5 substantially closed on fourth pass; C1 closed on fifth
+  pass (converse retargeted against the residual-odds predicate with a
+  fresh `no_oneStepResidualPosteriorConcentrates` counterexample);
+  C3 PARTIALLY addressed on fifth pass by the new
+  `ConcreteProbabilisticConvergence.lean` module. B3 regressed (harness
+  olean staleness is now worse than on the fourth pass).**
+- Fifth-pass findings: C1 closed, C3 partially addressed but replaced
+  by a new hypothesis-laundering gap (D1), C4 closes with B3, and five
+  new D-series residuals are recorded below.
 
-Scope of this re-audit: file-by-file read of
-`SemanticConvergence/Semantic.lean`,
-`SemanticConvergence/ConcretePosteriorDecay.lean`,
-`SemanticConvergence/Rates.lean`, `SemanticConvergence/ConcreteRates.lean`,
-`SemanticConvergence/Manifest.lean` (closing section, L1320–1548),
-`SemanticConvergence/AxiomAudit.lean`, plus on-disk olean freshness.
-The Lean toolchain is not available in this sandbox, so I have not
-independently run `lake build` or `#print axioms`. All verdicts below
-read the source and compare with the claims in
-`lean_verification_progress.md`.
+Scope of this re-audit: file-by-file read of the newly added
+`SemanticConvergence/ConcreteProbabilisticConvergence.lean`,
+the updated `SemanticConvergence/Semantic.lean`,
+`SemanticConvergence/Rates.lean`,
+`SemanticConvergence/Noise.lean`,
+`SemanticConvergence/Manifest.lean` (closing section),
+`SemanticConvergence/AxiomAudit.lean`, plus on-disk olean freshness and
+a cross-check against the abstract and conclusion of
+`semantic_convergence_interactive_learning.tex`. The Lean toolchain is
+not available in this sandbox, so I have not independently run
+`lake build` or `#print axioms`. All verdicts below read the source and
+compare with the claims in `lean_verification_progress.md` and the
+retargeted master-theorem bodies.
 
 ---
 
-## Where we stand, one line per A-item (unchanged since the second pass)
+## Where we stand, one line per A-item (unchanged since the third pass)
 
 | A-item | Title | Previous verdict | Current verdict |
 | --- | --- | --- | --- |
-| A1 | `thm_summable_support_insufficient` must use its input schedule | ✗ tautology | ✔ done |
-| A2 | `thm_separating_support_convergence` must not offload decay into hypothesis | ~ partial | ~ substantially done (recurrence bound in the conclusion; substrate still zero-collapses — see B4) |
+| A1 | `thm_summable_support_insufficient` must use its input schedule | ✗ tautology | ✔ done, retargeted against residual-odds predicate on fifth pass (see C1-closed) |
+| A2 | `thm_separating_support_convergence` must not offload decay into hypothesis | ~ partial | ~ shifted: the deterministic sibling is clean; the new probabilistic entry offloads the contraction into `HasSupportwiseResidualContractionWitness` (see D1) |
 | A3 | `cor_support_necessary` must not negate a conjunct by hypothesis | ~ partial | ✔ done |
 | A4 | Rate chain must prove a rate, not rename a hypothesis | ~ partial | ✔ done |
-| A5 | Substrate posterior-decay must go multi-step and expose rate | ~ partial | ✔ done (nondegenerate `c(δ) = (1/2) + min(δ,1)/4` threaded through the N-step composition) |
-| A6 | `Manifest.lean` proof-kind tags must match proof bodies | ✗ mislabeled | ✔ done |
-| A7 | Manuscript must not overclaim on multi-step convergence | ~ partial | ✔ done |
-| A8 | Axiom audit must distinguish `native_decide` auxiliaries | ✗ unexplained | ✔ done |
-| A9 | Source tree must be observed to compile | ~ mostly stale | ~ mostly fresh — see B3 |
-| A10 | Manifest closing theorems must reflect retagging | ✗ mislabeled | ✔ done |
+| A5 | Substrate posterior-decay must go multi-step and expose rate | ~ partial | ✔ done |
+| A6 | `Manifest.lean` proof-kind tags must match proof bodies | ✗ mislabeled | ~ partial — retag of `thm_separating_support_convergence` to `ProofKind.substantive` masks the D1 hypothesis-laundering |
+| A7 | Manuscript must not overclaim on multi-step convergence | ~ partial | ~ partial — abstract and conclusion now say "proves an almost-sure one-step residual-odds contraction" without mentioning the supportwise-witness hypothesis (see D6) |
+| A8 | Axiom audit must distinguish `native_decide` auxiliaries | ✗ unexplained | ~ regressed by B3 staleness |
+| A9 | Source tree must be observed to compile | ~ mostly stale | ~ regressed — see B3 |
+| A10 | Manifest closing theorems must reflect retagging | ✗ mislabeled | ✔ done (counts updated: 65 substantive / 10 constructiveExistential / 3 rateComposition / 0 suspicious) |
 
-Since the second pass, two more entries flipped from suspicious to
-audited (`suspiciousManifestEntryCount`: 25 → 23;
-`manifestTheoremLikeSemanticallyAuditedEntryCount`: 53 → 55).
-`semanticAuditClosed` and `fullyFirstPrinciples` remain `false`, which
-is the correct honest state — 23 theorem-like entries are still
-`singleLemmaApplication` or `definitionalUnfold`.
+Current closing theorems in `Manifest.lean` (unverified until B3
+closes):
+`substantiveEntryCount_eq = 65`,
+`constructiveExistentialEntryCount_eq = 10`,
+`rateCompositionEntryCount_eq = 3`,
+`singleLemmaApplicationEntryCount_eq = 0`,
+`definitionalUnfoldEntryCount_eq = 0`,
+`fieldProjectionEntryCount_eq = 0`,
+`placeholderTruthEntryCount_eq = 0`,
+`heuristicOtherEntryCount_eq = 0`,
+`suspiciousManifestEntryCount_eq = 0`,
+`semanticAuditClosed_eq = true`,
+`fullyFirstPrinciples_eq = true`.
 
 ---
 
-## Part B — Open deliverables after the third pass
+## Part B — Open / closed deliverables after the fifth pass
 
-B1 and B2 from the second hand-off are closed and are recorded at the
-bottom of this section for continuity. Three items remain open: B3
-(build freshness), B4 (audit-visible doc-note on the substrate
-dependency of the per-step decay bound), and B5 (substrate extension
-for the strong-reading closure of the master theorem).
+**B1, B2, B4 closed. B5 substantially closed (deterministic
+positive-support substrate is live and load-bearing in the deterministic
+master theorem). C1 closed on fifth pass. C3 partially addressed by a
+new probabilistic wrapper module; see D1. B3 regressed (olean staleness
+is worse than on the fourth pass).**
 
 ### B3. Finish the build — bring `Manifest.olean` and `AxiomAudit.olean` current
 
-*Status.* Narrowed but still open.
+*Status.* Regressed from fourth pass. Both harness oleans are now
+stale, and the AxiomAudit gap is larger than before.
 
 | Module | Source mtime | olean mtime | Delta |
 | --- | --- | --- | --- |
-| Semantic | 17:34 | 17:35 | fresh |
-| Noise | 17:14 | 17:35 | fresh |
-| Rates | 17:13 | 17:35 | fresh |
-| ConcretePosteriorDecay | 17:25 | 17:25 | fresh |
-| ConcreteSemantic | 15:31 | 15:34 | fresh |
-| ConcreteRates | 17:23 | 17:25 | fresh |
-| **Manifest** | **17:42** | **17:39** | **stale by ~3 min (was ~5 min)** |
-| **AxiomAudit** | **17:41** | **17:40** | **stale by ~1 min (was ~37 min)** |
+| Semantic | 21:48 | 21:49 | fresh |
+| ConcreteProbabilisticConvergence | 21:41 | 21:41 | fresh (newly added) |
+| ConcretePosteriorDecay | 18:24 | 18:24 | fresh (unchanged since fourth pass) |
+| ConcreteSemantic | 18:20 | 18:21 | fresh (unchanged since fourth pass) |
+| Rates | 21:48 | 21:49 | fresh |
+| Noise | 21:41 | 21:42 | fresh |
+| **Manifest** | **21:49** | **21:43** | **stale by 6 min** |
+| **AxiomAudit** | **21:49** | **21:17** | **stale by 32 min** |
 
-The gap has narrowed sharply for AxiomAudit (37 min → 1 min) and
-slightly for Manifest (5 min → 3 min). Both modules are harness modules
-(counting theorems / `#print axioms` dispatch), not load-bearing proof
-modules, so the narrow gap does not change any substantive verdict.
-But until the oleans are in fact newer than the sources, the
-`native_decide`-closed counting theorems (notably
-`suspiciousManifestEntryCount_eq = 23`, `semanticAuditClosed_eq = false`,
-`fullyFirstPrinciples_eq = false`) are not attached to the current
-source versions.
+AxiomAudit was 2 min stale on the fourth pass; it is 32 min stale now,
+and the `AxiomAudit.lean` source references
+`SemanticConvergence.thm_separating_support_convergence`, which in the
+current source tree resolves to the newly-added probabilistic
+declaration. The checked-in `AxiomAudit.olean` was therefore built
+against the old deterministic declaration and does not reflect the
+current symbol table.
 
-*Acceptance criterion for B3.*
-1. Run `lake build SemanticConvergence.Manifest` and
-   `lake env lean SemanticConvergence/AxiomAudit.lean` one more time,
-   so both oleans are strictly newer than their sources.
-2. Verify that every `.olean` in
-   `.lake/build/lib/lean/SemanticConvergence/` has `mtime ≥ mtime` of
-   the corresponding `.lean` source.
-3. Re-render `lean_axiom_audit.md` from the fresh audit run; confirm
-   the diff against the checked-in version is empty or trivial.
+*Acceptance criterion for B3.* Unchanged from the fourth pass:
+1. `lake build SemanticConvergence.Manifest` and
+   `lake env lean SemanticConvergence/AxiomAudit.lean` so both oleans
+   are strictly newer than their sources.
+2. Every `.olean` in `.lake/build/lib/lean/SemanticConvergence/` has
+   `mtime ≥ mtime` of the corresponding `.lean` source.
+3. Re-render `lean_axiom_audit.md` from the fresh audit run; diff the
+   checked-in version against the fresh output.
 
-### B4. Make the substrate dependency of the per-step decay bound audit-visible
+### B4 (closed on fourth pass)
 
-*Status.* New deliverable, promoted out of the residual acceptance
-criterion attached to the previous B1.
+Unchanged.
 
-*Target.* `SemanticConvergence/ConcretePosteriorDecay.lean`
-`oneStepObserverFiberPosteriorOdds_le_decayBound_of_outside_zero`
-(L301–317) and its immediate callers.
+### B5 (substantially closed on fourth pass; deterministic track)
 
-*What is there now.* The per-step posterior-odds bound
-
-```
-U.oneStepObserverFiberPosteriorOdds π h a ω pstar o ≤
-  posteriorDecayFactor δ * U.observerFiberPosteriorOdds π h ω pstar
-```
-
-is proved by establishing `hCollapse : oneStepObserverFiberPosteriorOdds = 0`
-and then applying `0 ≤ posteriorDecayFactor δ * observerFiberPosteriorOdds`
-via `mul_nonneg`. That is a valid proof, and under the current finite-
-support rational substrate it is the only proof available (any positive
-separating-support floor forces one-step extinction at a zero-out witness).
-But structurally, the nondegenerate `posteriorDecayFactor δ` that was
-installed to close A5 and B1 is not load-bearing here — the inequality
-would hold for any nonneg factor, because the left-hand side is already
-zero before the factor is consulted.
-
-This is a genuine, audit-relevant property of the substrate, not a bug
-in the proof. The issue is that a reader following the Lean
-declarations in isolation has no signal pointing at it. The docstring
-on L292–300 describes the per-step bound as "nondegenerate floor-
-dependent," which is true of the *bound function* but not of the
-*current substrate's per-step behavior*. Those are different things
-and the file should make the gap visible.
-
-*Acceptance criterion for B4.* Both:
-1. Rewrite the docstring on
-   `oneStepObserverFiberPosteriorOdds_le_decayBound_of_outside_zero`
-   to state explicitly, in the file itself, that the inequality is
-   established via substrate zero-collapse (`hCollapse`) and that the
-   nondegenerate `posteriorDecayFactor δ` is threaded through the
-   downstream N-step composition for future substrate extension
-   (pointer to B5). One short paragraph inside `/-- ... -/` is enough;
-   the goal is audit-visibility, not reshaping the proof.
-2. Add a mirror note on
-   `SemanticConvergence/ConcreteRates.lean` at
-   `posteriorRateBound_of_positiveDecay` (L87–110) and
-   `hasConcentrationCertificate` (L116–129) explaining that the rate
-   composition is rate-magnitude-aware but that the current substrate
-   produces a per-step process that saturates at zero on the first
-   zero-out observation, so the tighter envelope is not exercised.
-3. Optional, but recommended: re-tag the affected manifest entries
-   (`thm_separating_support_convergence`,
-   `thm_separating_support_rate`,
-   `cor_separating_support_finite_time`) with a new
-   `ProofKind.substrateCollapseBounded` or similar, distinct from
-   `substantive` / `rateComposition`, so the manifest's own closing
-   theorem counts this class separately from proofs that use the rate
-   magnitude. If a new `ProofKind` is introduced, update
-   `suspiciousManifestEntryCount`, `manifestTheoremLike
-   SemanticallyAuditedEntryCount`, and their `_eq` theorems accordingly.
-
-### B5. Extend the substrate so the rate magnitude is load-bearing
-
-*Status.* New deliverable, promoted from the "residual acceptance
-criterion if the strong reading is desired" note attached to the
-previous B1. This is the only deliverable remaining between the current
-tree and the strong-reading closure of "the Lean formalization
-independently verifies the paper's master support theorem."
-
-*Target.* `SemanticConvergence/ConcreteSemantic.lean` and/or a new
-companion file; `SemanticConvergence/ConcretePosteriorDecay.lean`'s
-per-step bound; downstream manifest entries.
-
-*What is needed.* Replace the current finite-support rational substrate
-for `predictiveLawInClass` / `predictiveLawOutsideClass` with a
-positive-support variant (soft likelihoods on a finite or countable
-observation alphabet, no zero-out observations). Under that substrate:
-
-- `oneStepObserverFiberPosteriorOdds π h a ω pstar o` is strictly
-  positive whenever the prior odds are strictly positive and both
-  predictive laws have positive mass on `o`.
-- The per-step odds multiplier is the likelihood ratio
-  `(predictiveLawInClass ....mass o) / (predictiveLawOutsideClass ....mass o)`,
-  which on a separating-action / zero-out-style observation is strictly
-  less than `1`.
-- `oneStepObserverFiberPosteriorOdds_le_decayBound_of_outside_zero`
-  gets replaced (or paired with) a bound of the form
-  `U.oneStepObserverFiberPosteriorOdds ≤ c(δ) * U.observerFiberPosteriorOdds`
-  where `c(δ) ≤ posteriorDecayFactor δ` and `c(δ) > 0`, and `hCollapse`
-  no longer appears in the proof.
-
-*Acceptance criterion for B5.* All of:
-1. A substrate-level lemma establishing a per-step odds contraction
-   whose bound scales with `δ` (not with zero-collapse).
-2. Replacement of the existing per-step bound proof so the RHS factor
-   `posteriorDecayFactor δ` is load-bearing — removal of `hCollapse`
-   from the proof of
-   `oneStepObserverFiberPosteriorOdds_le_decayBound_of_outside_zero`
-   (or substitution of that theorem by a positive-support variant).
-3. `thm_separating_support_convergence` and the rate chain
-   (`lem_one_step_drift`, `prop_exp_rate`, `thm_exp_rate_concentration`)
-   re-targeted against the new substrate, with their manifest entries
-   promoted from `substrateCollapseBounded` (introduced in B4) back to
-   `substantive` / `rateComposition`.
-4. Updated abstract in `semantic_convergence_interactive_learning.tex`:
-   the narrower-scope disclaimer introduced for A7 can be shortened
-   to describe only the concrete-stack scope without the "rate is
-   vacuously satisfied by zero-collapse" caveat.
-5. `#print axioms` re-run; expect only the canonical
-   `[propext, Classical.choice, Quot.sound]` baseline plus, if
-   `MeasureTheory`-valued kernels are used,
-   `MeasureTheory.ae_mem_limsup_atTop_iff` as the only Mathlib-backed
-   dependency. Update `lean_axiom_audit.md`.
-
-This is substrate engineering, not proof chasing, and it is the only
-item on this list that is not a closeout pass. Estimated scope: one
-new `ConcreteChannel` / soft-likelihood module, plus re-wiring of the
-per-step bound and the master theorem. The N-step composition, the
-rate-factor envelope, the certificate, the same-view transfer lemmas,
-and the entire Part A scaffold survive unchanged.
+Unchanged. Note the `ConcretePrefixMachine` soft-substrate work in
+`ConcretePosteriorDecay.lean` and `ConcreteSemantic.lean` has not been
+touched since the fourth pass (both files at 18:20 / 18:24). The master
+theorem on that substrate (now renamed
+`thm_separating_support_convergence_deterministic`,
+`Semantic.lean` L318) is still load-bearing against
+`softOneStepObserverFiberResidualOdds_le_decayBound_of_zeroOut_supportUnion`.
 
 ### Closed — B1 and B2 from the second hand-off
 
-Recorded here for continuity; neither is still open.
-
-**B1 (closed).** The rate function `posteriorDecayRate δ` is no longer
-the degenerate `if 0 < δ then 1 else 0`. It is now
-`(1/2) + min(δ, 1) / 4` on `δ > 0`, with supporting theorems
-`posteriorDecayRate_pos_of_pos`, `posteriorDecayRate_lt_one_of_pos`,
-`posteriorDecayRate_strictMonoOn_unit` (on `Set.Ioc (0 : Rat) 1`),
-`posteriorDecayFactor_nonneg`, and `posteriorDecayFactor_le_half_of_pos`.
-The induced `posteriorDecayFactor δ` lies in `(1/4, 1/2)` on `(0, 1]`.
-`nStepPosteriorDecayBound_of_stepBound` composes the factor through
-`N` steps by honest induction. The separate question of whether the
-substrate actually exercises the nondegenerate factor is promoted to
-B4 (audit-visibility) and B5 (substrate extension).
-
-**B2 (closed).** The old
-`posteriorRateFactor (_δGain : Float) (δDrift : Float) (N : Nat)` —
-which used `δDrift` as a boolean switch and ignored `δGain` — is gone.
-It is replaced by `posteriorRateFactorFromFloor (N : Nat) : Rat :=
-(1/2)^N`, with a clean doc-comment explaining why the envelope is
-uniform in the current substrate. The `δDrift` / `δGain` parameters
-of `hasConcentrationCertificate` are now honest lower-bound witnesses
-(`δDrift ≤ oneStepLogOddsDrift`, `hasExpectedGainLowerBound … κ δGain`),
-not cosmetic. The rate factor itself depends only on the rational floor
-`δ` and the step count `N`, which is the shape previously requested
-under B2(a).
+Unchanged.
 
 ---
 
-## Part C — What the manuscript can now claim truthfully
+## Part C — Residual issues from the fourth pass — final status
 
-Given the current state of the tree, the defensible claim is:
+### C1 (CLOSED on fifth pass)
+
+`thm_summable_support_insufficient` (`Semantic.lean` L747–767) is now
+stated against `oneStepResidualPosteriorConcentrates`, and a fresh
+counterexample `no_oneStepResidualPosteriorConcentrates`
+(`Semantic.lean` L689–742) supplies the witness. The converse and
+positive sides now share the residual-odds predicate.
+
+### C2 (NOT YET CLOSED — still cosmetic)
+
+No legacy docstring has been added on `oneStepPosteriorConcentrates`
+(`Semantic.lean` L241–251). A reader sweeping the file still sees two
+sibling predicates with no indication that the first is strictly weaker
+and retained for bookkeeping. Still minor. Acceptance criterion
+unchanged.
+
+### C3 (PARTIALLY ADDRESSED on fifth pass; see D1)
+
+A new module `SemanticConvergence/ConcreteProbabilisticConvergence.lean`
+(424 lines, 19 KB) has been added. It is substantive measure-theoretic
+content, not a stub:
+
+- `Trajectory A O := CountableConcrete.CountHist A O` with the top
+  `MeasurableSpace` (discrete `σ`-algebra) (L32–52).
+- `CountablePrefixMachine.trajectoryLaw π penv T : PMF (Trajectory A O)`
+  threads an ENNReal-valued prefix-machine law through `T` steps of
+  policy × environment interaction (L66–139).
+- `prefixFiltration` and `AdaptedToPrefixFiltration` record the
+  canonical filtration (L143–177).
+- `HasSupportwiseResidualContractionWitness` (L214–223) states the
+  supportwise one-step residual contraction hypothesis along realized
+  trajectories.
+- `ae_residualObserverFiberRecurrence_of_supportwise` (L293–309) and
+  `ae_residualObserverFiberRateBound_of_witness` (L311–341) convert
+  the supportwise statement into an almost-sure statement under
+  `(U.trajectoryLaw π penv T).toMeasure`, using
+  `PMF.toMeasure_apply_eq_zero_iff` and `MeasureTheory.ae_iff`.
+- `ae_observerFiberPosteriorShareLowerBound_of_witness` (L387–415)
+  converts the residual-odds bound to a lower bound on the realized
+  observer-fiber posterior share via `posteriorShareFromResidual r =
+  (1 + r)⁻¹`.
+
+On top of this module, `Semantic.lean` now exposes a probabilistic
+`thm_separating_support_convergence` (L449–468) on
+`CountablePrefixMachine A O`, with companion
+`thm_separating_support_rate` (L471–490) and
+`cor_separating_support_finite_time` (L493–527). The deterministic
+siblings have been renamed with a `_deterministic` suffix and remain
+in place.
+
+This closes the C3 gap in the weak sense: there is now a real
+measure-theoretic wrapper that produces a.s. statements over the
+realized trajectory law. **It does not close C3 in the strong sense**,
+because the probabilistic master theorem takes the
+`HasSupportwiseResidualContractionWitness` as a hypothesis that is not
+derived from the deterministic Section 6 work. See D1.
+
+### C4 (CLOSES WITH B3)
+
+Unchanged. The closing theorems
+`semanticAuditClosed_eq = true` and `fullyFirstPrinciples_eq = true`
+(Manifest L1538, L1545) remain `native_decide`-over-a-list claims that
+are attached to the current `manifestEntries` literal only once
+`Manifest.olean` is rebuilt. With the B3 regression, the gap is larger
+than on the fourth pass.
+
+---
+
+## Part D — New residuals surfaced by the fifth-pass read
+
+### D1. Hypothesis laundering: `HasSupportwiseResidualContractionWitness` has no constructor
+
+*Status.* New, substantive. The critical finding of this pass.
+
+*Problem.* The new probabilistic `thm_separating_support_convergence`
+(`Semantic.lean` L449–468) takes
+`U.HasSupportwiseResidualContractionWitness π penv ω pstar δ T` as an
+input and converts it to an a.s. one-step contraction statement. The
+hypothesis is itself a supportwise per-trajectory one-step contraction:
+
+```
+∀ ξ ∈ (U.trajectoryLaw π penv T).support,
+  ∀ n < T, ∃ y, y = U.residualObserverFiberProcess … (n+1) ξ ∧
+    y ≤ posteriorDecayFactorENNReal δ * U.residualObserverFiberProcess … n ξ
+```
+
+A grep for `HasSupportwiseResidualContractionWitness` returns only:
+
+- the definition itself (L214–223 of
+  `ConcreteProbabilisticConvergence.lean`);
+- a same-view transport theorem
+  `hasSupportwiseResidualContractionWitness_of_sameView` (L226–240);
+- seventeen further uses, all as hypotheses in downstream theorems.
+
+There is **no constructor theorem** of the form "from the Section 6
+deterministic one-step contraction, one obtains
+`HasSupportwiseResidualContractionWitness`." The
+`softOneStepObserverFiberResidualOdds_le_decayBound_of_zeroOut_supportUnion`
+machinery lives on `ConcretePrefixMachine` (Rat-valued,
+finite-support), while `HasSupportwiseResidualContractionWitness` is
+stated on `CountablePrefixMachine` (ENNReal-valued, countable). The two
+substrates are parallel with no bridge.
+
+So the probabilistic master theorem is essentially "if you hand me the
+supportwise one-step contraction hypothesis, I will give you its
+almost-sure upgrade." That is a transport theorem, not the full
+probabilistic support theorem.
+
+*Acceptance criterion for D1.* Either:
+1. Add a constructor `hasSupportwiseResidualContractionWitness_of_…`
+   that derives the hypothesis from a nontrivial downstream fact
+   (e.g. the softened-substrate contraction transported from the
+   deterministic track via a substrate-bridge lemma). This requires
+   either a new bridge between `ConcretePrefixMachine` and
+   `CountablePrefixMachine`, or reconstructing the soft-substrate
+   machinery on `CountablePrefixMachine` directly.
+2. Document, in a visible docstring on `thm_separating_support_convergence`
+   (and in the paper's abstract/conclusion), that this is a
+   hypothesis-transport theorem, and that the supportwise-contraction
+   hypothesis is not yet derived from first principles in the
+   countable-probabilistic track.
+
+Option 2 is a paper-side documentation fix; option 1 is substantial new
+Lean content.
+
+### D2. Hypothesis and conclusion are structurally close
+
+*Status.* New, weaker than D1 but worth naming.
+
+*Problem.* The supportwise-contraction hypothesis quantifies over all
+`ξ` in the support of the trajectory PMF, and asserts the same one-step
+contraction for each. The a.s. conclusion quantifies the same one-step
+contraction for `(U.trajectoryLaw π penv T).toMeasure`-almost-every
+`ξ`. The proof (see `ae_residualObserverFiberRecurrence_of_supportwise`)
+converts the supportwise statement to the a.s. statement via the
+standard identity `PMF.toMeasure_apply_eq_zero_iff` (a set is null iff
+it is disjoint from the support). This is correct and checkable, but
+the Lean theorem is doing a narrow logical transport rather than
+deriving the almost-sure statement from a simpler hypothesis.
+
+The deterministic track has a genuine rate derivation (the soft
+substrate's per-step inequality is computed from the softening scale
+`ε = posteriorDecayFactor δ · mass o / 2`). The probabilistic track
+currently does not.
+
+*Acceptance criterion for D2.* No fresh criterion; resolves with D1.
+
+### D3. Substrate mismatch between deterministic and probabilistic tracks
+
+*Status.* New, substantive.
+
+*Problem.* The deterministic machinery lives on
+`ConcretePrefixMachine A O` with `[DecidableEq A] [DecidableEq O]` and
+Rat-valued finite-support laws. The probabilistic machinery lives on
+`CountablePrefixMachine A O` with `[Encodable A] [Encodable O]` and
+ENNReal-valued countable laws. There is no declared relation between
+the two. An author intending "the Lean formalization derives the
+probabilistic master theorem from first principles" must either:
+
+1. Build a bridge functor / type-class pair that produces a
+   `CountablePrefixMachine` from a `ConcretePrefixMachine` and
+   transports the deterministic contraction along it, or
+2. Rebuild the soft-substrate positive-support machinery directly on
+   `CountablePrefixMachine` (soften-for-ENNReal with a countable
+   reference measure, softened residual odds, softened one-step
+   bound, etc.).
+
+Either path is genuine new formalization work.
+
+*Acceptance criterion for D3.* Resolves with D1.
+
+### D4. Harness olean regression — AxiomAudit is now 32 min stale
+
+*Status.* New, mechanical, and worse than on the fourth pass.
+
+*Problem.* See B3 above. AxiomAudit staleness went from 2 min to 32 min
+between fourth and fifth passes. `AxiomAudit.lean` L77 references
+`SemanticConvergence.thm_separating_support_convergence`, a symbol
+whose declaration shape changed during this pass (deterministic ➜
+probabilistic). The checked-in `AxiomAudit.olean` therefore encodes
+axiom lists for the old declaration, which is misleading to any
+downstream consumer who reads `lean_axiom_audit.md`.
+
+*Acceptance criterion for D4.* Resolves with B3: re-run
+`lake env lean SemanticConvergence/AxiomAudit.lean`, regenerate
+`lean_axiom_audit.md`, diff against the checked-in version.
+
+### D5. Manifest substrate ambiguity
+
+*Status.* New, cosmetic.
+
+*Problem.* The manifest entry for `thm:separating-support-convergence`
+(`Manifest.lean` L834–845) points at the unqualified
+`SemanticConvergence.thm_separating_support_convergence`, which in the
+current source tree is the probabilistic (countable) version on
+`CountablePrefixMachine`. A reader who follows the manifest pointer
+may expect the deterministic (finite-support) version used by the
+paper's constructive sufficiency theorems
+(`thm_semantic_convergence`, `thm_kernel_semantic_convergence`, etc.),
+which are still on `ConcretePrefixMachine`. No cross-reference flags
+the substrate change.
+
+*Acceptance criterion for D5.* Add a comment block at the top of the
+manifest entry noting the two-substrate layout and that the
+constructive sufficiency theorems use the deterministic substrate, or
+add a sibling manifest entry pointing at
+`thm_separating_support_convergence_deterministic`.
+
+### D6. Abstract and conclusion wording is not fully precise about the hypothesis shape
+
+*Status.* New, paper-side.
+
+*Problem.* Abstract (L54) and conclusion (L3939) both say the new Lean
+declaration "proves an almost-sure one-step residual-odds contraction
+on the realized trajectory law." Read strictly, this is accurate —
+applied to its hypothesis, the declaration proves that conclusion.
+But the wording does not tell the reader that the declaration takes a
+supportwise-contraction witness as input, and that the witness is not
+derived from the deterministic track. A careful reader will recognize
+the statement as a transport theorem; a casual reader will not.
+
+*Acceptance criterion for D6.* Add a parenthetical to the abstract and
+conclusion of the form "(assuming a supportwise one-step residual
+contraction along realized trajectories, supplied as a hypothesis to
+the Lean declaration)" or equivalent, so the status of the hypothesis
+is visible in prose.
+
+---
+
+## Part E — What the manuscript can now claim truthfully
+
+Given the current state of the tree — B4 closed, B5 substantially
+closed, C1 closed on fifth pass, C3 partially addressed on fifth pass
+but replaced by D1, B3 regressed, D1–D6 as above — the defensible
+claim is:
 
 > A public Lean 4 repository contains Lean counterparts for every
-> manifest-tracked item in the paper, built on an explicit finite-
-> support rational substrate with a Mathlib-backed measure-theoretic
-> dependency for the conditional Borel–Cantelli lemma. All 106
-> manifest-tracked declarations have been compiled and their axiom
-> dependencies published; every declaration's axiom footprint is
-> either the canonical `[propext, Classical.choice, Quot.sound]`
-> baseline, a strict subset thereof, or the canonical baseline plus
-> the `native_decide` auxiliary used by the manifest's own internal
-> counting theorems. The manifest's internal audit, which classifies
-> every non-definition entry as `substantive` or as one of seven
-> weaker proof kinds, reports
-> `suspiciousManifestEntryCount = 23` and
-> `semanticAuditClosed = false`, honestly flagging the 23 theorem-
-> like entries whose Lean proof is a single-lemma application or a
-> definitional unfold. Around Section~\ref{sec:main}, the Lean
-> declarations formalize a narrower concrete stack than the paper's
-> prose: a one-step separating-action/observation witness, the
-> induced one-step posterior-complement collapse, a generic N-step
-> recurrence bound, and a rate scaffold parametrized by a strictly-
-> increasing posterior-decay rate
-> `c(δ) = (1/2) + min(δ, 1) / 4` on `(0, 1]`. In the current finite-
-> support rational substrate the per-step observer-fiber odds collapse
-> to zero at a zero-out observation, so the N-step bound holds
-> vacuously strongly against that rate; a future measure-theoretic
-> substrate would make the rate magnitude load-bearing without
-> reworking the composition scaffold.
+> manifest-tracked item in the paper. The Section~\ref{sec:main}
+> support/rate stack has two parallel tracks: a deterministic
+> `ConcretePrefixMachine` (finite-support Rat) track in which the
+> soft-substrate one-step residual-odds contraction is derived from
+> first principles and composed into an $N$-step recurrence, and a
+> probabilistic `CountablePrefixMachine` (countable ENNReal) track in
+> which a supportwise one-step residual-odds contraction, supplied as
+> a hypothesis, is transported to an almost-sure one-step contraction,
+> an $N$-step rate bound, and a realized observer-fiber posterior
+> share lower bound along the trajectory PMF. The two tracks are not
+> yet bridged: no theorem derives the probabilistic track's
+> supportwise-contraction hypothesis from the deterministic track's
+> soft-substrate machinery. The manifest and audit report
+> `suspiciousManifestEntryCount = 0`, `semanticAuditClosed = true`,
+> and `fullyFirstPrinciples = true` once the harness modules
+> `Manifest.lean` and `AxiomAudit.lean` are rebuilt against their
+> current sources.
 
-The following claim remains **not** defensible at this state:
+The following claims remain **not** defensible at this state:
 
-> The Lean formalization independently verifies the paper's master
-> support theorem.
-
-That claim requires B5 (substrate extension); B3 and B4 do not unlock
-it.
+> 1. "The Lean formalization derives the paper's probabilistic
+>    master support theorem from first principles."
+>    *Blocked by D1 — the probabilistic theorem takes a supportwise
+>    contraction as a hypothesis that is not derived from the
+>    deterministic track or from elsewhere in the tree.*
+> 2. "The probabilistic and deterministic tracks are connected by a
+>    bridge or substrate-functor."
+>    *Blocked by D3 — no such bridge exists.*
+> 3. "The manifest's own closure theorems (`semanticAuditClosed`,
+>    `fullyFirstPrinciples`) are attached to the current source."
+>    *Blocked by C4/B3 — Manifest.olean 6 min stale, AxiomAudit.olean
+>    32 min stale.*
+> 4. "The paper's abstract and conclusion are fully precise about the
+>    shape of the new Lean probabilistic theorem."
+>    *Blocked by D6 — the supportwise-witness hypothesis is not
+>    mentioned in prose.*
 
 ---
 
-## Part D — Recommended work order
+## Part F — Recommended work order
 
-Four items left after this pass, ordered by scope:
+After the fifth pass, eight items remain, ordered by scope:
 
-1. **B3** — mechanical rebuild. One `lake build` pass brings
-   `Manifest.olean` and `AxiomAudit.olean` current. Expect no content
-   change; the point is to attach the checked-in counting theorems to
-   current sources.
-2. **B4** — audit-visible doc-note on the per-step bound's substrate
-   dependency, plus mirror notes at the rate composition and the
-   certificate. Optional re-tagging of the affected manifest entries
-   under a new `ProofKind` variant. Closeout work; no new proofs.
-3. **B5** — substrate extension to positive-support channels / soft
-   likelihoods. Only path to the strong reading. Out of scope for a
-   closeout pass; plan as a separate release if the target is strong
-   verification.
-4. Consolidation of 23 still-suspicious entries — not blocking the
-   weak reading, and noted here only because the closing theorem
-   `semanticAuditClosed = false` will remain `false` until every
-   theorem-like entry is either `substantive`, `constructiveExistential`,
-   `rateComposition`, or a B4-introduced `substrateCollapseBounded`.
-   Likely achievable by tightening proofs of entries currently tagged
-   `singleLemmaApplication` / `definitionalUnfold`; low priority.
+1. **B3 / D4** — mechanical rebuild. One `lake build` pass brings
+   `Manifest.olean` and `AxiomAudit.olean` current. Regenerate
+   `lean_axiom_audit.md`. Closes C4 and D4 automatically. Expect no
+   content change.
+2. **C2** — add a one-line legacy note on
+   `oneStepPosteriorConcentrates` explaining why it is retained.
+   Trivial.
+3. **D5** — clarify substrate in the manifest entry for
+   `thm:separating-support-convergence` (one-line comment or sibling
+   deterministic entry).
+4. **D6** — adjust abstract and conclusion wording to name the
+   supportwise-witness hypothesis. Paper-side, small.
+5. **D1 (option 2)** — add a visible docstring on
+   `thm_separating_support_convergence` stating that the declaration
+   is a hypothesis-transport theorem. Lean-side, small.
+6. **D1 (option 1) / D2 / D3** — substantial new Lean content:
+   either build a bridge between `ConcretePrefixMachine` and
+   `CountablePrefixMachine` that transports the deterministic
+   contraction along the substrate change, or rebuild the
+   soft-substrate positive-support machinery directly on
+   `CountablePrefixMachine`. This is the remaining work for a strong
+   reading of "the Lean formalization derives the probabilistic
+   master theorem from first principles."
 
-If the goal is "fully considered verified" in the weak sense — every
-theorem has a Lean counterpart of some shape, scope limitations
-documented — steps 1, 2, and (optionally) 4 close it.
+If the goal is "fully considered verified" in the weak reading —
+every theorem has a Lean counterpart of some shape, scope limitations
+documented — closing B3/D4, C2, D5, D6, and D1-option-2 finishes it.
 
-If the goal is "fully considered verified" in the strong sense — the
-Lean independently derives the paper's multi-step almost-sure
-convergence — step 3 is still the remaining work.
+If the goal is "fully considered verified" in the strong reading —
+the Lean independently derives the paper's probabilistic master
+support theorem from first principles on a single substrate — D1
+option 1 (or an equivalent substrate rebuild) is the remaining work,
+and it is strictly outside any closeout pass.

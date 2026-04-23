@@ -15,6 +15,8 @@ import SemanticConvergence.ConcreteBelief
 import SemanticConvergence.ConcreteSemantic
 import SemanticConvergence.ConcretePosteriorDecay
 import SemanticConvergence.ConcreteRates
+import SemanticConvergence.ConcreteProbabilisticConvergence
+import SemanticConvergence.ConcreteSubstrateBridge
 import SemanticConvergence.ConcreteNoise
 import SemanticConvergence.ConcreteSelfReference
 import SemanticConvergence.ConcreteBoundary
