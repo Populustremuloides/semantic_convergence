@@ -1,0 +1,89 @@
+\documentclass[11pt]{article}
+\usepackage[margin=0.8in]{geometry}
+\usepackage{microtype}
+\usepackage{amsmath,amssymb}
+\usepackage[dvipsnames]{xcolor}
+\usepackage{booktabs}
+\usepackage[numbers]{natbib}
+\usepackage{hyperref}
+\hypersetup{colorlinks=true,linkcolor=MidnightBlue,urlcolor=MidnightBlue}
+\setlength{\parskip}{0.2em}
+\setlength{\parindent}{0pt}
+\setlength{\bibsep}{0.05em}
+
+\title{\vspace{-2.5em}Class Project Report: Algorithmic Free Energy}
+\author{Brian Brown}
+\date{Spring 2026}
+
+\begin{document}
+\maketitle
+\vspace{-2.5em}
+
+\section{Project description and motivation}
+
+The class's recurring theme was that standard metrics for language models rarely measure what we mean by a model ``getting it right.'' Perplexity measures imitation of training style; held-out accuracy measures reproduction of a specific test set. I wanted to ask whether the problem is that we do not yet have a loss whose minimization forces an interactive learner to converge on the causal structure of its environment rather than on fit.
+
+I originally planned to build the benchmark I presented in class: a language model interacting with a small program and guessing what program generates the observations. When I ran it, the models I could afford were not strong enough. GPT-oss did not fit on my 3080, and the smaller open-weight models I could run failed outright. With about 25 hours of my project budget remaining, I decided that running more failing experiments would be less useful than thinking carefully about what an interactive learner should be asked to do. The program-inference task is still the intended application; the contribution is a formal criterion such a task can be scored against.
+
+Three threads are combined: Solomonoff and Hutter's universal prior over computable environments \citep{Solomonoff1964a,Hutter2005}, Friston's variational free-energy formulation for action selection \citep{Friston2010}, and Deutsch's explanatory stance, which motivates the interventional (rather than predictive) target as the definition of understanding \citep{Deutsch2011}. With consistent bookkeeping, the belief-minimization problem reduces to Bayes/Gibbs, and the action-minimization problem specializes to the information-gain criterion shared by Bayesian experimental design, compression-based curiosity, and active-inference curiosity.
+
+\section{Methodology}
+
+Two artifacts: a paper with 106 numbered items (definitions, lemmas, propositions, theorems, corollaries), and a Lean 4 formalization in which each item has a machine-checked counterpart. Repository: \url{https://github.com/Populustremuloides/semantic_convergence.git}.
+
+The central contribution is the identification of a single number --- the \emph{algorithmic free energy} --- whose minimization provably drives an interactive learner to converge on the correct causal model of its environment. The number has two parts. The belief part scores how well the learner's posterior tracks the evidence; its minimizer is exactly the Bayes/Gibbs posterior. The action part scores which interaction to try next; under zero action cost and uniform preferences its minimizer is exactly the classical information-gain criterion. Both parts use one reference, the universal prior weighted by Kolmogorov complexity over computable environments.
+
+``Correct model'' is made precise by four nested target classes. The history target is every program consistent with the observed transcript. The policy target narrows to programs indistinguishable under the learner's realized actions. The interventional target narrows further to programs that respond identically under every admissible intervention; this is the formal definition of understanding used throughout the paper. The syntactic target is the literal source program. The paper proves the inclusions are strict, and an observable-quotient theorem shows that a learner who only watches history can never resolve beneath the interventional target.
+
+The main positive result ties the functional to the target: minimizing algorithmic free energy, together with one explicit condition on the learner's realized policy, drives the belief onto the interventional target almost surely, with explicit finite-time rates. The condition is \emph{separating support} --- the cumulative probability the learner assigns to actions that distinguish classes of programs must diverge. Without it, the near-miss theorem shows the posterior on the interventional class stays frozen at its prior mass for every horizon. Matching converses rule out uniform recovery when separating mass is zero and admit failure with positive probability when it is merely summable. Three constructive realizations attain the condition: a class-against-complement action selector, an exact Gibbs kernel lift with a compact-action extension, and a differentiable finite-latent-class surrogate under three stated assumptions.
+
+Models attempted on the original benchmark: GPT-oss (too large) and several smaller open-weight models (all failed). Hardware: Nvidia RTX 3080 (10\,GB). Theorem-proving stack: Lean 4 with Mathlib, split into a paper-facing layer (\texttt{Semantic}, \texttt{Rates}, \texttt{Noise}) and a concrete foundational stack (\texttt{ConcretePrefixMachine}, \texttt{ConcreteSemantic}, \texttt{ConcretePosteriorDecay}, \texttt{ConcreteProbabilisticConvergence}). A generated manifest tags each of the 106 items with a proof-kind and first-principles-status label; a per-declaration axiom audit lists the axiom footprint of every item.
+
+\section{Results}
+
+The results are theoretical. Empirical comparison was not completed because the models I could run did not solve the original task.
+
+\paragraph{Positive.} Belief-side unification: the unique minimizer of the belief term equals the Bayes/Gibbs posterior (\texttt{lem\_variational}). Action-side unification: under zero action cost and uniform preferences, the action-term minimizer equals the shared information-gain criterion (\texttt{cor\_efe\_specialization}). Separating-support convergence theorem (\texttt{thm\_separating\_support\_convergence}), with rate (\texttt{thm\_separating\_support\_rate}) and finite-time share bound (\texttt{cor\_separating\_support\_finite\_time}). Three realizations: selector (\texttt{thm\_semantic\_convergence}), Gibbs kernel lift (\texttt{thm\_kernel\_semantic\_convergence}, extended by \texttt{cor\_compact\_action\_kernel}), differentiable surrogate (\texttt{thm\_amortized\_surrogate}, \texttt{cor\_amortized\_surrogate\_finite\_time}).
+
+\paragraph{Negative.} Near-miss (\texttt{thm\_afe\_near\_miss}); zero separating support rules out uniform recovery (\texttt{cor\_support\_necessary}); summable separating support admits failure with positive probability (\texttt{thm\_summable\_support\_insufficient}).
+
+\paragraph{Verification counts.} The manifest's closing theorems, proved by \texttt{native\_decide}, report: substantive 65; constructive-existential 10; rate-composition 3; suspicious (untagged) 0; semantic audit closed \texttt{true}; fully first-principles \texttt{true}. No \texttt{sorry}, \texttt{axiom}, or \texttt{opaque} introductions at the paper's abstract interface. One probabilistic theorem on the countable-ENNReal substrate currently takes a supportwise one-step contraction as a hypothesis rather than deriving it from the deterministic substrate; the audit flags this, and it is the next formalization item.
+
+\section{Discussion}
+
+\paragraph{Benefits.} The functional provides both a loss and a benchmark. The differentiable surrogate is a gradient-trainable objective whose minimization, under the three stated assumptions, corresponds to approach to the interventional target. The separating-support criterion is directly checkable against a deployed learner's realized policy. In an interactive setting where the environment includes the user, the interventional class is the specification of the user's responses under every intervention, so a learner satisfying the separating-support condition approaches a formal description of the user's preferences, to the extent that the stated assumptions hold.
+
+\paragraph{Drawbacks.} The assumptions are strong. Finite-time rates require bounded log-likelihood ratios. The surrogate uses a finite latent class and three deployment-side hypotheses (nonvanishing target class, uniform high-score region, soundness of the learned score for separation) that the paper does not prove from the optimization. The separating-support condition is on the realized policy, not on training, so a policy that looked separating at training can fail to be separating at deployment. The trainability claim is about the shape of the loss, not a measured result, because the models I could run were too small to test it.
+
+\paragraph{Relevance to LLM evaluation.} The practical application is the benchmark. Interactive program-inference tasks of the shape I originally planned are the setting the theorems are stated over. When sufficiently capable models are available, the pass criterion is the one the paper writes down, and the same criterion specializes to other interactive program-inference tasks. The differentiable surrogate gives a route to using the criterion as a training objective rather than only an evaluation metric.
+
+\section{Project hours log}
+
+Total: 30 hours.
+
+\begin{center}\small
+\begin{tabular}{llp{4.6in}}
+\toprule
+Date & Hrs & Activity \\
+\midrule
+Mar 1   & 1 & Planning; Kolmogorov, Friston, and Deutsch pieces came together. \\
+Mar 16  & 4 & Repository setup and initial example; on GitHub; coordinated with Spencer Kunkel. \\
+Apr 15  & 2 & Coordinated with Spencer on alternative approaches. \\
+Apr 17  & 3 & 3080 experiments: GPT-oss too large; smaller models all failed. Began the theory paper. \\
+Apr 18  & 6 & Theory paper; refining ideas. \\
+Apr 19  & 3 & Theory paper; refining ideas. \\
+Apr 20  & 6 & Prose paper finished; began the Lean formalization. \\
+Apr 21  & 5 & Theory paper; nearly finished the Lean formalization in time. \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{thebibliography}{9}
+\footnotesize
+\bibitem{Solomonoff1964a} R.~J. Solomonoff. A formal theory of inductive inference. \emph{Information and Control}, 7(1--2), 1964.
+\bibitem{Hutter2005} M.~Hutter. \emph{Universal Artificial Intelligence}. Springer, 2005.
+\bibitem{Friston2010} K.~Friston. The free-energy principle: a unified brain theory? \emph{Nature Reviews Neuroscience}, 11(2), 2010.
+\bibitem{Deutsch2011} D.~Deutsch. \emph{The Beginning of Infinity}. Viking, 2011.
+\end{thebibliography}
+
+\end{document}

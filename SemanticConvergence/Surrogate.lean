@@ -1,6 +1,7 @@
 import SemanticConvergence.Boundary
 import SemanticConvergence.Semantic
 import SemanticConvergence.ConcreteSurrogate
+import SemanticConvergence.Rates
 
 namespace SemanticConvergence
 
@@ -367,6 +368,75 @@ theorem cor_amortized_surrogate_finite_time
     U π h ω pstar highScoreActions
     (surrogateImplementedLaw highScoreActions refLaw rhoStar bonusFloor)
     hDeltaPos hOdds0 hFloor hDecayPos' hε
+
+/--
+Combined H10-facing finite-time surrogate certificate.
+
+The amortized assumptions `(A1)`--`(A3)` still prove the deployment-side
+separating-support floor. The finite-horizon residual and posterior-share
+bounds are discharged by the explicit zero-out package, not by the asymptotic
+H10 main theorem.
+-/
+theorem cor_amortized_surrogate_finite_time_zeroOutPackage
+    [Encodable A] [Encodable O]
+    [DecidableEq O] [BEq O] [LawfulBEq O]
+    (U : ConcretePrefixMachine A O)
+    (π : ConcretePolicy A O) (hπ : ProbabilisticPolicy π)
+    (hSem : ∀ c hc, ProbabilisticKernel (U.semantics c hc))
+    (penv pstar : U.Program)
+    (h : FullHist A O)
+    (ω : Observer (EncodedProgram A O))
+    (highScoreActions : List A)
+    (refLaw : ActionLaw A)
+    (rhoFloor rhoStar lambdaFloor bonusFloor : Rat)
+    (hRhoFloorPos : 0 < rhoFloor)
+    (hLambdaFloorPos : 0 < lambdaFloor)
+    (hBonusFloorPos : 0 < bonusFloor)
+    (hA1 : surrogateAssumptionA1 rhoFloor rhoStar)
+    (hA2 : surrogateAssumptionA2 refLaw highScoreActions lambdaFloor)
+    (hA3 :
+      surrogateAssumptionA3 U π h ω (U.toEncodedProgram pstar) highScoreActions)
+    (δ : Rat) (T : Nat)
+    (h𝒵 : ZeroOutRatePackage U π hπ hSem penv pstar ω T) :
+    (surrogateDeltaImpl rhoFloor lambdaFloor bonusFloor ≤
+        surrogateImplementedSeparatingMass
+          U π h ω (U.toEncodedProgram pstar) highScoreActions refLaw rhoStar bonusFloor ∧
+      hasSeparatingSupportOn
+        (surrogateImplementedLaw highScoreActions refLaw rhoStar bonusFloor)
+        highScoreActions
+        (U.separatingActionSet π h ω (U.toEncodedProgram pstar))) ∧
+      (∀ᵐ ξ ∂((U.toCountablePrefixMachine hSem).trajectoryLaw
+          (toCountablePolicy π hπ) (U.toCountableProgram hSem penv) T).toMeasure,
+        ∀ N, N ≤ T →
+          (U.toCountablePrefixMachine hSem).residualObserverFiberProcess
+              (toCountablePolicy π hπ) (U.liftObserver ω)
+              (U.toCountableEncodedProgram hSem pstar) N ξ ≤
+            CountableConcrete.CountablePrefixMachine.posteriorDecayFactorENNReal δ ^ N *
+              (U.toCountablePrefixMachine hSem).initialResidualObserverFiberOdds
+                (toCountablePolicy π hπ) (U.liftObserver ω)
+                (U.toCountableEncodedProgram hSem pstar)) ∧
+      (∀ᵐ ξ ∂((U.toCountablePrefixMachine hSem).trajectoryLaw
+          (toCountablePolicy π hπ) (U.toCountableProgram hSem penv) T).toMeasure,
+        ∀ N, N ≤ T →
+          (1 + CountableConcrete.CountablePrefixMachine.posteriorDecayFactorENNReal δ ^ N *
+            (U.toCountablePrefixMachine hSem).initialResidualObserverFiberOdds
+              (toCountablePolicy π hπ) (U.liftObserver ω)
+              (U.toCountableEncodedProgram hSem pstar))⁻¹ ≤
+            (U.toCountablePrefixMachine hSem).observerFiberPosteriorShareProcess
+              (toCountablePolicy π hπ) (U.liftObserver ω)
+              (U.toCountableEncodedProgram hSem pstar) N ξ) := by
+  have hSurrogate :=
+    thm_amortized_surrogate
+      U π h ω (U.toEncodedProgram pstar) highScoreActions refLaw
+      rhoFloor rhoStar lambdaFloor bonusFloor
+      hRhoFloorPos hLambdaFloorPos hBonusFloorPos hA1 hA2 hA3
+  have hRate :=
+    zeroOutRatePackage_residualRate
+      U π hπ hSem penv pstar ω δ T h𝒵
+  have hShare :=
+    zeroOutRatePackage_posteriorShareFiniteTime
+      U π hπ hSem penv pstar ω δ T h𝒵
+  exact ⟨hSurrogate, hRate, hShare⟩
 
 end ConcretePaperSurrogate
 

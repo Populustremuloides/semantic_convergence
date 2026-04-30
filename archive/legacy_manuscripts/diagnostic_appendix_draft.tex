@@ -1,0 +1,86 @@
+% Move 4 draft. Diagnostic appendix to slot in just before the bibliography.
+% Title: A Diagnostic for Interactive Learning Failures.
+%
+% The appendix turns the three-layer ontology of Section~\ref{sec:ontology} into
+% an operational checklist for applying the paper to a specific learner. It
+% includes (1) a three-question diagnostic procedure, (2) a cross-reference
+% table from symptom to canonical theorem to remedy, and (3) a worked example
+% on the near-miss theorem.
+
+\appendix
+
+\section{A Diagnostic for Interactive Learning Failures}
+\label{app:diagnostic}
+
+Section~\ref{sec:ontology-diagnostic} sorts every result of this paper into one of three layers and gives the diagnostic vocabulary in prose. This appendix turns that vocabulary into an operational checklist. The intent is for a reader holding a specific learner --- a language model evaluated on a specific task, an active-inference controller, a Solomonoff-style universal predictor, or any other interactive learner that has failed to concentrate its posterior on the desired semantic target --- to localize what went wrong and which remedy applies, by reading off the answer to three questions in a fixed order.
+
+\subsection{The three diagnostic questions}
+\label{app:diagnostic-questions}
+
+\paragraph{Question 1 (observer): is the access pattern fine enough?}
+Identify the observer $\omega$ underlying the learner's evidence model. If $\omega$ is strictly coarser than $\omega_{\mathrm{behav}}$, no learning rule can resolve the desired semantic target through it; the observable-quotient theorem (Theorem~\ref{thm:factor-through-quotient}) is absolute on this point. If $\omega$ is strictly finer than $\omega_{\mathrm{behav}}$ --- for instance, the syntactic observer $\omega_{\mathrm{syn}}$ for a target whose class is non-singleton --- the strict-hierarchy theorem (Theorem~\ref{thm:strict-hierarchy}) says no history-based learner can in general resolve $\omega$'s classes either, even though the structural ceiling is higher. The diagnostic outcome at this layer is binary: either the observer is at $\omega_{\mathrm{behav}}$ (or some relevantly equivalent observer matching the application's notion of distinguishability) or it is not. If not, no further question is meaningful.
+
+\emph{Remedy.} Change the access pattern, refine or coarsen the observer, or accept that the chosen target is unreachable through this access and substitute a different target.
+
+\paragraph{Question 2 (agent): is the learning architecture in the natural variational class?}
+Holding the observer fixed, ask whether the learner's belief update minimizes a divergence (Lemma~\ref{lem:variational}), uses the KL divergence within the natural convex class (Lemma~\ref{lem:kl-necessity}), and uses an action rule reducible to information gain under zero action cost and uniform preferences (Corollary~\ref{cor:efe-specialization}). An architecture outside this class --- a belief rule that does not minimize a divergence at all, a non-KL divergence on the natural convex class, or an action rule outside the information-gain family --- is structurally inadequate, and the main theorem of Section~\ref{sec:main} does not apply.
+
+\emph{Remedy.} Replace the offending component with the corresponding member of the natural variational class. The class is unique under the paper's structural assumptions; the choices are forced.
+
+\paragraph{Question 3 (coupling): is the agent $\kappa$-coupled to the environment through the observer?}
+Once the observer is at $\omega_{\mathrm{behav}}$ and the agent is in the natural variational class, convergence is purely a question of coupling: does the agent's policy produce class-predictive Bhattacharyya separation $\kappa>0$ on its policy support (Assumption~\textup{(M7)}), and does the (agent, environment) pair through this observer satisfy the prefix-Hellinger obligations (Assumption~\textup{(M6)})? The near-miss theorem (Theorem~\ref{thm:afe-near-miss}) is the canonical coupling failure: a structurally good agent on a substituted-prior environment fails because the coupling conditions are violated. The matching converses (Corollary~\ref{cor:support-necessary}, Theorem~\ref{thm:summable-support-insufficient}) are coupling failures of a different form --- the support-mass form rather than the score form.
+
+\emph{Remedy.} Engineer the policy or the reference law. The canonical realizations of Section~\ref{sec:semantic-action} --- the class-against-complement selector and the exact Gibbs kernel lift --- and the differentiable surrogate of Section~\ref{sec:amortized-surrogate} are recipes for satisfying the coupling conditions of Assumptions~\ref{ass:main-verified-package}.
+
+\subsection{Diagnostic cross-reference table}
+\label{app:diagnostic-table}
+
+Table~\ref{tab:diagnostic} maps an observed symptom to a diagnosis, a canonical theorem in this paper that exhibits or characterizes the failure mode, and a remedy class.
+
+\begin{table}[h]
+\centering\small
+\renewcommand{\arraystretch}{1.25}
+\begin{tabular}{p{0.30\linewidth}p{0.16\linewidth}p{0.20\linewidth}p{0.26\linewidth}}
+\toprule
+Symptom & Layer & Canonical theorem & Remedy class \\
+\midrule
+Target class cannot in principle be resolved through the learner's access. & Observer & Theorem~\ref{thm:factor-through-quotient} (observable quotient) & Refine the access pattern; change the observer. \\
+Target class is finer than the access pattern can resolve along any policy. & Observer & Theorem~\ref{thm:strict-hierarchy} (strict hierarchy) & Coarsen the target to a class at $\omega_{\mathrm{behav}}$. \\
+Belief update does not minimize a divergence at all. & Agent & Lemma~\ref{lem:variational} (variational identity) & Replace the update with the Bayes/Gibbs minimizer. \\
+Belief update minimizes a non-KL divergence on the natural convex class. & Agent & Lemma~\ref{lem:kl-necessity} (KL necessity) & Replace the divergence with KL against the universal prior. \\
+Action rule unresponsive to evidence value or outside the information-gain family. & Agent & Corollary~\ref{cor:efe-specialization} (EFE specialization) & Adopt the EFE-minimizing action rule under uniform preferences. \\
+Posterior on $[p^\star]$ frozen at prior mass for every finite horizon. & Coupling & Theorem~\ref{thm:afe-near-miss} (AFE near-miss) & Replace the substituted prior; engineer reference law for class-predictive separation. \\
+Zero separating policy mass on the agent's support. & Coupling & Corollary~\ref{cor:support-necessary} (support-necessary) & Add exploration to the policy until separating mass becomes positive. \\
+Separating support is positive but summable; still no convergence. & Coupling & Theorem~\ref{thm:summable-support-insufficient} (summable-support failure) & Increase exploration rate so separating mass diverges. \\
+Verified main-theorem hypotheses fail at some prefix. & Coupling & Theorem~\ref{thm:separating-support-convergence} (verified main) & Adjust policy, kernel, or reference law to restore Assumption~\textup{(M6)} or~\textup{(M7)}. \\
+\bottomrule
+\end{tabular}
+\caption{Symptom-to-remedy lookup. Each row corresponds to a single failure mode and points to the named theorem in this paper that is its canonical exhibit. The remedy class names the kind of intervention that would restore the corresponding hypothesis or close the layer-specific gap.}
+\label{tab:diagnostic}
+\end{table}
+
+\subsection{Worked example: applying the diagnostic to the near-miss theorem}
+\label{app:diagnostic-example}
+
+Consider a learner using the algorithmic free energy principle as its complete architecture: universal-prior belief, Bayes/Gibbs update, expected-free-energy action with zero cost and uniform preferences. Suppose the learner is run on the substituted-prior environment of Theorem~\ref{thm:afe-near-miss} and the posterior on $[p^\star]$ remains at its initial mass $\alpha_0$ for every finite horizon. Apply the diagnostic.
+
+\emph{Question 1 (observer).} The architecture is at $\omega_B=\omega_{\mathrm{syn}}$ on the belief side and the EFE action rule operates at $\omega_A=\omega_{\mathrm{behav}}$ via the standard active-inference decomposition. The observer at the action layer is precisely the behavioral observer; the observer is fine enough. \emph{No failure at the observer layer.}
+
+\emph{Question 2 (agent).} The architecture is exactly the natural variational class: Bayes/Gibbs belief from the universal-prior algorithmic free energy, EFE action under zero cost and uniform preferences. By Lemma~\ref{lem:variational} and Corollary~\ref{cor:efe-specialization}, the architecture is structurally adequate. \emph{No failure at the agent layer.}
+
+\emph{Question 3 (coupling).} This is where the failure must lie, and the diagnostic locates it. The substituted finite-support prior is engineered so that the realized policy under the agent's information-gain action induces an observer strictly coarser than $\omega_{\mathrm{behav}}$ (Theorem~\ref{thm:observer-promotion-failure}); class-predictive Bhattacharyya separation $\kappa$ at the realized observer is zero on the agent's policy support, violating Assumption~\textup{(M7)}. The coupling between the structurally good agent and the engineered environment, viewed through the canonical observer, fails. The remedy is to engineer the prior or the policy so that separation becomes positive on a divergent policy mass; the canonical realizations and the surrogate of Sections~\ref{sec:semantic-action} and~\ref{sec:amortized-surrogate} are constructions that do this.
+
+The diagnostic localizes the failure unambiguously to the coupling layer in three checks. The architecture itself is not at fault; the substituted-prior setup induces a coupling failure in the precise sense Assumption~\textup{(M7)} rules out.
+
+\subsection{Notes on application}
+\label{app:diagnostic-notes}
+
+Three cautions for applying the diagnostic to non-formal learners.
+
+First, identifying the observer requires a notion of distinguishability appropriate to the application. For a language model, the natural observer might track the model's response distribution on a specified prompt distribution; for an active-inference controller, the observer is the generative model's latent variable structure; for a real-world Solomonoff predictor, the observer is the access through the chosen interaction protocol. The diagnostic's first question is sharp; the work of identifying the right $\omega$ for the application is the application designer's, not the diagnostic's.
+
+Second, Question~2 is a more substantive structural test than it may appear. Many practical architectures are not natural-class agents in this paper's sense even when they look variational --- ELBO-based variational autoencoders against parametric families, for instance, do not in general satisfy KL-necessity over the natural convex class, because the family restricts the divergence in question. The diagnostic's second question detects this; an architecture that fails it is at best an approximation to a natural-class agent, and the convergence theorem applies only as far as the approximation does.
+
+Third, coupling conditions are not architectural and therefore not invariant under environment change. An agent that satisfies all coupling conditions on environment $\varepsilon_1$ may fail them on environment $\varepsilon_2$. The diagnostic's third question must be re-evaluated for each new environment of interest. Failures localized to the coupling layer always have engineering remedies of the kind cataloged in Sections~\ref{sec:semantic-action} and~\ref{sec:amortized-surrogate}, but those remedies are environment-specific.
+
+The three layers and three questions together constitute the operational form of this paper's contribution. A learner that passes all three questions is one to which the verified main theorem (Theorem~\ref{thm:separating-support-convergence}) applies as a guarantee.

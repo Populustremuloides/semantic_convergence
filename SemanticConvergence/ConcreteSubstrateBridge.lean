@@ -1,74 +1,15 @@
 import SemanticConvergence.ConcreteProbabilisticConvergence
+import SemanticConvergence.ConcretePMF
 
 namespace SemanticConvergence
 
 universe u v
 
 open Classical
-open scoped BigOperators
+open Filter
+open scoped BigOperators ENNReal NNReal ProbabilityTheory
 
 noncomputable section
-
-namespace ConcreteLaw
-
-variable {α : Type u} [DecidableEq α]
-
-/-- `ENNReal` mass function associated to a finite-support rational law. -/
-def toENNRealMass (μ : ConcreteLaw α) (a : α) : ENNReal :=
-  ENNReal.ofReal (μ.mass a : ℝ)
-
-/--
-The finite-support law can be transported to a PMF: masses are nonnegative and sum to one over
-the deduplicated support.
--/
-def HasPMFMass (μ : ConcreteLaw α) : Prop :=
-  (∀ a, 0 ≤ μ.mass a) ∧ ((μ.support.toFinset.sum fun a => μ.toENNRealMass a) = 1)
-
-theorem mass_eq_zero_of_not_mem_support (μ : ConcreteLaw α) {a : α}
-    (ha : a ∉ μ.support.toFinset) :
-    μ.mass a = 0 := by
-  by_contra hne
-  exact ha <| by simpa using μ.support_complete a hne
-
-theorem toENNRealMass_eq_zero_of_not_mem_support (μ : ConcreteLaw α) {a : α}
-    (ha : a ∉ μ.support.toFinset) :
-    μ.toENNRealMass a = 0 := by
-  simp [toENNRealMass, μ.mass_eq_zero_of_not_mem_support ha]
-
-/-- Transport a finite-support rational law to a PMF once its probability constraints are given. -/
-def toPMF (μ : ConcreteLaw α) (hμ : μ.HasPMFMass) : PMF α :=
-  PMF.ofFinset (μ.toENNRealMass) μ.support.toFinset hμ.2
-    (fun _ ha => μ.toENNRealMass_eq_zero_of_not_mem_support ha)
-
-@[simp]
-theorem toPMF_apply (μ : ConcreteLaw α) (hμ : μ.HasPMFMass) (a : α) :
-    μ.toPMF hμ a = μ.toENNRealMass a :=
-  rfl
-
-theorem mem_support_toPMF_iff (μ : ConcreteLaw α) (hμ : μ.HasPMFMass) (a : α) :
-    a ∈ (μ.toPMF hμ).support ↔ μ.mass a ≠ 0 := by
-  constructor
-  · intro ha
-    have hpmf : μ.toPMF hμ a ≠ 0 := (PMF.mem_support_iff _ _).1 ha
-    have hnonneg := hμ.1 a
-    by_contra hmass
-    apply hpmf
-    simp [ConcreteLaw.toPMF, ConcreteLaw.toENNRealMass, hmass]
-  · intro hmass
-    have hnonneg := hμ.1 a
-    have hmassENN : μ.toENNRealMass a ≠ 0 := by
-      intro hzero
-      apply hmass
-      have hnonneg_real : (0 : ℝ) ≤ μ.mass a := by
-        exact_mod_cast hnonneg
-      have hle_real : (μ.mass a : ℝ) ≤ 0 := by
-        simpa [ConcreteLaw.toENNRealMass] using (ENNReal.ofReal_eq_zero.mp hzero)
-      have hzero_real : (μ.mass a : ℝ) = 0 := le_antisymm hle_real hnonneg_real
-      exact_mod_cast hzero_real
-    exact (PMF.mem_support_iff _ _).2 <| by
-      simpa [ConcreteLaw.toPMF] using hmassENN
-
-end ConcreteLaw
 
 namespace ConcreteBridge
 
@@ -121,6 +62,15 @@ theorem histOfCountHist_countHistOfHist_apply {t : Nat} (h : Hist A O t) (i : Fi
     histOfCountHist (countHistOfHist h)
       (Fin.cast (by simp [countHistOfHist]) i) = h i := by
   simp [histOfCountHist, countHistOfHist, List.getElem_ofFn]
+
+theorem asFullHist_histOfCountHist_countHistOfHist {t : Nat} (h : Hist A O t) :
+    asFullHist (histOfCountHist (countHistOfHist h)) = asFullHist h := by
+  have hList :
+      countHistOfHist (histOfCountHist (countHistOfHist h)) =
+        countHistOfHist h := by
+    simp
+  simpa [countHistOfHist, asFullHist] using
+    (List.ofFn_inj'.1 hList)
 
 @[simp]
 theorem countHistOfHist_snoc {t : Nat} (h : Hist A O t) (e : HistEvent A O) :
@@ -203,6 +153,7 @@ namespace CountableConcrete
 variable {A : Type u} {O : Type v}
 variable [Encodable A] [Encodable O]
 
+omit [Encodable A] [Encodable O] in
 theorem histPMF_appendEvent
     (π : CountablePolicy A O) (κ : CountableKernel A O)
     (t : Nat) (h : CountHist A O) (a : A) (o : O) :
@@ -210,7 +161,7 @@ theorem histPMF_appendEvent
       histPMF π κ t h * π h a * κ h a o := by
   simp [histPMF, PMF.bind_apply, ConcreteBridge.appendEvent_eq_appendEvent_iff]
   rw [ENNReal.tsum_eq_add_tsum_ite h]
-  simp only [eq_self_iff_true, true_and]
+  simp only [true_and]
   have hSumAZero :
       ∀ x : CountHist A O, x ≠ h →
         (∑' (a₁ : A), (π x) a₁ *
@@ -248,7 +199,7 @@ theorem histPMF_appendEvent
         histPMF π κ t h *
           ∑' (a₁ : A), (π h) a₁ *
             ∑' (o₁ : O), if h = h ∧ a = a₁ ∧ o = o₁ then (κ h a₁) o₁ else 0 := by
-    simpa [hOuter]
+    simp [hOuter]
   have hOuter'' :
       (((histPMF π κ t h *
             ∑' (a₁ : A), (π h) a₁ *
@@ -334,7 +285,7 @@ theorem histPMF_appendEvent
         histPMF π κ t h *
           (∑' (a₁ : A), (π h) a₁ *
             ∑' (o₁ : O), if a = a₁ ∧ o = o₁ then (κ h a₁) o₁ else 0) := by
-        simp [mul_assoc]
+        simp
       _ = histPMF π κ t h * (π h a * κ h a o) := by rw [hMidEval]
       _ = histPMF π κ t h * π h a * κ h a o := by simp [mul_assoc]
   have hStartSimplify :
@@ -374,6 +325,324 @@ theorem histPMF_appendEvent
     refine tsum_congr (fun x => ?_)
     by_cases hx : x = h <;> simp [hx]
   exact hDecider.trans (hStartSimplify.trans (hOuterSimple.trans hCollapse))
+
+omit [Encodable A] [Encodable O] in
+/-- Histories in the recursive countable finite-horizon law have exactly the horizon length. -/
+theorem histPMF_mem_support_length_countable
+    {π : CountablePolicy A O} {κ : CountableKernel A O}
+    {t : Nat} {h : CountHist A O}
+    (hSupp : h ∈ (histPMF π κ t).support) :
+    h.length = t := by
+  induction t generalizing h with
+  | zero =>
+      simpa [histPMF] using hSupp
+  | succ t ih =>
+      rw [histPMF] at hSupp
+      rw [PMF.mem_support_bind_iff] at hSupp
+      rcases hSupp with ⟨hPrev, hPrevSupp, hActSupp⟩
+      rw [PMF.mem_support_bind_iff] at hActSupp
+      rcases hActSupp with ⟨a, _haSupp, hObsSupp⟩
+      rw [PMF.mem_support_bind_iff] at hObsSupp
+      rcases hObsSupp with ⟨o, _hoSupp, hPureSupp⟩
+      have hEq : h = appendEvent hPrev (a, o) := by
+        simpa using hPureSupp
+      have hPrevLen : hPrev.length = t := ih hPrevSupp
+      simp [hEq, hPrevLen, appendEvent_length]
+
+omit [Encodable A] [Encodable O] in
+theorem histPMF_eq_zero_of_length_ne
+    {π : CountablePolicy A O} {κ : CountableKernel A O}
+    {t : Nat} {h : CountHist A O}
+    (hLen : h.length ≠ t) :
+    histPMF π κ t h = 0 := by
+  by_contra hNonzero
+  have hSupp : h ∈ (histPMF π κ t).support := by
+    simpa [PMF.mem_support_iff] using hNonzero
+  exact hLen (histPMF_mem_support_length_countable hSupp)
+
+namespace CountablePrefixMachine
+
+omit [Encodable A] [Encodable O] in
+theorem ionescuNextEventPMF_apply
+    (π : CountablePolicy A O) (κ : CountableKernel A O)
+    (h : CountHist A O) (a : A) (o : O) :
+    ionescuNextEventPMF (A := A) (O := O) π κ h (a, o) =
+      π h a * κ h a o := by
+  simp [ionescuNextEventPMF, PMF.bind_apply]
+  rw [ENNReal.tsum_eq_add_tsum_ite a]
+  simp only [true_and]
+  have hInner :
+      (∑' (o₁ : O), if o = o₁ then (κ h a) o₁ else 0) =
+        (κ h a) o := by
+    rw [ENNReal.tsum_eq_add_tsum_ite o]
+    have hTail :
+        (∑' (x : O), if x = o then 0 else if o = x then (κ h a) x else 0) = 0 := by
+      rw [ENNReal.tsum_eq_zero]
+      intro x
+      by_cases hx : x = o
+      · simp [hx]
+      · have hox : ¬ o = x := by
+          intro hEq
+          exact hx hEq.symm
+        simp [hx, hox]
+    simp [hTail]
+  have hOuter :
+      (∑' (x : A), if x = a then 0 else
+        (π h) x *
+          ∑' (o₁ : O), if a = x ∧ o = o₁ then (κ h x) o₁ else 0) = 0 := by
+    rw [ENNReal.tsum_eq_zero]
+    intro x
+    by_cases hx : x = a
+    · simp [hx]
+    · have hax : ¬ a = x := by
+        intro hEq
+        exact hx hEq.symm
+      simp [hx, hax]
+  simp [hInner, hOuter]
+
+theorem ionescuStepKernel_singleton_apply
+    (π : CountablePolicy A O) (κ : CountableKernel A O)
+    (t : Nat)
+    (x : (i : Finset.Iic t) → ionescuTrajectoryState A O i)
+    (a : A) (o : O) :
+    ionescuStepKernel (A := A) (O := O) π κ t x
+        ({(a, o)} : Set (ionescuTrajectoryState A O (t + 1))) =
+      π (ionescuIicPrefix (A := A) (O := O) t x) a *
+        κ (ionescuIicPrefix (A := A) (O := O) t x) a o := by
+  letI : MeasurableSpace (HistEvent A O) :=
+    histEventMeasurableSpace A O
+  change
+    ((ionescuNextEventPMF (A := A) (O := O) π κ
+      (ionescuIicPrefix (A := A) (O := O) t x)).toMeasure)
+      ({(a, o)} : Set (HistEvent A O)) =
+      π (ionescuIicPrefix (A := A) (O := O) t x) a *
+        κ (ionescuIicPrefix (A := A) (O := O) t x) a o
+  calc
+    ((ionescuNextEventPMF (A := A) (O := O) π κ
+      (ionescuIicPrefix (A := A) (O := O) t x)).toMeasure)
+        ({(a, o)} : Set (HistEvent A O))
+        =
+          ionescuNextEventPMF (A := A) (O := O) π κ
+            (ionescuIicPrefix (A := A) (O := O) t x) (a, o) := by
+          exact PMF.toMeasure_apply_singleton
+            (p :=
+              ionescuNextEventPMF (A := A) (O := O) π κ
+                (ionescuIicPrefix (A := A) (O := O) t x))
+            (a := (a, o))
+            (h := measurableSet_singleton (a, o))
+    _ =
+          π (ionescuIicPrefix (A := A) (O := O) t x) a *
+            κ (ionescuIicPrefix (A := A) (O := O) t x) a o := by
+          exact ionescuNextEventPMF_apply (A := A) (O := O) π κ
+            (ionescuIicPrefix (A := A) (O := O) t x) a o
+
+theorem ionescuTrajectoryMeasure_streamPrefix_appendEvent
+    (π : CountablePolicy A O) (κ : CountableKernel A O)
+    (t : Nat) (h : CountHist A O) (a : A) (o : O) :
+    ionescuTrajectoryMeasure (A := A) (O := O) π κ
+        {x | ionescuStreamPrefix (A := A) (O := O) x (t + 1) =
+          appendEvent h (a, o)} =
+      ionescuTrajectoryMeasure (A := A) (O := O) π κ
+        {x | ionescuStreamPrefix (A := A) (O := O) x t = h} *
+        π h a * κ h a o := by
+  let M :=
+    ionescuTrajectoryMeasure (A := A) (O := O) π κ
+  let K :=
+    ionescuStepKernel (A := A) (O := O) π κ t
+  let s : Set ((i : Finset.Iic t) → ionescuTrajectoryState A O i) :=
+    {y | ionescuIicPrefix (A := A) (O := O) t y = h}
+  let e : ionescuTrajectoryState A O (t + 1) := (a, o)
+  have hs : MeasurableSet s := MeasurableSet.of_discrete
+  have he : MeasurableSet ({e} : Set (ionescuTrajectoryState A O (t + 1))) :=
+    measurableSet_singleton e
+  have hProd : MeasurableSet (s ×ˢ ({e} : Set (ionescuTrajectoryState A O (t + 1)))) :=
+    hs.prod he
+  have hJointMeas :
+      Measurable
+        (fun x : (n : Nat) → ionescuTrajectoryState A O n =>
+          (Preorder.frestrictLe t x, x (t + 1))) := by
+    exact (Preorder.measurable_frestrictLe (X := ionescuTrajectoryState A O) t).prod
+      (measurable_pi_apply (X := ionescuTrajectoryState A O) (t + 1))
+  have hRestrictMeas :
+      Measurable
+        (fun x : (n : Nat) → ionescuTrajectoryState A O n =>
+          Preorder.frestrictLe t x) :=
+    Preorder.measurable_frestrictLe (X := ionescuTrajectoryState A O) t
+  have hSet :
+      {x : (n : Nat) → ionescuTrajectoryState A O n |
+        ionescuStreamPrefix (A := A) (O := O) x (t + 1) =
+          appendEvent h (a, o)} =
+        (fun x : (n : Nat) → ionescuTrajectoryState A O n =>
+          (Preorder.frestrictLe t x, x (t + 1))) ⁻¹'
+          (s ×ˢ ({e} : Set (ionescuTrajectoryState A O (t + 1)))) := by
+    ext x
+    simp only [Set.mem_setOf_eq, Set.mem_preimage]
+    change
+      ionescuStreamPrefix (A := A) (O := O) x (t + 1) =
+          appendEvent h (a, o) ↔
+        ionescuIicPrefix (A := A) (O := O) t (Preorder.frestrictLe t x) = h ∧
+          x (t + 1) = e
+    rw [ionescuStreamPrefix_succ_eq_appendEvent (A := A) (O := O) x t,
+      ionescuIicPrefix_frestrictLe (A := A) (O := O) x t]
+    constructor
+    · intro hEq
+      exact (appendEvent_eq_appendEvent_iff (A := A) (O := O)).1 hEq
+    · rintro ⟨hPrefix, hEvent⟩
+      exact (appendEvent_eq_appendEvent_iff (A := A) (O := O)).2 ⟨hPrefix, hEvent⟩
+  have hPrefixPreimage :
+      (fun x : (n : Nat) → ionescuTrajectoryState A O n =>
+        Preorder.frestrictLe t x) ⁻¹' s =
+        {x | ionescuStreamPrefix (A := A) (O := O) x t = h} := by
+    ext x
+    simp [s, ionescuIicPrefix_frestrictLe (A := A) (O := O) x t]
+  have hMapPrefix :
+      (M.map (fun x : (n : Nat) → ionescuTrajectoryState A O n =>
+        Preorder.frestrictLe t x)) s =
+        M {x | ionescuStreamPrefix (A := A) (O := O) x t = h} := by
+    rw [MeasureTheory.Measure.map_apply hRestrictMeas hs, hPrefixPreimage]
+  calc
+    M {x | ionescuStreamPrefix (A := A) (O := O) x (t + 1) =
+          appendEvent h (a, o)}
+        =
+          M.map
+            (fun x : (n : Nat) → ionescuTrajectoryState A O n =>
+              (Preorder.frestrictLe t x, x (t + 1)))
+            (s ×ˢ ({e} : Set (ionescuTrajectoryState A O (t + 1)))) := by
+            rw [hSet, MeasureTheory.Measure.map_apply hJointMeas hProd]
+    _ =
+          ((M.map (fun x : (n : Nat) → ionescuTrajectoryState A O n =>
+            Preorder.frestrictLe t x)) ⊗ₘ K)
+            (s ×ˢ ({e} : Set (HistEvent A O))) := by
+            change
+              ((ProbabilityTheory.Kernel.trajMeasure
+                (ionescuInitialMeasure (A := A) (O := O))
+                (ionescuStepKernel (A := A) (O := O) π κ)).map
+                  (fun x : (n : Nat) → ionescuTrajectoryState A O n =>
+                    (Preorder.frestrictLe t x, x (t + 1))))
+                (s ×ˢ ({e} : Set (ionescuTrajectoryState A O (t + 1)))) =
+              (((ProbabilityTheory.Kernel.trajMeasure
+                (ionescuInitialMeasure (A := A) (O := O))
+                (ionescuStepKernel (A := A) (O := O) π κ)).map
+                  (fun x : (n : Nat) → ionescuTrajectoryState A O n =>
+                    Preorder.frestrictLe t x)) ⊗ₘ
+                ionescuStepKernel (A := A) (O := O) π κ t)
+                (s ×ˢ ({e} : Set (ionescuTrajectoryState A O (t + 1))))
+            rw [ProbabilityTheory.Kernel.map_frestrictLe_trajMeasure_compProd_eq_map_trajMeasure]
+    _ =
+          ∫⁻ y in s, K y ({e} : Set (ionescuTrajectoryState A O (t + 1)))
+            ∂(M.map (fun x : (n : Nat) → ionescuTrajectoryState A O n =>
+              Preorder.frestrictLe t x)) := by
+            exact MeasureTheory.Measure.compProd_apply_prod
+              (μ := M.map (fun x : (n : Nat) → ionescuTrajectoryState A O n =>
+                Preorder.frestrictLe t x))
+              (κ := K) hs he
+    _ =
+          ∫⁻ _ in s, π h a * κ h a o
+            ∂(M.map (fun x : (n : Nat) → ionescuTrajectoryState A O n =>
+              Preorder.frestrictLe t x)) := by
+            apply MeasureTheory.setLIntegral_congr_fun hs
+            intro y hy
+            have hyPrefix :
+                ionescuIicPrefix (A := A) (O := O) t y = h := hy
+            change
+              ionescuStepKernel (A := A) (O := O) π κ t y
+                  ({(a, o)} : Set (ionescuTrajectoryState A O (t + 1))) =
+                π h a * κ h a o
+            rw [ionescuStepKernel_singleton_apply (A := A) (O := O) π κ t y a o,
+              hyPrefix]
+    _ =
+          (π h a * κ h a o) *
+            (M.map (fun x : (n : Nat) → ionescuTrajectoryState A O n =>
+              Preorder.frestrictLe t x)) s := by
+            rw [MeasureTheory.setLIntegral_const]
+    _ =
+          M {x | ionescuStreamPrefix (A := A) (O := O) x t = h} *
+            π h a * κ h a o := by
+            rw [hMapPrefix]
+            ac_rfl
+
+theorem ionescuTrajectoryMeasure_streamPrefix_eq_histPMF
+    (π : CountablePolicy A O) (κ : CountableKernel A O) :
+    ∀ t h,
+      ionescuTrajectoryMeasure (A := A) (O := O) π κ
+          {x | ionescuStreamPrefix (A := A) (O := O) x t = h} =
+        histPMF π κ t h := by
+  intro t
+  induction t with
+  | zero =>
+      intro h
+      cases h with
+      | nil =>
+          simp [ionescuStreamPrefix, histPMF]
+      | cons e es =>
+          have hEmpty :
+              {x : (n : Nat) → ionescuTrajectoryState A O n |
+                ionescuStreamPrefix (A := A) (O := O) x 0 = e :: es} = ∅ := by
+            ext x
+            simp [ionescuStreamPrefix]
+          rw [hEmpty]
+          simp [histPMF]
+  | succ t ih =>
+      intro hNext
+      by_cases hNil : hNext = []
+      · subst hNext
+        have hEmpty :
+            {x : (n : Nat) → ionescuTrajectoryState A O n |
+              ionescuStreamPrefix (A := A) (O := O) x (t + 1) = []} = ∅ := by
+          ext x
+          constructor
+          · intro hx
+            have hLen := congrArg List.length hx
+            simp [ionescuStreamPrefix_length] at hLen
+          · intro hx
+            cases hx
+        have hHist :
+            histPMF π κ (t + 1) ([] : CountHist A O) = 0 := by
+          exact histPMF_eq_zero_of_length_ne
+            (π := π) (κ := κ) (t := t + 1) (h := ([] : CountHist A O))
+            (by simp)
+        rw [hEmpty, hHist]
+        simp
+      · let h := hNext.dropLast
+        let e := hNext.getLast hNil
+        have hDecomp : appendEvent h e = hNext := by
+          simpa [h, e, appendEvent] using (List.dropLast_append_getLast hNil)
+        rw [← hDecomp]
+        rcases e with ⟨a, o⟩
+        rw [ionescuTrajectoryMeasure_streamPrefix_appendEvent (A := A) (O := O) π κ t h a o,
+          ih h, histPMF_appendEvent]
+
+/--
+The countable Ionescu-Tulcea construction bundled as the public infinite
+trajectory-law contract consumed by the Section 6 convergence layer.
+-/
+noncomputable def ionescuInfiniteTrajectoryLaw
+    (π : CountablePolicy A O) (κ : CountableKernel A O) :
+    InfiniteTrajectoryLaw (A := A) (O := O) π κ where
+  measure := ionescuInfiniteTrajectoryMeasure (A := A) (O := O) π κ
+  isProbabilityMeasure :=
+    ionescuInfiniteTrajectoryMeasure_isProbabilityMeasure (A := A) (O := O) π κ
+  prefix_cylinder_eq_histPMF := by
+    intro t h
+    rw [ionescuInfiniteTrajectoryMeasure]
+    rw [MeasureTheory.Measure.map_apply
+      (measurable_ionescuStreamToInfiniteTrajectory (A := A) (O := O))
+      (measurableSet_infinitePrefixCylinderAt (A := A) (O := O) t h)]
+    change
+      ionescuTrajectoryMeasure (A := A) (O := O) π κ
+          {x | ionescuStreamPrefix (A := A) (O := O) x t = h} =
+        histPMF π κ t h
+    exact ionescuTrajectoryMeasure_streamPrefix_eq_histPMF
+      (A := A) (O := O) π κ t h
+
+/-- Environment-specialized Ionescu-Tulcea infinite Bayes/Gibbs trajectory law. -/
+noncomputable def infiniteBayesGibbsTrajectoryLaw_of_ionescu
+    (U : CountablePrefixMachine A O)
+    (π : CountablePolicy A O) (penv : U.Program) :
+    InfiniteBayesGibbsTrajectoryLaw (A := A) (O := O) U π penv :=
+  ionescuInfiniteTrajectoryLaw (A := A) (O := O) π (U.programSemantics penv)
+
+end CountablePrefixMachine
 
 end CountableConcrete
 
@@ -452,6 +721,53 @@ theorem listWeightedSum_div_right {α : Type u}
       simp [listWeightedSum_cons, ih]
       ring
 
+theorem listWeightedSum_nonneg {α : Type u}
+    (xs : List α) (f : α → Rat)
+    (hf : ∀ a, a ∈ xs → 0 ≤ f a) :
+    0 ≤ listWeightedSum xs f := by
+  induction xs with
+  | nil =>
+      simp [listWeightedSum]
+  | cons x xs ih =>
+      have hx : 0 ≤ f x := hf x (by simp)
+      have hxs : 0 ≤ listWeightedSum xs f := by
+        exact ih (fun a ha => hf a (by simp [ha]))
+      rw [listWeightedSum_cons]
+      linarith
+
+theorem listWeightedSum_eq_zero_of_nonneg_of_mem {α : Type u}
+    {xs : List α} {f : α → Rat}
+    (hf : ∀ a, a ∈ xs → 0 ≤ f a)
+    (hsum : listWeightedSum xs f = 0)
+    {a : α} (ha : a ∈ xs) :
+    f a = 0 := by
+  induction xs with
+  | nil =>
+      simp at ha
+  | cons x xs ih =>
+      rw [listWeightedSum_cons] at hsum
+      have hxNonneg : 0 ≤ f x := hf x (by simp)
+      have htailNonneg : 0 ≤ listWeightedSum xs f :=
+        listWeightedSum_nonneg xs f (fun y hy => hf y (by simp [hy]))
+      have hxZero : f x = 0 := by
+        linarith
+      have htailZero : listWeightedSum xs f = 0 := by
+        linarith
+      rcases List.mem_cons.1 ha with hax | hax
+      · subst hax
+        exact hxZero
+      · exact ih (fun y hy => hf y (by simp [hy])) htailZero hax
+
+theorem listWeightedSum_const_mul {α : Type u}
+    (xs : List α) (c : Rat) (f : α → Rat) :
+    listWeightedSum xs (fun a => c * f a) = c * listWeightedSum xs f := by
+  induction xs with
+  | nil =>
+      simp [listWeightedSum]
+  | cons x xs ih =>
+      simp [listWeightedSum_cons, ih]
+      ring
+
 theorem listWeightedSum_filter_eq {α : Type u}
     (xs : List α) (C : α → Prop) [DecidablePred C] (f : α → Rat) :
     listWeightedSum (xs.filter C) f =
@@ -475,6 +791,30 @@ theorem listWeightedSum_filter_cond_eq {α : Type u}
       by_cases hC : C x
       · simp [listWeightedSum_cons, hC, ih]
       · simp [listWeightedSum_cons, hC, ih]
+
+theorem listWeightedSum_filter_not_cond_eq {α : Type u}
+    (xs : List α) (C : α → Prop) [DecidablePred C] (f : α → Rat) :
+    listWeightedSum (xs.filter (fun a => ¬ C a))
+        (fun a => if C a then 0 else f a) =
+      listWeightedSum (xs.filter (fun a => ¬ C a)) f := by
+  simpa [not_not] using
+    (listWeightedSum_filter_cond_eq
+      (xs := xs) (C := fun a => ¬ C a) (f := f))
+
+theorem listWeightedSum_filter_add_filter_not {α : Type u}
+    (xs : List α) (C : α → Prop) [DecidablePred C] (f : α → Rat) :
+    listWeightedSum xs f =
+      listWeightedSum (xs.filter C) f +
+        listWeightedSum (xs.filter (fun a => ¬ C a)) f := by
+  induction xs with
+  | nil =>
+      simp [listWeightedSum]
+  | cons x xs ih =>
+      by_cases hC : C x
+      · simp [listWeightedSum_cons, hC, ih]
+        ring
+      · simp [listWeightedSum_cons, hC, ih]
+        ring
 
 theorem finset_sum_toFinset_eq_listWeightedSum {α : Type u} [DecidableEq α]
     (xs : List α) (hxs : xs.Nodup) (f : α → Rat) :
@@ -690,6 +1030,97 @@ theorem histLaw_snoc_mass
     _ = (histLaw π κ t).mass h * ((π t h).mass a * (κ t h a).mass o) := hmem
     _ = (histLaw π κ t).mass h * (π t h).mass a * (κ t h a).mass o := by
         ring
+
+theorem bayesNumeratorLaw_snoc_mass
+    (U : ConcretePrefixMachine A O)
+    (π : ConcretePolicy A O)
+    (hπN : PolicySupportNodup π)
+    (hSemN : ∀ c hc, KernelSupportNodup (U.semantics c hc))
+    {t : Nat} (h : Hist A O t) (a : A) (o : O) (p : U.Program) :
+    (U.bayesNumeratorLaw π (asFullHist (snoc h (a, o)))).mass p =
+      (π t h).mass a *
+        ((U.bayesNumeratorLaw π (asFullHist h)).mass p *
+          (programObsLaw (asFullHist h) a (U.toEncodedProgram p)).mass o) := by
+  have hSnoc :=
+    histLaw_snoc_mass π (U.programSemantics p) hπN
+      (by
+        simpa [ConcretePrefixMachine.programSemantics] using hSemN p.1 p.2)
+      h a o
+  simp only [ConcretePrefixMachine.bayesNumeratorLaw, ConcretePrefixMachine.likelihood,
+    programObsLaw, ConcretePrefixMachine.toEncodedProgram, asFullHist]
+  rw [hSnoc]
+  ring
+
+theorem bayesNumeratorClassMass_snoc_eq
+    (U : ConcretePrefixMachine A O)
+    (π : ConcretePolicy A O)
+    (hπN : PolicySupportNodup π)
+    (hSemN : ∀ c hc, KernelSupportNodup (U.semantics c hc))
+    {t : Nat} (h : Hist A O t) (a : A) (o : O)
+    (C : PredSet U.Program) [DecidablePred C] :
+    ConcreteLaw.classMass (U.bayesNumeratorLaw π (asFullHist (snoc h (a, o)))) C =
+      (π t h).mass a *
+        listWeightedSum (U.allPrograms.filter C)
+          (fun p =>
+            (U.bayesNumeratorLaw π (asFullHist h)).mass p *
+              (programObsLaw (asFullHist h) a (U.toEncodedProgram p)).mass o) := by
+  classical
+  unfold ConcreteLaw.classMass ConcreteLaw.totalMass ConcreteLaw.restrict
+  simp only [ConcretePrefixMachine.bayesNumeratorLaw]
+  rw [listWeightedSum_filter_cond_eq]
+  calc
+    listWeightedSum (U.allPrograms.filter C)
+        (fun p =>
+          (U.bayesNumeratorLaw π (asFullHist (snoc h (a, o)))).mass p) =
+      listWeightedSum (U.allPrograms.filter C)
+        (fun p =>
+          (π t h).mass a *
+            ((U.bayesNumeratorLaw π (asFullHist h)).mass p *
+              (programObsLaw (asFullHist h) a (U.toEncodedProgram p)).mass o)) := by
+        refine congrArg (listWeightedSum (U.allPrograms.filter C)) ?_
+        funext p
+        exact U.bayesNumeratorLaw_snoc_mass π hπN hSemN h a o p
+    _ =
+      (π t h).mass a *
+        listWeightedSum (U.allPrograms.filter C)
+          (fun p =>
+            (U.bayesNumeratorLaw π (asFullHist h)).mass p *
+              (programObsLaw (asFullHist h) a (U.toEncodedProgram p)).mass o) := by
+        exact listWeightedSum_const_mul _ _ _
+
+theorem evidence_snoc_eq
+    (U : ConcretePrefixMachine A O)
+    (π : ConcretePolicy A O)
+    (hπN : PolicySupportNodup π)
+    (hSemN : ∀ c hc, KernelSupportNodup (U.semantics c hc))
+    {t : Nat} (h : Hist A O t) (a : A) (o : O) :
+    U.evidence π (asFullHist (snoc h (a, o))) =
+      (π t h).mass a *
+        listWeightedSum U.allPrograms
+          (fun p =>
+            (U.bayesNumeratorLaw π (asFullHist h)).mass p *
+              (programObsLaw (asFullHist h) a (U.toEncodedProgram p)).mass o) := by
+  classical
+  unfold ConcretePrefixMachine.evidence ConcreteLaw.totalMass
+  calc
+    listWeightedSum (U.bayesNumeratorLaw π (asFullHist (snoc h (a, o)))).support
+        (U.bayesNumeratorLaw π (asFullHist (snoc h (a, o)))).mass =
+      listWeightedSum U.allPrograms
+        (fun p =>
+          (π t h).mass a *
+            ((U.bayesNumeratorLaw π (asFullHist h)).mass p *
+              (programObsLaw (asFullHist h) a (U.toEncodedProgram p)).mass o)) := by
+        simp only [ConcretePrefixMachine.bayesNumeratorLaw]
+        refine congrArg (listWeightedSum U.allPrograms) ?_
+        funext p
+        exact U.bayesNumeratorLaw_snoc_mass π hπN hSemN h a o p
+    _ =
+      (π t h).mass a *
+        listWeightedSum U.allPrograms
+          (fun p =>
+            (U.bayesNumeratorLaw π (asFullHist h)).mass p *
+              (programObsLaw (asFullHist h) a (U.toEncodedProgram p)).mass o) := by
+        exact listWeightedSum_const_mul _ _ _
 
 theorem histLaw_mass_nonneg
     (π : ConcretePolicy A O) (κ : ConcreteKernel A O)
@@ -1269,6 +1700,332 @@ theorem posteriorClassMass_eq_bayesNumeratorClassMass_div_evidence
     funext a
     by_cases hCa : C a <;> simp [hCa]
 
+theorem oneStepClassObservationMass_eq_posterior_weighted_obs_of_class_ne_zero
+    (U : ConcretePrefixMachine A O)
+    (π : ConcretePolicy A O) (h : FullHist A O) (a : A)
+    (C : PredSet U.Program) [DecidablePred C] (o : O)
+    (hClass : U.posteriorClassMass π h C ≠ 0) :
+    U.oneStepClassObservationMass π h a C o =
+      listWeightedSum (U.allPrograms.filter C)
+        (fun p => (U.posteriorLaw π h).mass p *
+          (programObsLaw h a (U.toEncodedProgram p)).mass o) := by
+  classical
+  let mC : Rat := U.posteriorClassMass π h C
+  have hmC : mC ≠ 0 := by simpa [mC] using hClass
+  have hDiv :
+      listWeightedSum U.allPrograms
+          (fun p =>
+            ((if C p then (U.posteriorLaw π h).mass p else 0) / mC) *
+              (programObsLaw h a (U.toEncodedProgram p)).mass o) =
+        listWeightedSum U.allPrograms
+          (fun p =>
+            (if C p then
+              (U.posteriorLaw π h).mass p *
+                (programObsLaw h a (U.toEncodedProgram p)).mass o
+             else 0)) / mC := by
+    rw [← listWeightedSum_div_right]
+    refine congrArg (listWeightedSum U.allPrograms) ?_
+    funext p
+    by_cases hCp : C p
+    · simp [hCp]
+      ring
+    · simp [hCp]
+  calc
+    U.oneStepClassObservationMass π h a C o =
+        mC *
+          listWeightedSum U.allPrograms
+            (fun p =>
+              ((if C p then (U.posteriorLaw π h).mass p else 0) / mC) *
+                (programObsLaw h a (U.toEncodedProgram p)).mass o) := by
+          simp [ConcretePrefixMachine.oneStepClassObservationMass,
+            ConcretePrefixMachine.predictiveLawInClass,
+            ConcretePrefixMachine.posteriorWithinClass, mixLaw,
+            ConcretePrefixMachine.normalizeOnPrograms, ConcreteLaw.restrict,
+            mC, hmC]
+    _ =
+        mC *
+          (listWeightedSum U.allPrograms
+            (fun p =>
+              (if C p then
+                (U.posteriorLaw π h).mass p *
+                  (programObsLaw h a (U.toEncodedProgram p)).mass o
+               else 0)) / mC) := by
+          rw [hDiv]
+    _ =
+        listWeightedSum U.allPrograms
+          (fun p =>
+            (if C p then
+              (U.posteriorLaw π h).mass p *
+                (programObsLaw h a (U.toEncodedProgram p)).mass o
+             else 0)) := by
+          field_simp [hmC]
+    _ =
+        listWeightedSum (U.allPrograms.filter C)
+          (fun p => (U.posteriorLaw π h).mass p *
+            (programObsLaw h a (U.toEncodedProgram p)).mass o) := by
+          rw [listWeightedSum_filter_eq]
+
+theorem oneStepComplementObservationMass_eq_posterior_weighted_obs_of_complement_ne_zero
+    (U : ConcretePrefixMachine A O)
+    (π : ConcretePolicy A O) (h : FullHist A O) (a : A)
+    (C : PredSet U.Program) [DecidablePred C] (o : O)
+    (hComp : U.complementPosteriorMass π h C ≠ 0) :
+    U.oneStepComplementObservationMass π h a C o =
+      listWeightedSum (U.allPrograms.filter (fun p => ¬ C p))
+        (fun p => (U.posteriorLaw π h).mass p *
+          (programObsLaw h a (U.toEncodedProgram p)).mass o) := by
+  classical
+  simpa [ConcretePrefixMachine.oneStepComplementObservationMass,
+    ConcretePrefixMachine.complementPosteriorMass,
+    ConcretePrefixMachine.predictiveLawOutsideClass,
+    ConcretePrefixMachine.posteriorOutsideClass] using
+    U.oneStepClassObservationMass_eq_posterior_weighted_obs_of_class_ne_zero
+      π h a (fun p => ¬ C p) o hComp
+
+theorem oneStepClassObservationMass_eq_bayesNumerator_obs_div_evidence_of_class_ne_zero
+    (U : ConcretePrefixMachine A O)
+    (π : ConcretePolicy A O) (h : FullHist A O) (a : A)
+    (C : PredSet U.Program) [DecidablePred C] (o : O)
+    (hClass : U.posteriorClassMass π h C ≠ 0) :
+    U.oneStepClassObservationMass π h a C o =
+      listWeightedSum (U.allPrograms.filter C)
+        (fun p =>
+          (U.bayesNumeratorLaw π h).mass p *
+            (programObsLaw h a (U.toEncodedProgram p)).mass o) /
+        U.evidence π h := by
+  classical
+  have hEvidenceNe : U.evidence π h ≠ 0 := by
+    intro hZ
+    apply hClass
+    rw [U.posteriorClassMass_eq_bayesNumeratorClassMass_div_evidence π h C]
+    simp [hZ]
+  rw [U.oneStepClassObservationMass_eq_posterior_weighted_obs_of_class_ne_zero
+    π h a C o hClass]
+  rw [← listWeightedSum_div_right]
+  refine congrArg (listWeightedSum (U.allPrograms.filter C)) ?_
+  funext p
+  simp [ConcretePrefixMachine.posteriorLaw, ConcretePrefixMachine.normalizeOnPrograms,
+    hEvidenceNe]
+  ring
+
+theorem oneStepComplementObservationMass_eq_bayesNumerator_obs_div_evidence_of_complement_ne_zero
+    (U : ConcretePrefixMachine A O)
+    (π : ConcretePolicy A O) (h : FullHist A O) (a : A)
+    (C : PredSet U.Program) [DecidablePred C] (o : O)
+    (hComp : U.complementPosteriorMass π h C ≠ 0) :
+    U.oneStepComplementObservationMass π h a C o =
+      listWeightedSum (U.allPrograms.filter (fun p => ¬ C p))
+        (fun p =>
+          (U.bayesNumeratorLaw π h).mass p *
+            (programObsLaw h a (U.toEncodedProgram p)).mass o) /
+        U.evidence π h := by
+  classical
+  simpa [ConcretePrefixMachine.complementPosteriorMass,
+    ConcretePrefixMachine.oneStepComplementObservationMass,
+    ConcretePrefixMachine.predictiveLawOutsideClass,
+    ConcretePrefixMachine.posteriorOutsideClass] using
+    U.oneStepClassObservationMass_eq_bayesNumerator_obs_div_evidence_of_class_ne_zero
+      π h a (fun p => ¬ C p) o hComp
+
+theorem oneStepObservationEvidence_eq_bayesNumerator_obs_div_evidence_of_split_ne_zero
+    (U : ConcretePrefixMachine A O)
+    (π : ConcretePolicy A O) (h : FullHist A O) (a : A)
+    (C : PredSet U.Program) [DecidablePred C] (o : O)
+    (hClass : U.posteriorClassMass π h C ≠ 0)
+    (hComp : U.complementPosteriorMass π h C ≠ 0) :
+    U.oneStepObservationEvidence π h a C o =
+      listWeightedSum U.allPrograms
+        (fun p =>
+          (U.bayesNumeratorLaw π h).mass p *
+            (programObsLaw h a (U.toEncodedProgram p)).mass o) /
+        U.evidence π h := by
+  classical
+  rw [ConcretePrefixMachine.oneStepObservationEvidence,
+    U.oneStepClassObservationMass_eq_bayesNumerator_obs_div_evidence_of_class_ne_zero
+      π h a C o hClass,
+    U.oneStepComplementObservationMass_eq_bayesNumerator_obs_div_evidence_of_complement_ne_zero
+      π h a C o hComp]
+  rw [listWeightedSum_filter_add_filter_not (xs := U.allPrograms) (C := C)
+    (f := fun p =>
+      (U.bayesNumeratorLaw π h).mass p *
+        (programObsLaw h a (U.toEncodedProgram p)).mass o)]
+  ring
+
+theorem posteriorClassMass_snoc_eq_oneStepClassPosteriorMass_of_split_ne_zero
+    (U : ConcretePrefixMachine A O)
+    (π : ConcretePolicy A O)
+    (hπN : PolicySupportNodup π)
+    (hSemN : ∀ c hc, KernelSupportNodup (U.semantics c hc))
+    {t : Nat} (h : Hist A O t) (a : A) (o : O)
+    (C : PredSet U.Program) [DecidablePred C]
+    (hAction : (π t h).mass a ≠ 0)
+    (hClass : U.posteriorClassMass π (asFullHist h) C ≠ 0)
+    (hComp : U.complementPosteriorMass π (asFullHist h) C ≠ 0) :
+    U.posteriorClassMass π (asFullHist (snoc h (a, o))) C =
+      U.oneStepClassPosteriorMass π (asFullHist h) a C o := by
+  classical
+  let f : U.Program → Rat :=
+    fun p =>
+      (U.bayesNumeratorLaw π (asFullHist h)).mass p *
+        (programObsLaw (asFullHist h) a (U.toEncodedProgram p)).mass o
+  let sC : Rat := listWeightedSum (U.allPrograms.filter C) f
+  let sT : Rat := listWeightedSum U.allPrograms f
+  have hEvidenceOldNe : U.evidence π (asFullHist h) ≠ 0 := by
+    intro hZ
+    apply hClass
+    rw [U.posteriorClassMass_eq_bayesNumeratorClassMass_div_evidence π (asFullHist h) C]
+    simp [hZ]
+  have hClassObs :
+      U.oneStepClassObservationMass π (asFullHist h) a C o =
+        sC / U.evidence π (asFullHist h) := by
+    simpa [sC, f] using
+      U.oneStepClassObservationMass_eq_bayesNumerator_obs_div_evidence_of_class_ne_zero
+        π (asFullHist h) a C o hClass
+  have hObsEvidence :
+      U.oneStepObservationEvidence π (asFullHist h) a C o =
+        sT / U.evidence π (asFullHist h) := by
+    simpa [sT, f] using
+      U.oneStepObservationEvidence_eq_bayesNumerator_obs_div_evidence_of_split_ne_zero
+        π (asFullHist h) a C o hClass hComp
+  have hNextClassNum :
+      ConcreteLaw.classMass
+          (U.bayesNumeratorLaw π (asFullHist (snoc h (a, o)))) C =
+        (π t h).mass a * sC := by
+    simpa [sC, f] using
+      U.bayesNumeratorClassMass_snoc_eq π hπN hSemN h a o C
+  have hNextEvidence :
+      U.evidence π (asFullHist (snoc h (a, o))) =
+        (π t h).mass a * sT := by
+    simpa [sT, f] using
+      U.evidence_snoc_eq π hπN hSemN h a o
+  by_cases hTotal : sT = 0
+  · have hNextEvidenceZero :
+        U.evidence π (asFullHist (snoc h (a, o))) = 0 := by
+      simp [hNextEvidence, hTotal]
+    have hObsEvidenceZero :
+        U.oneStepObservationEvidence π (asFullHist h) a C o = 0 := by
+      simp [hObsEvidence, hTotal]
+    rw [U.posteriorClassMass_eq_bayesNumeratorClassMass_div_evidence
+      π (asFullHist (snoc h (a, o))) C]
+    simp [ConcretePrefixMachine.oneStepClassPosteriorMass, hNextEvidenceZero,
+      hObsEvidenceZero]
+  · have hNextEvidenceNe :
+        U.evidence π (asFullHist (snoc h (a, o))) ≠ 0 := by
+      rw [hNextEvidence]
+      exact mul_ne_zero hAction hTotal
+    have hObsEvidenceNe :
+        U.oneStepObservationEvidence π (asFullHist h) a C o ≠ 0 := by
+      rw [hObsEvidence]
+      exact div_ne_zero hTotal hEvidenceOldNe
+    rw [U.posteriorClassMass_eq_bayesNumeratorClassMass_div_evidence
+      π (asFullHist (snoc h (a, o))) C]
+    rw [ConcretePrefixMachine.oneStepClassPosteriorMass]
+    simp [hNextEvidenceNe, hObsEvidenceNe, hNextClassNum, hNextEvidence,
+      hClassObs, hObsEvidence]
+    field_simp [hAction, hTotal, hEvidenceOldNe]
+    simp [hAction, hTotal, hEvidenceOldNe]
+
+theorem complementPosteriorMass_snoc_eq_oneStepComplementPosteriorMass_of_split_ne_zero
+    (U : ConcretePrefixMachine A O)
+    (π : ConcretePolicy A O)
+    (hπN : PolicySupportNodup π)
+    (hSemN : ∀ c hc, KernelSupportNodup (U.semantics c hc))
+    {t : Nat} (h : Hist A O t) (a : A) (o : O)
+    (C : PredSet U.Program) [DecidablePred C]
+    (hAction : (π t h).mass a ≠ 0)
+    (hClass : U.posteriorClassMass π (asFullHist h) C ≠ 0)
+    (hComp : U.complementPosteriorMass π (asFullHist h) C ≠ 0) :
+    U.complementPosteriorMass π (asFullHist (snoc h (a, o))) C =
+      U.oneStepComplementPosteriorMass π (asFullHist h) a C o := by
+  classical
+  let f : U.Program → Rat :=
+    fun p =>
+      (U.bayesNumeratorLaw π (asFullHist h)).mass p *
+        (programObsLaw (asFullHist h) a (U.toEncodedProgram p)).mass o
+  let sComp : Rat := listWeightedSum (U.allPrograms.filter (fun p => ¬ C p)) f
+  let sT : Rat := listWeightedSum U.allPrograms f
+  have hEvidenceOldNe : U.evidence π (asFullHist h) ≠ 0 := by
+    intro hZ
+    apply hComp
+    rw [ConcretePrefixMachine.complementPosteriorMass]
+    rw [ConcretePrefixMachine.posteriorLaw]
+    rw [classMass_normalizeOnPrograms_eq (U := U)
+      (μ := U.bayesNumeratorLaw π (asFullHist h))
+      (Z := U.evidence π (asFullHist h)) (C := fun p => ¬ C p)]
+    simp [hZ]
+  have hCompObs :
+      U.oneStepComplementObservationMass π (asFullHist h) a C o =
+        sComp / U.evidence π (asFullHist h) := by
+    simpa [sComp, f] using
+      U.oneStepComplementObservationMass_eq_bayesNumerator_obs_div_evidence_of_complement_ne_zero
+        π (asFullHist h) a C o hComp
+  have hObsEvidence :
+      U.oneStepObservationEvidence π (asFullHist h) a C o =
+        sT / U.evidence π (asFullHist h) := by
+    simpa [sT, f] using
+      U.oneStepObservationEvidence_eq_bayesNumerator_obs_div_evidence_of_split_ne_zero
+        π (asFullHist h) a C o hClass hComp
+  have hNextCompNum :
+      ConcreteLaw.classMass
+          (U.bayesNumeratorLaw π (asFullHist (snoc h (a, o)))) (fun p => ¬ C p) =
+        (π t h).mass a * sComp := by
+    simpa [sComp, f] using
+      U.bayesNumeratorClassMass_snoc_eq π hπN hSemN h a o (fun p => ¬ C p)
+  have hNextCompNumList :
+      listWeightedSum (U.allPrograms.filter (fun p => ¬ C p))
+          (U.bayesNumeratorLaw π (asFullHist (snoc h (a, o)))).mass =
+        (π t h).mass a * sComp := by
+    rw [← hNextCompNum]
+    unfold ConcreteLaw.classMass ConcreteLaw.totalMass ConcreteLaw.restrict
+    simp only [ConcretePrefixMachine.bayesNumeratorLaw]
+    rw [← listWeightedSum_filter_cond_eq
+      (xs := U.allPrograms) (C := fun p => ¬ C p)
+      (f := fun p =>
+        U.universalPrior p *
+          U.likelihood π (asFullHist (snoc h (a, o))) p)]
+  have hNextCompNumListBool :
+      listWeightedSum (U.allPrograms.filter (fun p => !decide (C p)))
+          (U.bayesNumeratorLaw π (asFullHist (snoc h (a, o)))).mass =
+        (π t h).mass a * sComp := by
+    simpa [decide_not] using hNextCompNumList
+  have hNextEvidence :
+      U.evidence π (asFullHist (snoc h (a, o))) =
+        (π t h).mass a * sT := by
+    simpa [sT, f] using
+      U.evidence_snoc_eq π hπN hSemN h a o
+  by_cases hTotal : sT = 0
+  · have hNextEvidenceZero :
+        U.evidence π (asFullHist (snoc h (a, o))) = 0 := by
+      simp [hNextEvidence, hTotal]
+    have hObsEvidenceZero :
+        U.oneStepObservationEvidence π (asFullHist h) a C o = 0 := by
+      simp [hObsEvidence, hTotal]
+    rw [ConcretePrefixMachine.complementPosteriorMass]
+    rw [ConcretePrefixMachine.posteriorLaw]
+    rw [classMass_normalizeOnPrograms_eq (U := U)
+      (μ := U.bayesNumeratorLaw π (asFullHist (snoc h (a, o))))
+      (Z := U.evidence π (asFullHist (snoc h (a, o)))) (C := fun p => ¬ C p)]
+    simp [ConcretePrefixMachine.oneStepComplementPosteriorMass, hNextEvidenceZero,
+      hObsEvidenceZero]
+  · have hNextEvidenceNe :
+        U.evidence π (asFullHist (snoc h (a, o))) ≠ 0 := by
+      rw [hNextEvidence]
+      exact mul_ne_zero hAction hTotal
+    have hObsEvidenceNe :
+        U.oneStepObservationEvidence π (asFullHist h) a C o ≠ 0 := by
+      rw [hObsEvidence]
+      exact div_ne_zero hTotal hEvidenceOldNe
+    rw [ConcretePrefixMachine.complementPosteriorMass]
+    rw [ConcretePrefixMachine.posteriorLaw]
+    rw [classMass_normalizeOnPrograms_eq (U := U)
+      (μ := U.bayesNumeratorLaw π (asFullHist (snoc h (a, o))))
+      (Z := U.evidence π (asFullHist (snoc h (a, o)))) (C := fun p => ¬ C p)]
+    rw [ConcretePrefixMachine.oneStepComplementPosteriorMass]
+    simp [hNextEvidenceNe, hObsEvidenceNe, hNextCompNumListBool, hNextEvidence,
+      hCompObs, hObsEvidence]
+    field_simp [hAction, hTotal, hEvidenceOldNe]
+    simp [hAction, hTotal, hEvidenceOldNe]
+
 theorem observerFiberBayesNumeratorMass_toCountable_eq
     (U : ConcretePrefixMachine A O)
     (hCodes : U.CodesNodup)
@@ -1412,6 +2169,96 @@ theorem bayesNumeratorClassMass_nonneg
     · simp [hC, U.bayesNumeratorLaw_mass_nonneg π hπ hπN hSem hSemN h p]
     · simp [hC]
   exact Finset.sum_nonneg (fun p _ => hTermNonneg p)
+
+theorem evidence_nonneg
+    (U : ConcretePrefixMachine A O)
+    (hCodes : U.CodesNodup)
+    (π : ConcretePolicy A O) (hπ : ProbabilisticPolicy π)
+    (hπN : PolicySupportNodup π)
+    (hSem : ∀ c hc, ProbabilisticKernel (U.semantics c hc))
+    (hSemN : SemanticsSupportNodup U)
+    (h : FullHist A O) :
+    0 ≤ U.evidence π h := by
+  classical
+  letI := U.programFintype hCodes
+  rw [ConcretePrefixMachine.evidence, ConcreteLaw.totalMass,
+    ConcretePrefixMachine.bayesNumeratorLaw]
+  rw [← U.sum_programFintype_eq_listWeightedSum hCodes]
+  exact Finset.sum_nonneg
+    (fun p _ => by
+      simpa [ConcretePrefixMachine.bayesNumeratorLaw] using
+        U.bayesNumeratorLaw_mass_nonneg π hπ hπN hSem hSemN h p)
+
+theorem posteriorClassMass_nonneg
+    (U : ConcretePrefixMachine A O)
+    (hCodes : U.CodesNodup)
+    (π : ConcretePolicy A O) (hπ : ProbabilisticPolicy π)
+    (hπN : PolicySupportNodup π)
+    (hSem : ∀ c hc, ProbabilisticKernel (U.semantics c hc))
+    (hSemN : SemanticsSupportNodup U)
+    (h : FullHist A O)
+    (C : PredSet U.Program) [DecidablePred C] :
+    0 ≤ U.posteriorClassMass π h C := by
+  classical
+  rw [U.posteriorClassMass_eq_bayesNumeratorClassMass_div_evidence π h C]
+  by_cases hZ : U.evidence π h = 0
+  · simp [hZ]
+  · have hEvidenceNonneg := U.evidence_nonneg hCodes π hπ hπN hSem hSemN h
+    have hEvidencePos : 0 < U.evidence π h :=
+      lt_of_le_of_ne hEvidenceNonneg (Ne.symm hZ)
+    have hClassNonneg :=
+      U.bayesNumeratorClassMass_nonneg hCodes π hπ hπN hSem hSemN h C
+    simp [hZ, div_nonneg hClassNonneg (le_of_lt hEvidencePos)]
+
+theorem complementPosteriorMass_nonneg
+    (U : ConcretePrefixMachine A O)
+    (hCodes : U.CodesNodup)
+    (π : ConcretePolicy A O) (hπ : ProbabilisticPolicy π)
+    (hπN : PolicySupportNodup π)
+    (hSem : ∀ c hc, ProbabilisticKernel (U.semantics c hc))
+    (hSemN : SemanticsSupportNodup U)
+    (h : FullHist A O)
+    (C : PredSet U.Program) [DecidablePred C] :
+    0 ≤ U.complementPosteriorMass π h C := by
+  classical
+  simpa [ConcretePrefixMachine.complementPosteriorMass] using
+    U.posteriorClassMass_nonneg hCodes π hπ hπN hSem hSemN h (fun p => ¬ C p)
+
+theorem residualClassPosteriorOdds_nonneg
+    (U : ConcretePrefixMachine A O)
+    (hCodes : U.CodesNodup)
+    (π : ConcretePolicy A O) (hπ : ProbabilisticPolicy π)
+    (hπN : PolicySupportNodup π)
+    (hSem : ∀ c hc, ProbabilisticKernel (U.semantics c hc))
+    (hSemN : SemanticsSupportNodup U)
+    (h : FullHist A O)
+    (C : PredSet U.Program) [DecidablePred C] :
+    0 ≤ U.residualClassPosteriorOdds π h C := by
+  classical
+  unfold ConcretePrefixMachine.residualClassPosteriorOdds
+  by_cases hClassZero : U.posteriorClassMass π h C = 0
+  · simp [hClassZero]
+  · have hClassNonneg :=
+      U.posteriorClassMass_nonneg hCodes π hπ hπN hSem hSemN h C
+    have hCompNonneg :=
+      U.complementPosteriorMass_nonneg hCodes π hπ hπN hSem hSemN h C
+    simp [hClassZero, div_nonneg hCompNonneg hClassNonneg]
+
+theorem residualObserverFiberPosteriorOdds_nonneg
+    (U : ConcretePrefixMachine A O)
+    (hCodes : U.CodesNodup)
+    (π : ConcretePolicy A O) (hπ : ProbabilisticPolicy π)
+    (hπN : PolicySupportNodup π)
+    (hSem : ∀ c hc, ProbabilisticKernel (U.semantics c hc))
+    (hSemN : SemanticsSupportNodup U)
+    (h : FullHist A O)
+    (ω : Observer (EncodedProgram A O))
+    (pstar : EncodedProgram A O) :
+    0 ≤ U.residualObserverFiberPosteriorOdds π h ω pstar := by
+  classical
+  simpa [ConcretePrefixMachine.residualObserverFiberPosteriorOdds] using
+    U.residualClassPosteriorOdds_nonneg hCodes π hπ hπN hSem hSemN h
+      (U.observerFiber ω pstar)
 
 theorem bayesNumeratorClassMass_le_evidence
     (U : ConcretePrefixMachine A O)
@@ -1744,6 +2591,639 @@ theorem histPMF_mem_support_length
       have hPrevLen : hPrev.length = t := ih hPrevSupp
       simpa [hEq, hPrevLen, CountableConcrete.appendEvent_length]
 
+theorem histPMF_historyPrefix_mem_support
+    {π : CountableConcrete.CountablePolicy A O}
+    {κ : CountableConcrete.CountableKernel A O}
+    {T n : Nat} {ξ : CountableConcrete.CountHist A O}
+    (hSupp : ξ ∈ (CountableConcrete.histPMF π κ T).support)
+    (hn : n ≤ T) :
+    CountableConcrete.CountablePrefixMachine.historyPrefix ξ n ∈
+      (CountableConcrete.histPMF π κ n).support := by
+  induction T generalizing ξ n with
+  | zero =>
+      have hn0 : n = 0 := Nat.eq_zero_of_le_zero hn
+      subst n
+      simp [CountableConcrete.CountablePrefixMachine.historyPrefix,
+        CountableConcrete.histPMF]
+  | succ T ih =>
+      cases n with
+      | zero =>
+          simp [CountableConcrete.CountablePrefixMachine.historyPrefix,
+            CountableConcrete.histPMF]
+      | succ n =>
+          have hnLe : n ≤ T := Nat.succ_le_succ_iff.mp hn
+          by_cases hnEq : n = T
+          · subst n
+            have hLen : ξ.length = T + 1 :=
+              histPMF_mem_support_length hSupp
+            have hTake :
+                CountableConcrete.CountablePrefixMachine.historyPrefix ξ (T + 1) = ξ := by
+              exact (List.take_eq_self_iff ξ).2 (by simpa [hLen])
+            simpa [hTake] using hSupp
+          · have hnLt : n < T := lt_of_le_of_ne hnLe hnEq
+            rw [CountableConcrete.histPMF] at hSupp
+            rw [PMF.mem_support_bind_iff] at hSupp
+            rcases hSupp with ⟨hPrev, hPrevSupp, hActSupp⟩
+            rw [PMF.mem_support_bind_iff] at hActSupp
+            rcases hActSupp with ⟨a, haSupp, hObsSupp⟩
+            rw [PMF.mem_support_bind_iff] at hObsSupp
+            rcases hObsSupp with ⟨o, hoSupp, hPureSupp⟩
+            have hEq : ξ = CountableConcrete.appendEvent hPrev (a, o) := by
+              simpa using hPureSupp
+            have hPrevLen : hPrev.length = T :=
+              histPMF_mem_support_length hPrevSupp
+            have hTake :
+                CountableConcrete.CountablePrefixMachine.historyPrefix ξ (n + 1) =
+                  CountableConcrete.CountablePrefixMachine.historyPrefix hPrev (n + 1) := by
+              have hle : n + 1 ≤ hPrev.length := by
+                simpa [hPrevLen] using Nat.succ_le_of_lt hnLt
+              simp [CountableConcrete.CountablePrefixMachine.historyPrefix, hEq,
+                CountableConcrete.appendEvent, List.take_append_of_le_length hle]
+            rw [hTake]
+            exact ih hPrevSupp (Nat.succ_le_of_lt hnLt)
+
+theorem histPMF_appendEvent_mem_support_observation
+    {π : CountableConcrete.CountablePolicy A O}
+    {κ : CountableConcrete.CountableKernel A O}
+    {t : Nat} {h : CountableConcrete.CountHist A O} {a : A} {o : O}
+    (hSupp :
+      CountableConcrete.appendEvent h (a, o) ∈
+        (CountableConcrete.histPMF π κ (t + 1)).support) :
+    o ∈ (κ h a).support := by
+  rw [CountableConcrete.histPMF] at hSupp
+  rw [PMF.mem_support_bind_iff] at hSupp
+  rcases hSupp with ⟨hPrev, _hPrevSupp, hActSupp⟩
+  rw [PMF.mem_support_bind_iff] at hActSupp
+  rcases hActSupp with ⟨a', _haSupp, hObsSupp⟩
+  rw [PMF.mem_support_bind_iff] at hObsSupp
+  rcases hObsSupp with ⟨o', hoSupp, hPureSupp⟩
+  have hEq :
+      CountableConcrete.appendEvent h (a, o) =
+        CountableConcrete.appendEvent hPrev (a', o') := by
+    simpa using hPureSupp
+  rcases (ConcreteBridge.appendEvent_eq_appendEvent_iff _ _ _ _).1 hEq with
+    ⟨rfl, hEvent⟩
+  cases hEvent
+  exact hoSupp
+
+theorem histPMF_appendEvent_mem_support_action
+    {π : CountableConcrete.CountablePolicy A O}
+    {κ : CountableConcrete.CountableKernel A O}
+    {t : Nat} {h : CountableConcrete.CountHist A O} {a : A} {o : O}
+    (hSupp :
+      CountableConcrete.appendEvent h (a, o) ∈
+        (CountableConcrete.histPMF π κ (t + 1)).support) :
+    a ∈ (π h).support := by
+  rw [CountableConcrete.histPMF] at hSupp
+  rw [PMF.mem_support_bind_iff] at hSupp
+  rcases hSupp with ⟨hPrev, _hPrevSupp, hActSupp⟩
+  rw [PMF.mem_support_bind_iff] at hActSupp
+  rcases hActSupp with ⟨a', haSupp, hObsSupp⟩
+  rw [PMF.mem_support_bind_iff] at hObsSupp
+  rcases hObsSupp with ⟨o', _hoSupp, hPureSupp⟩
+  have hEq :
+      CountableConcrete.appendEvent h (a, o) =
+        CountableConcrete.appendEvent hPrev (a', o') := by
+    simpa using hPureSupp
+  rcases (ConcreteBridge.appendEvent_eq_appendEvent_iff _ _ _ _).1 hEq with
+    ⟨rfl, hEvent⟩
+  cases hEvent
+  exact haSupp
+
+omit [DecidableEq A] [DecidableEq O] in
+/--
+Finite-prefix agreement for an infinite trajectory law forces realized actions
+to lie in the policy support at every time, almost surely.
+
+The proof rules out, for each fixed `(h,a,o)`, the cylinder in which the next
+prefix is `appendEvent h (a,o)` while `a` is unsupported by `π h`: its mass is
+the finite recursive mass `histPMF (t+1) (appendEvent h (a,o))`, which factors
+through `π h a = 0`.
+-/
+theorem infiniteTrajectoryLaw_realized_action_mem_support
+    {π : CountableConcrete.CountablePolicy A O}
+    {κ : CountableConcrete.CountableKernel A O}
+    (P :
+      CountableConcrete.CountablePrefixMachine.InfiniteTrajectoryLaw
+        (A := A) (O := O) π κ) :
+    CountableConcrete.CountablePrefixMachine.InfiniteHasRealizedPolicySupportAtAllTimes
+      π P.measure := by
+  rw [CountableConcrete.CountablePrefixMachine.InfiniteHasRealizedPolicySupportAtAllTimes]
+  rw [MeasureTheory.ae_all_iff]
+  intro n
+  have hAvoid :
+      ∀ᵐ ξ ∂P.measure,
+        ∀ h : CountableConcrete.CountHist A O,
+        ∀ a : A,
+        ∀ o : O,
+          a ∉ (π h).support →
+            CountableConcrete.CountablePrefixMachine.infiniteHistoryPrefix ξ (n + 1) ≠
+              CountableConcrete.appendEvent h (a, o) := by
+    rw [MeasureTheory.ae_all_iff]
+    intro h
+    rw [MeasureTheory.ae_all_iff]
+    intro a
+    rw [MeasureTheory.ae_all_iff]
+    intro o
+    by_cases ha : a ∈ (π h).support
+    · exact Filter.Eventually.of_forall (fun _ hnot => False.elim (hnot ha))
+    · have hπ : π h a = 0 := by
+        simpa [PMF.mem_support_iff] using ha
+      have hMass :
+          P.measure
+              {ξ : CountableConcrete.CountablePrefixMachine.InfiniteTrajectory A O |
+                CountableConcrete.CountablePrefixMachine.infiniteHistoryPrefix ξ (n + 1) =
+                  CountableConcrete.appendEvent h (a, o)} = 0 := by
+        calc
+          P.measure
+              {ξ : CountableConcrete.CountablePrefixMachine.InfiniteTrajectory A O |
+                CountableConcrete.CountablePrefixMachine.infiniteHistoryPrefix ξ (n + 1) =
+                  CountableConcrete.appendEvent h (a, o)}
+              =
+                CountableConcrete.histPMF π κ (n + 1)
+                  (CountableConcrete.appendEvent h (a, o)) := by
+                simpa [CountableConcrete.CountablePrefixMachine.infinitePrefixCylinderAt] using
+                  P.prefix_cylinder_eq_histPMF (n + 1)
+                    (CountableConcrete.appendEvent h (a, o))
+          _ =
+                CountableConcrete.histPMF π κ n h * π h a * κ h a o := by
+                exact CountableConcrete.histPMF_appendEvent π κ n h a o
+          _ = 0 := by
+                simp [hπ]
+      have hAE :
+          ∀ᵐ ξ ∂P.measure,
+            ξ ∉
+              {ξ : CountableConcrete.CountablePrefixMachine.InfiniteTrajectory A O |
+                CountableConcrete.CountablePrefixMachine.infiniteHistoryPrefix ξ (n + 1) =
+                  CountableConcrete.appendEvent h (a, o)} :=
+        (MeasureTheory.measure_eq_zero_iff_ae_notMem
+          (μ := P.measure)
+          (s :=
+            {ξ : CountableConcrete.CountablePrefixMachine.InfiniteTrajectory A O |
+              CountableConcrete.CountablePrefixMachine.infiniteHistoryPrefix ξ (n + 1) =
+                CountableConcrete.appendEvent h (a, o)})).1 hMass
+      filter_upwards [hAE] with ξ hξ _hnot hPrefix
+      exact hξ hPrefix
+  filter_upwards [hAvoid] with ξ hξ
+  by_contra hUnsupported
+  have hPrefix :
+      CountableConcrete.CountablePrefixMachine.infiniteHistoryPrefix ξ (n + 1) =
+        CountableConcrete.appendEvent
+          (CountableConcrete.CountablePrefixMachine.infiniteHistoryPrefix ξ n)
+          (CountableConcrete.CountablePrefixMachine.infiniteRealizedAction ξ n,
+            CountableConcrete.CountablePrefixMachine.infiniteRealizedObservation ξ n) :=
+    CountableConcrete.CountablePrefixMachine.infiniteHistoryPrefix_succ_eq_appendEvent_realized
+      (A := A) (O := O) ξ n
+  exact
+    (hξ
+      (CountableConcrete.CountablePrefixMachine.infiniteHistoryPrefix ξ n)
+      (CountableConcrete.CountablePrefixMachine.infiniteRealizedAction ξ n)
+      (CountableConcrete.CountablePrefixMachine.infiniteRealizedObservation ξ n)
+      hUnsupported) hPrefix
+
+omit [DecidableEq A] [DecidableEq O] in
+/-- Environment-specialized form of realized action support for an infinite Bayes/Gibbs law. -/
+theorem infiniteBayesGibbsTrajectoryLaw_realized_action_mem_support
+    (U : CountableConcrete.CountablePrefixMachine A O)
+    (π : CountableConcrete.CountablePolicy A O)
+    (penv : U.Program)
+    (P :
+      CountableConcrete.CountablePrefixMachine.InfiniteBayesGibbsTrajectoryLaw
+        (A := A) (O := O) U π penv) :
+    CountableConcrete.CountablePrefixMachine.InfiniteHasRealizedPolicySupportAtAllTimes
+      π P.measure :=
+  infiniteTrajectoryLaw_realized_action_mem_support (A := A) (O := O) P
+
+omit [DecidableEq A] [DecidableEq O] in
+/--
+Constructed-law Hellinger spine for the Ionescu-Tulcea Bayes/Gibbs trajectory law.
+
+This is the first point where the H5 soft convergence route is specialized to
+the actual infinite law built from `π` and the realized environment `penv`,
+rather than to an arbitrary infinite trajectory measure. The all-time realized
+policy-support input is discharged by finite-prefix agreement of the constructed
+Ionescu law; the remaining inputs are exactly the semantic affinity ceiling and
+the Bayes/Gibbs Hellinger martingale/L¹ envelope obligations.
+-/
+theorem infiniteBayesGibbsTrajectoryLaw_of_ionescu_hellingerConvergenceSpine_of_affinityCeiling
+    (U : CountableConcrete.CountablePrefixMachine A O)
+    (π : CountableConcrete.CountablePolicy A O)
+    (penv : U.Program)
+    (ω : Observer (CountableConcrete.CountableEncodedProgram A O))
+    (pstar : CountableConcrete.CountableEncodedProgram A O)
+    {ℱ :
+      MeasureTheory.Filtration Nat
+        (inferInstance :
+          MeasurableSpace
+            (CountableConcrete.CountablePrefixMachine.InfiniteTrajectory A O))}
+    {C : ℝ≥0} {κ : ℝ}
+    (hM_martingale :
+      MeasureTheory.Martingale
+        (U.infiniteRealizedObserverFiberHellingerEnvelopeProcess π ω pstar)
+        ℱ
+        (CountableConcrete.CountablePrefixMachine.infiniteBayesGibbsTrajectoryLaw_of_ionescu
+          (A := A) (O := O) U π penv).measure)
+    (hM_bdd :
+      ∀ n,
+        MeasureTheory.eLpNorm
+            (U.infiniteRealizedObserverFiberHellingerEnvelopeProcess π ω pstar n) 1
+            (CountableConcrete.CountablePrefixMachine.infiniteBayesGibbsTrajectoryLaw_of_ionescu
+              (A := A) (O := O) U π penv).measure ≤
+          (C : ℝ≥0∞))
+    (hCeiling :
+      CountableConcrete.CountablePrefixMachine.InfiniteHasObserverFiberBhattacharyyaAffinityCeilingOnPolicySupport
+        U π ω pstar
+        (CountableConcrete.CountablePrefixMachine.infiniteBayesGibbsTrajectoryLaw_of_ionescu
+          (A := A) (O := O) U π penv).measure κ) :
+    HellingerConvergenceSpine
+      (CountableConcrete.CountablePrefixMachine.infiniteBayesGibbsTrajectoryLaw_of_ionescu
+        (A := A) (O := O) U π penv).measure
+      ℱ
+      (U.infiniteRealizedResidualOddsProcess π ω pstar)
+      (U.infiniteRealizedObserverFiberHellingerEnvelopeProcess π ω pstar)
+      (U.infiniteRealizedObserverFiberCumulativeBhattacharyyaSeparationProcess π ω pstar)
+      C := by
+  let P :
+      CountableConcrete.CountablePrefixMachine.InfiniteBayesGibbsTrajectoryLaw
+        (A := A) (O := O) U π penv :=
+    CountableConcrete.CountablePrefixMachine.infiniteBayesGibbsTrajectoryLaw_of_ionescu
+      (A := A) (O := O) U π penv
+  have hSupport :
+      CountableConcrete.CountablePrefixMachine.InfiniteHasRealizedPolicySupportAtAllTimes
+        π P.measure :=
+    infiniteBayesGibbsTrajectoryLaw_realized_action_mem_support
+      (A := A) (O := O) U π penv P
+  change
+    HellingerConvergenceSpine P.measure ℱ
+      (U.infiniteRealizedResidualOddsProcess π ω pstar)
+      (U.infiniteRealizedObserverFiberHellingerEnvelopeProcess π ω pstar)
+      (U.infiniteRealizedObserverFiberCumulativeBhattacharyyaSeparationProcess π ω pstar)
+      C
+  exact
+    U.hellingerConvergenceSpine_of_infiniteObserverFiberBhattacharyya_affinityCeiling_policySupport
+      π ω pstar hM_martingale hM_bdd hCeiling hSupport
+
+omit [DecidableEq A] [DecidableEq O] in
+/--
+Constructed-law Hellinger spine from the actual Bayes/Gibbs conditional-step
+identity.
+
+Compared with
+`infiniteBayesGibbsTrajectoryLaw_of_ionescu_hellingerConvergenceSpine_of_affinityCeiling`,
+this theorem does not expose the martingale or L¹-bound as assumptions.  The
+canonical prefix filtration is fixed, martingality is derived from the
+one-step conditional-expectation identity, L¹-boundedness is derived from the
+finite envelope bound, and cumulative separation divergence is derived from the
+affinity ceiling plus realized policy support of the constructed Ionescu law.
+-/
+theorem infiniteBayesGibbsTrajectoryLaw_of_ionescu_hellingerConvergenceSpine_of_condExp_affinityCeiling
+    (U : CountableConcrete.CountablePrefixMachine A O)
+    (π : CountableConcrete.CountablePolicy A O)
+    (penv : U.Program)
+    (ω : Observer (CountableConcrete.CountableEncodedProgram A O))
+    (pstar : CountableConcrete.CountableEncodedProgram A O)
+    {C : ℝ≥0} {κ : ℝ}
+    (hCondExp :
+      ∀ n,
+        U.infiniteRealizedObserverFiberHellingerEnvelopeProcess π ω pstar n =ᵐ[
+          (CountableConcrete.CountablePrefixMachine.infiniteBayesGibbsTrajectoryLaw_of_ionescu
+            (A := A) (O := O) U π penv).measure]
+          MeasureTheory.condExp
+            (CountableConcrete.CountablePrefixMachine.infinitePrefixMathlibFiltration
+              (A := A) (O := O) n)
+            (CountableConcrete.CountablePrefixMachine.infiniteBayesGibbsTrajectoryLaw_of_ionescu
+              (A := A) (O := O) U π penv).measure
+            (U.infiniteRealizedObserverFiberHellingerEnvelopeProcess π ω pstar (n + 1)))
+    (hBound :
+      ∀ n, ∀ᵐ ξ ∂
+        (CountableConcrete.CountablePrefixMachine.infiniteBayesGibbsTrajectoryLaw_of_ionescu
+          (A := A) (O := O) U π penv).measure,
+        ‖U.infiniteRealizedObserverFiberHellingerEnvelopeProcess π ω pstar n ξ‖ₑ ≤
+          (C : ℝ≥0∞))
+    (hCeiling :
+      CountableConcrete.CountablePrefixMachine.InfiniteHasObserverFiberBhattacharyyaAffinityCeilingOnPolicySupport
+        U π ω pstar
+        (CountableConcrete.CountablePrefixMachine.infiniteBayesGibbsTrajectoryLaw_of_ionescu
+          (A := A) (O := O) U π penv).measure κ) :
+    HellingerConvergenceSpine
+      (CountableConcrete.CountablePrefixMachine.infiniteBayesGibbsTrajectoryLaw_of_ionescu
+        (A := A) (O := O) U π penv).measure
+      (CountableConcrete.CountablePrefixMachine.infinitePrefixMathlibFiltration
+        (A := A) (O := O))
+      (U.infiniteRealizedResidualOddsProcess π ω pstar)
+      (U.infiniteRealizedObserverFiberHellingerEnvelopeProcess π ω pstar)
+      (U.infiniteRealizedObserverFiberCumulativeBhattacharyyaSeparationProcess π ω pstar)
+      C := by
+  let P :
+      CountableConcrete.CountablePrefixMachine.InfiniteBayesGibbsTrajectoryLaw
+        (A := A) (O := O) U π penv :=
+    CountableConcrete.CountablePrefixMachine.infiniteBayesGibbsTrajectoryLaw_of_ionescu
+      (A := A) (O := O) U π penv
+  have hSupport :
+      CountableConcrete.CountablePrefixMachine.InfiniteHasRealizedPolicySupportAtAllTimes
+        π P.measure :=
+    infiniteBayesGibbsTrajectoryLaw_realized_action_mem_support
+      (A := A) (O := O) U π penv P
+  have hFloor :
+      CountableConcrete.CountablePrefixMachine.InfiniteHasObserverFiberBhattacharyyaUniformSeparationFloor
+        U π ω pstar P.measure κ :=
+    U.infiniteHasObserverFiberBhattacharyyaUniformSeparationFloor_of_affinityCeiling_policySupport
+      π ω pstar hCeiling hSupport
+  have hDiverges :
+      ∀ᵐ ξ ∂P.measure,
+        Tendsto
+          (fun n =>
+            U.infiniteRealizedObserverFiberCumulativeBhattacharyyaSeparationProcess
+              π ω pstar n ξ)
+          atTop atTop :=
+    U.ae_infiniteRealizedObserverFiberCumulativeBhattacharyyaSeparation_tendsto_atTop_of_uniform_floor
+      π ω pstar hFloor
+  change
+    HellingerConvergenceSpine P.measure
+      (CountableConcrete.CountablePrefixMachine.infinitePrefixMathlibFiltration
+        (A := A) (O := O))
+      (U.infiniteRealizedResidualOddsProcess π ω pstar)
+      (U.infiniteRealizedObserverFiberHellingerEnvelopeProcess π ω pstar)
+      (U.infiniteRealizedObserverFiberCumulativeBhattacharyyaSeparationProcess π ω pstar)
+      C
+  exact
+    U.infiniteRealizedObserverFiberHellingerConvergenceSpine_of_condExp_succ
+      π ω pstar hCondExp hBound hDiverges
+
+omit [DecidableEq A] [DecidableEq O] in
+/--
+Constructed-law true-environment Hellinger spine for the Ionescu-Tulcea
+Bayes/Gibbs trajectory law.
+
+This is the caveat-free constructed-law route: the envelope score is normalized
+against the actual program kernel `programSemantics penv`, not against the
+observer-fiber in-class predictive mixture.
+-/
+theorem infiniteBayesGibbsTrajectoryLaw_of_ionescu_trueLawHellingerConvergenceSpine_of_condExp_affinityCeiling
+    (U : CountableConcrete.CountablePrefixMachine A O)
+    (π : CountableConcrete.CountablePolicy A O)
+    (penv : U.Program)
+    (ω : Observer (CountableConcrete.CountableEncodedProgram A O))
+    (pstar : CountableConcrete.CountableEncodedProgram A O)
+    {C : ℝ≥0} {κ : ℝ}
+    (hCondExp :
+      ∀ n,
+        U.infiniteRealizedObserverFiberTrueLawHellingerEnvelopeProcess
+            π penv ω pstar n =ᵐ[
+          (CountableConcrete.CountablePrefixMachine.infiniteBayesGibbsTrajectoryLaw_of_ionescu
+            (A := A) (O := O) U π penv).measure]
+          MeasureTheory.condExp
+            (CountableConcrete.CountablePrefixMachine.infinitePrefixMathlibFiltration
+              (A := A) (O := O) n)
+            (CountableConcrete.CountablePrefixMachine.infiniteBayesGibbsTrajectoryLaw_of_ionescu
+              (A := A) (O := O) U π penv).measure
+            (U.infiniteRealizedObserverFiberTrueLawHellingerEnvelopeProcess
+              π penv ω pstar (n + 1)))
+    (hBound :
+      ∀ n, ∀ᵐ ξ ∂
+        (CountableConcrete.CountablePrefixMachine.infiniteBayesGibbsTrajectoryLaw_of_ionescu
+          (A := A) (O := O) U π penv).measure,
+        ‖U.infiniteRealizedObserverFiberTrueLawHellingerEnvelopeProcess
+            π penv ω pstar n ξ‖ₑ ≤
+          (C : ℝ≥0∞))
+    (hCeiling :
+      CountableConcrete.CountablePrefixMachine.InfiniteHasObserverFiberTrueLawHellingerAffinityCeilingOnPolicySupport
+        U π penv ω pstar
+        (CountableConcrete.CountablePrefixMachine.infiniteBayesGibbsTrajectoryLaw_of_ionescu
+          (A := A) (O := O) U π penv).measure κ) :
+    HellingerConvergenceSpine
+      (CountableConcrete.CountablePrefixMachine.infiniteBayesGibbsTrajectoryLaw_of_ionescu
+        (A := A) (O := O) U π penv).measure
+      (CountableConcrete.CountablePrefixMachine.infinitePrefixMathlibFiltration
+        (A := A) (O := O))
+      (U.infiniteRealizedResidualOddsProcess π ω pstar)
+      (U.infiniteRealizedObserverFiberTrueLawHellingerEnvelopeProcess π penv ω pstar)
+      (U.infiniteRealizedObserverFiberTrueLawCumulativeHellingerSeparationProcess
+        π penv ω pstar)
+      C := by
+  let P :
+      CountableConcrete.CountablePrefixMachine.InfiniteBayesGibbsTrajectoryLaw
+        (A := A) (O := O) U π penv :=
+    CountableConcrete.CountablePrefixMachine.infiniteBayesGibbsTrajectoryLaw_of_ionescu
+      (A := A) (O := O) U π penv
+  have hSupport :
+      CountableConcrete.CountablePrefixMachine.InfiniteHasRealizedPolicySupportAtAllTimes
+        π P.measure :=
+    infiniteBayesGibbsTrajectoryLaw_realized_action_mem_support
+      (A := A) (O := O) U π penv P
+  change
+    HellingerConvergenceSpine P.measure
+      (CountableConcrete.CountablePrefixMachine.infinitePrefixMathlibFiltration
+        (A := A) (O := O))
+      (U.infiniteRealizedResidualOddsProcess π ω pstar)
+      (U.infiniteRealizedObserverFiberTrueLawHellingerEnvelopeProcess π penv ω pstar)
+      (U.infiniteRealizedObserverFiberTrueLawCumulativeHellingerSeparationProcess
+        π penv ω pstar)
+      C
+  exact
+    U.infiniteRealizedObserverFiberTrueLawHellingerConvergenceSpine_of_condExp_affinityCeiling
+      π penv ω pstar hCondExp hBound hCeiling hSupport
+
+omit [DecidableEq A] [DecidableEq O] in
+/--
+Constructed-law true-environment Hellinger spine from the actual martingale.
+
+Compared with
+`infiniteBayesGibbsTrajectoryLaw_of_ionescu_trueLawHellingerConvergenceSpine_of_condExp_affinityCeiling`,
+this theorem does not expose a public conditional-expectation hypothesis or a
+pointwise envelope bound.  All-time realized policy support is discharged by
+the Ionescu construction, and the uniform `L¹` envelope bound is derived from
+nonnegative martingality.
+-/
+theorem infiniteBayesGibbsTrajectoryLaw_of_ionescu_trueLawHellingerConvergenceSpine_of_martingale_affinityCeiling
+    (U : CountableConcrete.CountablePrefixMachine A O)
+    (π : CountableConcrete.CountablePolicy A O)
+    (penv : U.Program)
+    (ω : Observer (CountableConcrete.CountableEncodedProgram A O))
+    (pstar : CountableConcrete.CountableEncodedProgram A O)
+    {κ : ℝ}
+    (hM_martingale :
+      MeasureTheory.Martingale
+        (U.infiniteRealizedObserverFiberTrueLawHellingerEnvelopeProcess
+          π penv ω pstar)
+        (CountableConcrete.CountablePrefixMachine.infinitePrefixMathlibFiltration
+          (A := A) (O := O))
+        (CountableConcrete.CountablePrefixMachine.infiniteBayesGibbsTrajectoryLaw_of_ionescu
+          (A := A) (O := O) U π penv).measure)
+    (hCeiling :
+      CountableConcrete.CountablePrefixMachine.InfiniteHasObserverFiberTrueLawHellingerAffinityCeilingOnPolicySupport
+        U π penv ω pstar
+        (CountableConcrete.CountablePrefixMachine.infiniteBayesGibbsTrajectoryLaw_of_ionescu
+          (A := A) (O := O) U π penv).measure κ) :
+    ∃ C : ℝ≥0,
+      HellingerConvergenceSpine
+        (CountableConcrete.CountablePrefixMachine.infiniteBayesGibbsTrajectoryLaw_of_ionescu
+          (A := A) (O := O) U π penv).measure
+        (CountableConcrete.CountablePrefixMachine.infinitePrefixMathlibFiltration
+          (A := A) (O := O))
+        (U.infiniteRealizedResidualOddsProcess π ω pstar)
+        (U.infiniteRealizedObserverFiberTrueLawHellingerEnvelopeProcess π penv ω pstar)
+        (U.infiniteRealizedObserverFiberTrueLawCumulativeHellingerSeparationProcess
+          π penv ω pstar) C := by
+  let P :
+      CountableConcrete.CountablePrefixMachine.InfiniteBayesGibbsTrajectoryLaw
+        (A := A) (O := O) U π penv :=
+    CountableConcrete.CountablePrefixMachine.infiniteBayesGibbsTrajectoryLaw_of_ionescu
+      (A := A) (O := O) U π penv
+  have hSupport :
+      CountableConcrete.CountablePrefixMachine.InfiniteHasRealizedPolicySupportAtAllTimes
+        π P.measure :=
+    infiniteBayesGibbsTrajectoryLaw_realized_action_mem_support
+      (A := A) (O := O) U π penv P
+  change
+    ∃ C : ℝ≥0,
+      HellingerConvergenceSpine P.measure
+        (CountableConcrete.CountablePrefixMachine.infinitePrefixMathlibFiltration
+          (A := A) (O := O))
+        (U.infiniteRealizedResidualOddsProcess π ω pstar)
+        (U.infiniteRealizedObserverFiberTrueLawHellingerEnvelopeProcess π penv ω pstar)
+        (U.infiniteRealizedObserverFiberTrueLawCumulativeHellingerSeparationProcess
+          π penv ω pstar) C
+  exact
+    U.hellingerConvergenceSpine_of_infiniteObserverFiberTrueLawHellinger_affinityCeiling_policySupport_of_martingale
+      π penv ω pstar hM_martingale hCeiling hSupport
+
+omit [DecidableEq A] [DecidableEq O] in
+/--
+Constructed-law true-environment Hellinger spine from a raw Ionescu-coordinate
+martingale.
+
+This is the global lift from the shifted Ionescu process to the public
+infinite-trajectory theorem: the raw martingale is pushed through
+`ionescuStreamToInfiniteTrajectory`, adaptedness is supplied by the canonical
+prefix filtration, and the public `L¹` bound is then derived from nonnegative
+martingality by the downstream spine constructor.
+-/
+theorem infiniteBayesGibbsTrajectoryLaw_of_ionescu_trueLawHellingerConvergenceSpine_of_rawIonescuMartingale_affinityCeiling
+    (U : CountableConcrete.CountablePrefixMachine A O)
+    (π : CountableConcrete.CountablePolicy A O)
+    (penv : U.Program)
+    (ω : Observer (CountableConcrete.CountableEncodedProgram A O))
+    (pstar : CountableConcrete.CountableEncodedProgram A O)
+    {κ : ℝ}
+    (hRaw :
+      MeasureTheory.Martingale
+        (CountableConcrete.CountablePrefixMachine.ionescuPullbackInfiniteProcess
+          (A := A) (O := O)
+          (U.infiniteRealizedObserverFiberTrueLawHellingerEnvelopeProcess
+            π penv ω pstar))
+        (MeasureTheory.Filtration.piLE
+          (X := CountableConcrete.CountablePrefixMachine.ionescuTrajectoryState A O))
+        (CountableConcrete.CountablePrefixMachine.ionescuTrajectoryMeasure
+          (A := A) (O := O) π (U.programSemantics penv)))
+    (hCeiling :
+      CountableConcrete.CountablePrefixMachine.InfiniteHasObserverFiberTrueLawHellingerAffinityCeilingOnPolicySupport
+        U π penv ω pstar
+        (CountableConcrete.CountablePrefixMachine.infiniteBayesGibbsTrajectoryLaw_of_ionescu
+          (A := A) (O := O) U π penv).measure κ) :
+    ∃ C : ℝ≥0,
+      HellingerConvergenceSpine
+        (CountableConcrete.CountablePrefixMachine.infiniteBayesGibbsTrajectoryLaw_of_ionescu
+          (A := A) (O := O) U π penv).measure
+        (CountableConcrete.CountablePrefixMachine.infinitePrefixMathlibFiltration
+          (A := A) (O := O))
+        (U.infiniteRealizedResidualOddsProcess π ω pstar)
+        (U.infiniteRealizedObserverFiberTrueLawHellingerEnvelopeProcess π penv ω pstar)
+        (U.infiniteRealizedObserverFiberTrueLawCumulativeHellingerSeparationProcess
+          π penv ω pstar) C := by
+  let Y :=
+    U.infiniteRealizedObserverFiberTrueLawHellingerEnvelopeProcess π penv ω pstar
+  have hStrong :
+      MeasureTheory.StronglyAdapted
+        (CountableConcrete.CountablePrefixMachine.infinitePrefixMathlibFiltration
+          (A := A) (O := O)) Y :=
+    U.infiniteRealizedObserverFiberTrueLawHellingerEnvelopeProcess_stronglyAdapted_prefixFiltration
+      π penv ω pstar
+  have hM_push :
+      MeasureTheory.Martingale Y
+        (CountableConcrete.CountablePrefixMachine.infinitePrefixMathlibFiltration
+          (A := A) (O := O))
+        ((CountableConcrete.CountablePrefixMachine.ionescuTrajectoryMeasure
+          (A := A) (O := O) π (U.programSemantics penv)).map
+            (CountableConcrete.CountablePrefixMachine.ionescuStreamToInfiniteTrajectory
+              (A := A) (O := O))) :=
+    CountableConcrete.CountablePrefixMachine.martingale_infiniteTrajectory_of_ionescuPullback_martingale
+      (A := A) (O := O) hRaw hStrong
+  have hM_public :
+      MeasureTheory.Martingale Y
+        (CountableConcrete.CountablePrefixMachine.infinitePrefixMathlibFiltration
+          (A := A) (O := O))
+        (CountableConcrete.CountablePrefixMachine.infiniteBayesGibbsTrajectoryLaw_of_ionescu
+          (A := A) (O := O) U π penv).measure := by
+    simpa [Y,
+      CountableConcrete.CountablePrefixMachine.infiniteBayesGibbsTrajectoryLaw_of_ionescu,
+      CountableConcrete.CountablePrefixMachine.ionescuInfiniteTrajectoryLaw,
+      CountableConcrete.CountablePrefixMachine.ionescuInfiniteTrajectoryMeasure] using hM_push
+  exact
+    infiniteBayesGibbsTrajectoryLaw_of_ionescu_trueLawHellingerConvergenceSpine_of_martingale_affinityCeiling
+      (A := A) (O := O) U π penv ω pstar hM_public hCeiling
+
+theorem trajectoryLaw_historyPrefix_mem_support
+    (U : CountableConcrete.CountablePrefixMachine A O)
+    (π : CountableConcrete.CountablePolicy A O)
+    (penv : U.Program) {T n : Nat}
+    {ξ : CountableConcrete.CountablePrefixMachine.Trajectory A O}
+    (hξ : ξ ∈ (U.trajectoryLaw π penv T).support)
+    (hn : n ≤ T) :
+    CountableConcrete.CountablePrefixMachine.historyPrefix ξ n ∈
+      (CountableConcrete.histPMF π (U.programSemantics penv) n).support := by
+  exact histPMF_historyPrefix_mem_support
+    (π := π) (κ := U.programSemantics penv)
+    (T := T) (n := n) (ξ := ξ)
+    (by simpa [CountableConcrete.CountablePrefixMachine.trajectoryLaw] using hξ) hn
+
+theorem trajectoryLaw_realized_observation_mem_support
+    (U : CountableConcrete.CountablePrefixMachine A O)
+    (π : CountableConcrete.CountablePolicy A O)
+    (penv : U.Program) {T n : Nat}
+    {ξ : CountableConcrete.CountablePrefixMachine.Trajectory A O}
+    (hξ : ξ ∈ (U.trajectoryLaw π penv T).support)
+    (hn : n < T) {a : A} {o : O}
+    (hPrefix :
+      CountableConcrete.CountablePrefixMachine.historyPrefix ξ (n + 1) =
+        CountableConcrete.appendEvent
+          (CountableConcrete.CountablePrefixMachine.historyPrefix ξ n) (a, o)) :
+    o ∈ (U.programSemantics penv
+      (CountableConcrete.CountablePrefixMachine.historyPrefix ξ n) a).support := by
+  have hPrefSupp :
+      CountableConcrete.CountablePrefixMachine.historyPrefix ξ (n + 1) ∈
+        (CountableConcrete.histPMF π (U.programSemantics penv) (n + 1)).support :=
+    trajectoryLaw_historyPrefix_mem_support
+      (U := U) (π := π) (penv := penv) hξ (Nat.succ_le_of_lt hn)
+  rw [hPrefix] at hPrefSupp
+  exact histPMF_appendEvent_mem_support_observation
+    (π := π) (κ := U.programSemantics penv) (t := n)
+    (h := CountableConcrete.CountablePrefixMachine.historyPrefix ξ n)
+    (a := a) (o := o) hPrefSupp
+
+theorem trajectoryLaw_realized_action_mem_support
+    (U : CountableConcrete.CountablePrefixMachine A O)
+    (π : CountableConcrete.CountablePolicy A O)
+    (penv : U.Program) {T n : Nat}
+    {ξ : CountableConcrete.CountablePrefixMachine.Trajectory A O}
+    (hξ : ξ ∈ (U.trajectoryLaw π penv T).support)
+    (hn : n < T) {a : A} {o : O}
+    (hPrefix :
+      CountableConcrete.CountablePrefixMachine.historyPrefix ξ (n + 1) =
+        CountableConcrete.appendEvent
+          (CountableConcrete.CountablePrefixMachine.historyPrefix ξ n) (a, o)) :
+    a ∈ (π (CountableConcrete.CountablePrefixMachine.historyPrefix ξ n)).support := by
+  have hPrefSupp :
+      CountableConcrete.CountablePrefixMachine.historyPrefix ξ (n + 1) ∈
+        (CountableConcrete.histPMF π (U.programSemantics penv) (n + 1)).support :=
+    trajectoryLaw_historyPrefix_mem_support
+      (U := U) (π := π) (penv := penv) hξ (Nat.succ_le_of_lt hn)
+  rw [hPrefix] at hPrefSupp
+  exact histPMF_appendEvent_mem_support_action
+    (π := π) (κ := U.programSemantics penv) (t := n)
+    (h := CountableConcrete.CountablePrefixMachine.historyPrefix ξ n)
+    (a := a) (o := o) hPrefSupp
+
 theorem trajectoryLaw_mem_support_length
     (U : CountableConcrete.CountablePrefixMachine A O)
     (π : CountableConcrete.CountablePolicy A O)
@@ -1753,6 +3233,63 @@ theorem trajectoryLaw_mem_support_length
     ξ.length = T := by
   simpa [CountableConcrete.CountablePrefixMachine.trajectoryLaw] using
     (histPMF_mem_support_length (hSupp := hξ))
+
+omit [DecidableEq A] [DecidableEq O] [Encodable A] [Encodable O] in
+/-- The next countable prefix is the current prefix plus the realized event. -/
+theorem countable_historyPrefix_succ_eq_appendEvent_get
+    (ξ : CountableConcrete.CountHist A O) {n : Nat} (hn : n < ξ.length) :
+    CountableConcrete.CountablePrefixMachine.historyPrefix ξ (n + 1) =
+      CountableConcrete.appendEvent
+        (CountableConcrete.CountablePrefixMachine.historyPrefix ξ n)
+        (ξ.get ⟨n, hn⟩) := by
+  rw [CountableConcrete.CountablePrefixMachine.historyPrefix,
+    CountableConcrete.appendEvent]
+  exact (List.take_concat_get' ξ n hn).symm
+
+/--
+Finite-horizon H4 bridge.
+
+On the current finite trajectory law, a policy-support affinity ceiling gives a
+realized Bhattacharyya score floor for every nonterminal step `n < T`. This is
+the finite-horizon analogue of the all-time H3 floor; extending it to all `n`
+requires an infinite-trajectory law or the explicit all-time support predicate.
+-/
+theorem finiteHorizon_realizedObserverFiberBhattacharyyaSeparation_floor_of_affinityCeiling
+    (U : CountableConcrete.CountablePrefixMachine A O)
+    (π : CountableConcrete.CountablePolicy A O)
+    (penv : U.Program)
+    (ω : Observer (CountableConcrete.CountableEncodedProgram A O))
+    (pstar : CountableConcrete.CountableEncodedProgram A O)
+    {T : Nat} {κ : ℝ}
+    (hCeiling :
+      U.HasFiniteHorizonObserverFiberBhattacharyyaAffinityCeilingOnPolicySupport
+        π penv ω pstar T κ) :
+    ∀ ξ, ξ ∈ (U.trajectoryLaw π penv T).support →
+      ∀ n, n < T →
+        κ ≤ U.realizedObserverFiberBhattacharyyaSeparationProcess π ω pstar n ξ := by
+  rcases hCeiling with ⟨hκ, hCeiling⟩
+  intro ξ hξ n hn
+  have hLen := trajectoryLaw_mem_support_length U π penv T hξ
+  have hnLen : n < ξ.length := by
+    simpa [hLen] using hn
+  let a : A := (ξ.get ⟨n, hnLen⟩).1
+  let o : O := (ξ.get ⟨n, hnLen⟩).2
+  have hPrefix :
+      CountableConcrete.CountablePrefixMachine.historyPrefix ξ (n + 1) =
+        CountableConcrete.appendEvent
+          (CountableConcrete.CountablePrefixMachine.historyPrefix ξ n) (a, o) := by
+    simpa [a, o] using countable_historyPrefix_succ_eq_appendEvent_get ξ hnLen
+  have hAct :
+      a ∈ (π (CountableConcrete.CountablePrefixMachine.historyPrefix ξ n)).support := by
+    exact trajectoryLaw_realized_action_mem_support
+      (U := U) (π := π) (penv := penv) (T := T) (n := n)
+      (ξ := ξ) hξ hn hPrefix
+  rcases hCeiling ξ hξ n hn a hAct with ⟨hAffPos, hAffLe⟩
+  rw [CountableConcrete.CountablePrefixMachine.realizedObserverFiberBhattacharyyaSeparationProcess_of_lt
+    U π ω pstar hnLen]
+  exact U.observerFiberBhattacharyyaScore_ge_of_affinity_ceiling
+    π n (CountableConcrete.CountablePrefixMachine.historyPrefix ξ n) a
+    ω pstar hκ hAffPos hAffLe
 
 theorem residualObserverFiberProcess_toCountable_eq_of_prefix_length
     (U : ConcretePrefixMachine A O)

@@ -13,6 +13,7 @@ The generator writes:
 - `lean_concrete_theorem_audit.md`
 - `lean_verification_progress.md`
 - `lean_axiom_audit.md`
+- `h10_formal_item_ledger.md`
 - `SemanticConvergence/AxiomAudit.lean`
 - `SemanticConvergence/Manifest.lean`
 
@@ -39,6 +40,7 @@ PROOF_AUDIT_MD = ROOT / "lean_proof_audit.md"
 CONCRETE_THEOREM_AUDIT_MD = ROOT / "lean_concrete_theorem_audit.md"
 PROGRESS_MD = ROOT / "lean_verification_progress.md"
 AXIOM_AUDIT_MD = ROOT / "lean_axiom_audit.md"
+H10_LEDGER_MD = ROOT / "h10_formal_item_ledger.md"
 MANIFEST_LEAN = ROOT / "SemanticConvergence" / "Manifest.lean"
 AXIOM_AUDIT_LEAN = ROOT / "SemanticConvergence" / "AxiomAudit.lean"
 LEAN_SRC_DIR = ROOT / "SemanticConvergence"
@@ -50,7 +52,7 @@ def write_if_changed(path: pathlib.Path, content: str) -> None:
     path.write_text(content)
 
 PATTERN = re.compile(
-    r"\\begin\{(definition|lemma|proposition|corollary|theorem)\}"
+    r"\\begin\{(definition|lemma|proposition|corollary|theorem|assumptions)\}"
     r"(?:\[([^\]]*)\])?(.*?)\\end\{\1\}",
     re.S,
 )
@@ -73,14 +75,24 @@ RATE_COMPOSITION_HINTS = (
     "certificate_implies_rateBound",
 )
 
+RATE_COMPOSITION_DECL_NAMES = {
+    "zeroOutRatePackage_decodableNoiseTransfer",
+    "zeroOutRatePackage_oneStepResidual",
+    "zeroOutRatePackage_residualRate",
+    "zeroOutRatePackage_posteriorShareFiniteTime",
+    "zeroOutRatePackage_expRate",
+    "zeroOutRatePackage_sameViewResidualRate",
+    "zeroOutRatePackage_sameViewPosteriorShareFiniteTime",
+}
+
 TITLE_OVERRIDES = {
-    "prop:exp-rate": "Positive-floor exponential rate, expectation form",
-    "prop:kernel-exp-rate": "Same-view transfer of the positive-floor exponential rate",
-    "thm:exp-rate-concentration": "Finite-time positive-floor rate transfer",
+    "lem:one-step-drift-kernel": "Same-view transfer of residual-contraction witnesses",
+    "prop:exp-rate": "Zero-out residual-rate certificate",
+    "prop:kernel-exp-rate": "Same-view zero-out residual-rate transfer",
+    "thm:exp-rate-concentration": "Same-view finite-time posterior-share transfer",
 }
 
 PUBLIC_PROBABILISTIC_BRIDGE_LABELS = {
-    "thm:separating-support-convergence",
     "thm:separating-support-rate",
     "cor:separating-support-finite-time",
     "lem:one-step-drift",
@@ -90,19 +102,159 @@ PUBLIC_PROBABILISTIC_BRIDGE_LABELS = {
     "cor:noise-transfer",
 }
 
+EXACTNESS_PENDING_LABELS = {
+    "thm:separating-support-convergence": (
+        "Public Section 6 now has a paper-facing soft route: "
+        "`HellingerConvergenceSpine` packages residual nonnegativity, an "
+        "L1-bounded martingale envelope, divergent cumulative Bhattacharyya "
+        "separation, and the square-root Bayes identity, and "
+        "`thm_separating_support_convergence_hellinger_spine` proves "
+        "posterior-share convergence from that package. The manifest-tracked "
+        "`thm_separating_support_convergence` remains the stronger concrete "
+        "zero-out support route. It no longer takes a trajectory-level `hStep` "
+        "input; it takes `HasRealizedPrefixResidualUpdates`, and "
+        "`prefixwiseResidualDecay_of_realizedPrefixResidualUpdates` derives "
+        "`hStep` internally. The soft route now also has an H3 divergence "
+        "bridge: `HasObserverFiberBhattacharyyaUniformSeparationFloor` plus "
+        "`hellingerConvergenceSpine_of_observerFiberBhattacharyya_uniform_separation_floor` "
+        "derive the cumulative Bhattacharyya divergence leg instead of taking "
+        "`S_n -> infinity` raw. H4 now reduces that floor to a semantic "
+        "Bhattacharyya-affinity ceiling on policy-supported actions plus "
+        "all-time realized policy support; the finite `trajectoryLaw T` version "
+        "is proved only for nonterminal steps `n < T`. H5 now adds "
+        "`InfiniteTrajectory`, infinite residual/Bhattacharyya/cumulative/envelope "
+        "processes, the corresponding `InfiniteHas...` hypotheses, and "
+        "`hellingerConvergenceSpine_of_infiniteObserverFiberBhattacharyya_affinityCeiling_policySupport`, "
+        "so the soft route can be stated on genuine all-time streams. The "
+        "infinite Bayes/Gibbs law is now constructed by the countable "
+        "Ionescu-Tulcea stream constructor: `ionescuTrajectoryMeasure` builds "
+        "the shifted product law, `ionescuInfiniteTrajectoryLaw` packages its "
+        "push-forward as an `InfiniteTrajectoryLaw`, "
+        "`ionescuTrajectoryMeasure_streamPrefix_eq_histPMF` proves finite-prefix "
+        "agreement with `histPMF`, and "
+        "`infiniteBayesGibbsTrajectoryLaw_of_ionescu` specializes the constructor "
+        "to a realized environment. `infiniteTrajectoryLaw_realized_action_mem_support` "
+        "then derives all-time realized policy support from that constructed "
+        "finite-prefix agreement. The Hellinger route is now instantiated on "
+        "that constructed law: "
+        "`infiniteBayesGibbsTrajectoryLaw_of_ionescu_hellingerConvergenceSpine_of_affinityCeiling` "
+        "constructs the spine for the Ionescu law after martingale/L1 and "
+        "affinity-ceiling inputs, and "
+        "`thm_constructed_infinite_bayes_gibbs_hellinger_spine_convergence` "
+        "turns that constructed-law spine into posterior-share convergence. "
+        "The remaining H10 correspondence risk is not law existence or generic-law "
+        "specialization; it is to derive the H5 semantic affinity-ceiling input "
+        "from the paper's semantic separation/kernel hypotheses for that "
+        "constructed Bayes/Gibbs infinite law, and prove the Bayes/Gibbs "
+        "Hellinger envelope is an L1-bounded martingale. For the zero-out special case, "
+        "the tracked sublocks are the nondegenerate split/zero-denominator cases "
+        "in `HasRealizedPrefixPosteriorMassUpdates` and the derivation of "
+        "`HasTrueEnvironmentObserverFiberSupportSeparation` from the same paper "
+        "hypotheses."
+    ),
+    "thm:separating-support-rate": (
+        "Rate theorem remains the finite-horizon companion for the concrete "
+        "zero-out support route. It inherits `HasRealizedPrefixResidualUpdates`, "
+        "not a raw `hStep` recurrence, and derives the supportwise recurrence "
+        "internally by the same bridge as `thm:separating-support-convergence`. "
+        "The soft paper route is now represented separately by "
+        "`HellingerConvergenceSpine`, with the divergence leg reducible to a "
+        "uniform observer-fiber Bhattacharyya floor, and H4 reduces that floor "
+        "to a semantic affinity ceiling plus realized policy support. Closing "
+        "the rate stack from first principles requires instantiating the "
+        "H5 semantic affinity-ceiling hypothesis for the Bayes/Gibbs infinite "
+        "law plus the Bayes/Gibbs "
+        "L1-bounded martingale envelope, or completing the zero-out route's "
+        "normalized-update/support-separation sublocks."
+    ),
+    "cor:separating-support-finite-time": (
+        "Finite-time posterior-share corollary now inherits "
+        "`HasRealizedPrefixResidualUpdates`, not a raw `hStep` recurrence. It is "
+        "the finite-time zero-out special-case corollary; first-principles closure "
+        "now centers on deriving the Bayes/Gibbs-induced Hellinger envelope "
+        "martingale/L1 properties and deriving the H5 semantic affinity-ceiling "
+        "input for the soft theorem. All-time realized policy support now follows "
+        "from the constructed Ionescu-Tulcea infinite law's finite-prefix agreement. "
+        "The zero-out route still has "
+        "normalized realized posterior-mass updates and observer-fiber support "
+        "separation remaining as the zero-out-route sublocks."
+    ),
+    "lem:one-step-drift": (
+        "Concrete drift wrapper now takes `HasRealizedPrefixResidualUpdates` and "
+        "derives the supportwise one-step recurrence internally, rather than taking "
+        "a raw `hStep` recurrence. The true-environment support-to-realized-zero-out "
+        "bridge is now constructed from observer-fiber support separation. This is "
+        "the drift piece for the zero-out special case; the soft paper theorem is "
+        "tracked separately through `HellingerConvergenceSpine`."
+    ),
+    "prop:exp-rate": (
+        "Concrete exponential-rate wrapper now inherits "
+        "`HasRealizedPrefixResidualUpdates` and derives the recurrence internally. "
+        "It remains part of the zero-out special-case rate stack. The soft paper "
+        "route now flows through `HellingerConvergenceSpine`; first-principles "
+        "closure requires deriving that spine, or separately completing this "
+        "zero-out route's normalized posterior-mass update and support-separation "
+        "sublocks."
+    ),
+    "prop:kernel-exp-rate": (
+        "Kernel exponential-rate transfer now inherits the same "
+        "`HasRealizedPrefixResidualUpdates` package for the source program before "
+        "same-view transport. It remains part of the zero-out special-case rate "
+        "stack; the soft paper route is represented separately by "
+        "`HellingerConvergenceSpine`."
+    ),
+    "thm:exp-rate-concentration": (
+        "Finite-time rate concentration now inherits "
+        "`HasRealizedPrefixResidualUpdates`, derives the raw recurrence internally, "
+        "and then applies the countable rate witness. It is a finite-horizon "
+        "consequence of the zero-out special-case stack; the paper's soft "
+        "convergence route is now represented by `HellingerConvergenceSpine`."
+    ),
+    "cor:noise-transfer": (
+        "Noise-transfer corollary now inherits `HasRealizedPrefixResidualUpdates` "
+        "through `thm:exp-rate-concentration`; it no longer exposes a raw `hStep` "
+        "input. This corollary remains attached to the zero-out/rate special-case "
+        "stack; the soft paper convergence theorem is represented separately by "
+        "`HellingerConvergenceSpine` and its posterior-share theorem."
+    ),
+}
+
 MANIFEST_ENTRY_COMMENTS = {
     "thm:separating-support-convergence": [
         "    /-",
-        "    `thm:separating-support-convergence` names the countable probabilistic",
-        "    Section 6 theorem on `CountablePrefixMachine` and realized trajectory laws.",
-        "    Its current proof path is first-principles: the probabilistic theorem",
-        "    is derived from the deterministic `ConcretePrefixMachine` soft-substrate",
-        "    contraction through the explicit bridge layer in",
-        "    `ConcreteSubstrateBridge`, and the selector/kernel realizations are",
-        "    then rethreaded through that bridged theorem stack.",
+        "    The paper-facing soft Section 6 route is now represented by",
+        "    `HellingerConvergenceSpine` and",
+        "    `thm_separating_support_convergence_hellinger_spine`, which prove",
+        "    posterior-share convergence from the Bhattacharyya martingale spine",
+        "    without assuming a zero-out observation. This manifest-tracked",
+        "    declaration remains the concrete zero-out support route. It no longer",
+        "    accepts the public trajectory-level `hStep` recurrence directly:",
+        "    `SemanticConvergence.prefixwiseResidualDecay_of_realizedPrefixResidualUpdates`",
+        "    derives that recurrence from `HasRealizedPrefixResidualUpdates`, and",
+        "    `ConcreteSubstrateBridge` transports it to the countable supportwise",
+        "    witness. H3 now derives the cumulative-divergence leg of the",
+        "    soft spine from a uniform observer-fiber Bhattacharyya floor,",
+        "    and H4 reduces that floor to a semantic Bhattacharyya-affinity",
+        "    ceiling on policy-supported actions plus all-time realized",
+        "    policy support. H5 adds `InfiniteTrajectory`, the infinite",
+        "    residual/Bhattacharyya/cumulative/envelope processes, the",
+        "    corresponding `InfiniteHas...` hypotheses, and the infinite-stream",
+        "    affinity-ceiling spine constructor. First-principles closure now",
+        "    requires deriving those H5 inputs for the Bayes/Gibbs infinite law",
+        "    and proving the Bayes/Gibbs Hellinger envelope is an L1-bounded",
+        "    martingale; the",
+        "    zero-out route separately retains the normalized-update and",
+        "    observer-fiber support-separation sublocks.",
         "    -/",
     ],
 }
+
+# H10 now exposes the remaining support/rate/noise assumptions directly in the
+# manuscript through `ZeroOutRatePackage` and package-level Lean wrappers.
+# Historical risk notes above are retained only as provenance for earlier audit
+# passes; active generated reports should not treat them as open risks.
+EXACTNESS_PENDING_LABELS = {}
+MANIFEST_ENTRY_COMMENTS = {}
 
 SUSPICIOUS_PROOF_KINDS = {
     "placeholder-truth",
@@ -227,7 +379,7 @@ PUNCHLIST_PROGRESS = [
         "phase": "Final sync",
         "status": "implemented",
         "depends": "None",
-        "artifact": "semantic_convergence_interactive_learning.tex + README.md + formalization_target.md",
+        "artifact": "semantic_convergence_interactive_learning.tex + README.md + h10_lean_correspondence_punchlist.md",
     },
     {
         "item": 14,
@@ -269,6 +421,7 @@ DERIVED_LABELS = {
     "def:observer",
     "def:int-sem-class",
     "def:history-recoverable",
+    "def:strict-hierarchy-witnesses",
     "lem:nesting",
     "lem:fit-gap",
     "thm:policy-gap",
@@ -320,9 +473,14 @@ DERIVED_LABELS = {
     "prop:finite-action-kernel-separation",
     "prop:compact-action-kernel-separation",
     "lem:conditional-bc",
+    "def:hellinger-spine",
     "lem:contraction",
     "prop:full-support-behavioral",
+    "def:zero-out-rate-package",
+    "def:semantic-learning-package",
+    "ass:main-verified-package",
     "thm:separating-support-convergence",
+    "thm:infinite-affinity-hellinger-bridge",
     "thm:exploration-floor-behavioral",
     "thm:separating-support-rate",
     "cor:separating-support-finite-time",
@@ -381,6 +539,7 @@ CONCRETE_STACK_LABELS = {
     "prop:refinement-chain",
     "lem:observable-quotient",
     "def:history-recoverable",
+    "def:strict-hierarchy-witnesses",
     "thm:factor-through-quotient",
     "lem:fit-gap",
     "thm:policy-gap",
@@ -430,9 +589,14 @@ CONCRETE_STACK_LABELS = {
     "prop:compact-action-kernel-separation",
     "cor:noise-left-invertible-history-independent",
     "lem:conditional-bc",
+    "def:hellinger-spine",
     "lem:contraction",
     "prop:full-support-behavioral",
+    "def:zero-out-rate-package",
+    "def:semantic-learning-package",
+    "ass:main-verified-package",
     "thm:separating-support-convergence",
+    "thm:infinite-affinity-hellinger-bridge",
     "thm:exploration-floor-behavioral",
     "thm:separating-support-rate",
     "cor:separating-support-finite-time",
@@ -590,11 +754,123 @@ COVERED_LABELS = DERIVED_LABELS | {
 }
 
 MODULE_OVERRIDES = {
+    "def:history-compat": "SemanticConvergence.Hierarchy",
+    "def:policy-pred": "SemanticConvergence.Hierarchy",
+    "def:int-sem-class": "SemanticConvergence.Hierarchy",
     "def:observer": "SemanticConvergence.Foundations",
+    "lem:nesting": "SemanticConvergence.Hierarchy",
+    "prop:refinement-chain": "SemanticConvergence.Hierarchy",
+    "lem:observable-quotient": "SemanticConvergence.Hierarchy",
+    "def:history-recoverable": "SemanticConvergence.Hierarchy",
+    "def:strict-hierarchy-witnesses": "SemanticConvergence.Hierarchy",
+    "thm:factor-through-quotient": "SemanticConvergence.Hierarchy",
+    "lem:fit-gap": "SemanticConvergence.Hierarchy",
+    "thm:policy-gap": "SemanticConvergence.Hierarchy",
+    "lem:syntactic-gap": "SemanticConvergence.Hierarchy",
+    "thm:strict-hierarchy": "SemanticConvergence.Hierarchy",
+    "def:bhat-omega": "SemanticConvergence.Functional",
+    "def:raw-two-observer-functional": "SemanticConvergence.Functional",
+    "def:two-observer-functional": "SemanticConvergence.Functional",
+    "def:kernel-functional": "SemanticConvergence.Functional",
+    "def:meeting-point-shorthand": "SemanticConvergence.Functional",
+    "prop:belief-invariance-above": "SemanticConvergence.Functional",
+    "prop:belief-illtyped-below": "SemanticConvergence.Functional",
+    "prop:action-cap": "SemanticConvergence.Functional",
+    "cor:twins-frozen-ratio": "SemanticConvergence.Functional",
+    "thm:meeting-point": "SemanticConvergence.Functional",
+    "cor:canonical-pair": "SemanticConvergence.Functional",
+    "prop:goal-dialed": "SemanticConvergence.Functional",
+    "def:universal-prior": "SemanticConvergence.Functional",
+    "def:afe": "SemanticConvergence.Functional",
+    "lem:prior-invariance": "SemanticConvergence.Belief",
+    "lem:prior-necessity": "SemanticConvergence.Belief",
+    "lem:variational": "SemanticConvergence.Belief",
+    "lem:kl-necessity": "SemanticConvergence.Belief",
+    "lem:merging": "SemanticConvergence.Belief",
+    "def:decodable-channel": "SemanticConvergence.Noise",
+    "prop:noise-immunity": "SemanticConvergence.Noise",
+    "def:left-invertible-channel": "SemanticConvergence.Noise",
+    "prop:noise-left-invertible": "SemanticConvergence.Noise",
+    "prop:noise-decoding": "SemanticConvergence.Noise",
+    "cor:noise-transfer": "SemanticConvergence.Noise",
+    "def:hellinger-spine": "SemanticConvergence.MartingaleContraction",
+    "def:zero-out-rate-package": "SemanticConvergence.Rates",
+    "def:semantic-learning-package": "SemanticConvergence.Ontology",
+    "ass:main-verified-package": "SemanticConvergence.Ontology",
+    "thm:separating-support-convergence": "SemanticConvergence.Ontology",
+    "thm:infinite-affinity-hellinger-bridge": "SemanticConvergence.Ontology",
+    "thm:exploration-floor-behavioral": "SemanticConvergence.Ontology",
+    "thm:semantic-convergence": "SemanticConvergence.Ontology",
+    "thm:kernel-semantic-convergence": "SemanticConvergence.Ontology",
+    "cor:compact-action-kernel": "SemanticConvergence.Ontology",
+    "cor:finite-maximin": "SemanticConvergence.Ontology",
+    "cor:goal-dialed-payoff": "SemanticConvergence.Ontology",
+    "thm:separating-support-rate": "SemanticConvergence.Rates",
+    "cor:separating-support-finite-time": "SemanticConvergence.Rates",
+    "cor:noise-left-invertible-history-independent": "SemanticConvergence.Ontology",
+    "lem:one-step-drift": "SemanticConvergence.Rates",
+    "prop:exp-rate": "SemanticConvergence.Rates",
+    "lem:one-step-drift-kernel": "SemanticConvergence.Rates",
+    "prop:kernel-exp-rate": "SemanticConvergence.Rates",
+    "thm:exp-rate-concentration": "SemanticConvergence.Rates",
+    "def:finite-time-policy-observer": "SemanticConvergence.SelfReference",
+    "lem:monotone-refinement": "SemanticConvergence.SelfReference",
+    "def:self-ref-rule": "SemanticConvergence.SelfReference",
+    "lem:exploration-reachability": "SemanticConvergence.SelfReference",
+    "prop:observer-promotion-sr": "SemanticConvergence.SelfReference",
+    "def:self-ref-exploratory": "SemanticConvergence.SelfReference",
+    "thm:self-ref-convergence": "SemanticConvergence.SelfReference",
+    "prop:self-ref-obstruction": "SemanticConvergence.SelfReference",
+    "thm:self-ref-exploratory": "SemanticConvergence.SelfReference",
+    "thm:self-ref-exploratory-rate": "SemanticConvergence.SelfReference",
+    "prop:self-ref-one-step-split": "SemanticConvergence.SelfReference",
+    "thm:self-ref-sharp": "SemanticConvergence.SelfReference",
+    "prop:boundary-identity": "SemanticConvergence.Boundary",
+    "def:efe": "SemanticConvergence.Boundary",
+    "lem:risk-ig": "SemanticConvergence.Boundary",
+    "cor:efe-specialization": "SemanticConvergence.Boundary",
+    "def:afe-principle": "SemanticConvergence.Boundary",
+    "lem:info-decomp": "SemanticConvergence.Boundary",
+    "thm:afe-near-miss": "SemanticConvergence.Boundary",
+    "thm:observer-promotion-failure": "SemanticConvergence.Boundary",
+    "cor:observer-promotion-universal": "SemanticConvergence.Boundary",
+    "cor:promotion-contrast": "SemanticConvergence.Boundary",
+    "prop:kernel-functional-minimizer-compact": "SemanticConvergence.Belief",
     "prop:amortized-surrogate-minimizer": "SemanticConvergence.Surrogate",
-    "thm:amortized-surrogate": "SemanticConvergence.Surrogate",
+    "thm:amortized-surrogate": "SemanticConvergence.Ontology",
     "cor:amortized-surrogate-finite-time": "SemanticConvergence.Surrogate",
 }
+
+DECL_NAME_OVERRIDES = {
+    "def:strict-hierarchy-witnesses": "HierarchyWitnesses",
+    "def:hellinger-spine": "HellingerConvergenceSpine",
+    "def:zero-out-rate-package": "ZeroOutRatePackage",
+    "def:semantic-learning-package": "def_semantic_learning_package",
+    "ass:main-verified-package": "ass_main_verified_package",
+    "thm:separating-support-convergence": "h10_verified_semantic_learning_package_converges",
+    "thm:infinite-affinity-hellinger-bridge":
+        "h10_infinite_affinity_hellinger_bridge",
+    "thm:exploration-floor-behavioral": "h10_exploration_floor_behavioral",
+    "thm:semantic-convergence": "h10_semantic_convergence",
+    "thm:kernel-semantic-convergence": "h10_kernel_semantic_convergence",
+    "cor:compact-action-kernel": "h10_compact_action_kernel",
+    "cor:finite-maximin": "h10_finite_maximin",
+    "cor:goal-dialed-payoff": "h10_goal_dialed_payoff",
+    "thm:amortized-surrogate": "h10_amortized_surrogate",
+    "cor:noise-left-invertible-history-independent":
+        "h10_support_left_invertible_noisy_transfer",
+    "cor:amortized-surrogate-finite-time":
+        "cor_amortized_surrogate_finite_time_zeroOutPackage",
+    "cor:noise-transfer": "zeroOutRatePackage_decodableNoiseTransfer",
+    "lem:one-step-drift": "zeroOutRatePackage_oneStepResidual",
+    "thm:separating-support-rate": "zeroOutRatePackage_residualRate",
+    "cor:separating-support-finite-time": "zeroOutRatePackage_posteriorShareFiniteTime",
+    "prop:exp-rate": "zeroOutRatePackage_expRate",
+    "prop:kernel-exp-rate": "zeroOutRatePackage_sameViewResidualRate",
+    "thm:exp-rate-concentration": "zeroOutRatePackage_sameViewPosteriorShareFiniteTime",
+}
+
+CONDITIONAL_CORRESPONDENCE_LABELS: set[str] = set()
 
 CONCRETE_SUBSTRATE_MODULES = {
     "SemanticConvergence.ConcreteCore": "Concrete discrete interaction core: histories, local laws, recursive path laws, reachability.",
@@ -757,6 +1033,9 @@ def classify_decl(kind: str, name: str, text: str) -> tuple[str, str]:
     stmt = text.split(":=", 1)[0]
     stmt_compact = compact_text(stmt)
 
+    if name in RATE_COMPOSITION_DECL_NAMES:
+        return "rate-composition", body_compact
+
     if ": True" in stmt_compact and body_compact in {"by trivial", "trivial"}:
         return "placeholder-truth", body_compact
 
@@ -887,18 +1166,41 @@ def proof_kind_for_entry(entry: dict[str, object], decls: list[LeanDecl]) -> str
     return decl.proof_kind
 
 
+def correspondence_status_for_entry(entry: dict[str, object]) -> str:
+    if not bool(entry.get("lean_decl_found", False)):
+        return "needs Lean wrapper"
+    if str(entry["label"]) in CONDITIONAL_CORRESPONDENCE_LABELS:
+        return "conditional Lean counterpart"
+    return "exact Lean counterpart"
+
+
 def enrich_manifest_entries(
-    entries: list[dict[str, object]], decls: list[LeanDecl]
+    entries: list[dict[str, object]],
+    decls: list[LeanDecl],
+    proof_bodies: dict[str, str],
 ) -> list[dict[str, object]]:
     enriched: list[dict[str, object]] = []
     for entry in entries:
         enriched_entry = dict(entry)
         chosen_decl = choose_decl_for_entry(entry, decls)
         stmt = statement_text(chosen_decl.text) if chosen_decl is not None else ""
+        proof_body = proof_bodies.get(str(entry["label"]), "")
         is_public_bridge_surface = str(entry["label"]) in PUBLIC_PROBABILISTIC_BRIDGE_LABELS
+        if chosen_decl is not None:
+            enriched_entry["module"] = chosen_decl.module
+            enriched_entry["decl_name"] = chosen_decl.name
         enriched_entry["proof_kind"] = proof_kind_for_entry(entry, decls)
         enriched_entry["qualified_decl_name"] = (
             chosen_decl.qualified_name if chosen_decl is not None else str(entry["decl_name"])
+        )
+        enriched_entry["lean_decl_found"] = chosen_decl is not None
+        enriched_entry["has_manuscript_proof"] = bool(proof_body)
+        enriched_entry["manuscript_proof_cites_lean"] = (
+            bool(proof_body)
+            and str(enriched_entry["qualified_decl_name"]) in proof_body
+        )
+        enriched_entry["correspondence_status"] = correspondence_status_for_entry(
+            enriched_entry
         )
         enriched_entry["public_probabilistic_bridge_surface"] = is_public_bridge_surface
         enriched_entry["public_probabilistic_bridge_witness_hyp"] = (
@@ -911,11 +1213,20 @@ def enrich_manifest_entries(
         enriched_entry["public_probabilistic_bridge_concrete_root"] = (
             is_public_bridge_surface and "ConcretePrefixMachine" in stmt
         )
+        exactness_note = (
+            ""
+            if str(entry["label"]) == "thm:separating-support-convergence"
+            else EXACTNESS_PENDING_LABELS.get(str(entry["label"]), "")
+        )
+        enriched_entry["exactness_lock_pending"] = bool(exactness_note)
+        enriched_entry["exactness_lock_note"] = exactness_note
         enriched.append(enriched_entry)
     return enriched
 
 
 def normalize_decl_name(label: str) -> str:
+    if label in DECL_NAME_OVERRIDES:
+        return DECL_NAME_OVERRIDES[label]
     cleaned = label.strip()
     cleaned = cleaned.replace(":", "_")
     cleaned = cleaned.replace("-", "_")
@@ -1000,6 +1311,31 @@ def parse_entries() -> list[dict[str, object]]:
     return entries
 
 
+def parse_proof_bodies_by_label() -> dict[str, str]:
+    """Map the most recent formal label to its following manuscript proof body."""
+    lines = TEX_PATH.read_text().splitlines()
+    proof_bodies: dict[str, str] = {}
+    last_label: str | None = None
+    idx = 0
+    while idx < len(lines):
+        label_match = re.search(
+            r"\\label\{((?:def|lem|prop|cor|thm|ass):[^}]*)\}", lines[idx]
+        )
+        if label_match is not None:
+            last_label = label_match.group(1)
+        if r"\begin{proof" in lines[idx] and last_label is not None:
+            proof_lines = [lines[idx]]
+            idx += 1
+            while idx < len(lines):
+                proof_lines.append(lines[idx])
+                if r"\end{proof}" in lines[idx]:
+                    break
+                idx += 1
+            proof_bodies[last_label] = "\n".join(proof_lines)
+        idx += 1
+    return proof_bodies
+
+
 def render_markdown(entries: list[dict[str, object]], axiom_map: dict[str, list[str]]) -> str:
     counts = Counter(entry["kind"] for entry in entries)
     derived_count = sum(entry["status"] == "derived" for entry in entries)
@@ -1036,6 +1372,20 @@ def render_markdown(entries: list[dict[str, object]], axiom_map: dict[str, list[
         and len(public_bridge_equation_hyp_entries) == 0
         and len(public_bridge_concrete_root_entries) == len(public_bridge_entries)
     )
+    exactness_pending_entries = [
+        entry for entry in entries if entry["exactness_lock_pending"]
+    ]
+    missing_lean_decl_entries = [
+        entry for entry in entries if not entry["lean_decl_found"]
+    ]
+    proof_entries = [entry for entry in entries if entry["has_manuscript_proof"]]
+    proof_citation_entries = [
+        entry for entry in proof_entries if entry["manuscript_proof_cites_lean"]
+    ]
+    missing_proof_citation_entries = [
+        entry for entry in proof_entries if not entry["manuscript_proof_cites_lean"]
+    ]
+    semantic_exactness_closed = len(exactness_pending_entries) == 0
     axiom_groups = axiom_status_groups(entries, axiom_map)
     lines = [
         "# Formalization Manifest",
@@ -1057,6 +1407,10 @@ def render_markdown(entries: list[dict[str, object]], axiom_map: dict[str, list[
         "- `migrated-to-concrete`: the paper-facing wrapper now depends only on the concrete first-principles stack",
         "- `pending-concrete-migration`: the paper-facing wrapper still depends on an abstract theorem interface, even though a concrete substrate may already exist in the repo",
         "",
+        "H10 correspondence-risk conventions:",
+        "- `closed`: no active H10 correspondence risk is attached to this manuscript item",
+        "- `pending`: the item has a mechanically checked Lean declaration, but a risk note records that the declaration is conditional or does not yet match the H10 mathematical target",
+        "",
         f"- Core declarations: `{len(entries)}`",
         f"- Definitions: `{counts['definition']}`",
         f"- Lemmas: `{counts['lemma']}`",
@@ -1070,12 +1424,18 @@ def render_markdown(entries: list[dict[str, object]], axiom_map: dict[str, list[
         f"- Abstract-interface: `{abstract_count}`",
         f"- Migrated-to-concrete: `{migrated_count}`",
         f"- Pending concrete migration: `{pending_migration_count}`",
+        f"- Missing Lean declarations: `{len(missing_lean_decl_entries)}`",
         f"- Axiom-audit rows matching the canonical baseline `{EXPECTED_AXIOMS}`: `{len(axiom_groups[CANONICAL_AXIOM_STATUS])}`",
         f"- Axiom-audit rows using the expected `native_decide` auxiliary `{NATIVE_DECIDE_AUXILIARY}`: `{len(axiom_groups[EXPECTED_NATIVE_DECIDE_AXIOM_STATUS])}`",
         f"- Axiom-audit rows lighter than the canonical baseline: `{len(axiom_groups[LIGHTER_THAN_BASELINE_AXIOM_STATUS])}`",
         f"- Axiom-audit rows with genuine unexpected drift: `{len(axiom_groups[GENUINE_AXIOM_DRIFT_STATUS])}`",
         "- Exact per-declaration axiom dependencies are published in `lean_axiom_audit.md`.",
         "- While substantive sources still use `native_decide`, the generated axiom audit treats the corresponding compiled helper axiom as expected rather than as drift.",
+        "",
+        "H10 correspondence-risk snapshot:",
+        f"- Entries with active H10 correspondence risks: `{len(exactness_pending_entries)}`",
+        f"- H10 correspondence risks closed: `{'yes' if semantic_exactness_closed else 'no'}`",
+        "- Active risk source: `h10_lean_correspondence_punchlist.md`",
         "",
         "Probabilistic bridge-surface snapshot:",
         f"- Public probabilistic bridge entries audited: `{len(public_bridge_entries)}`",
@@ -1095,14 +1455,109 @@ def render_markdown(entries: list[dict[str, object]], axiom_map: dict[str, list[
         f"- `placeholder-truth`: `{proof_kind_counts['placeholder-truth']}`",
         f"- `heuristic-other`: `{proof_kind_counts['heuristic-other']}`",
         "",
-        "| # | Kind | TeX label | Title | Lines | Lean module | Lean declaration | Qualified Lean declaration | Paper status | First-principles status | Migration status | Proof kind |",
-        "| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |",
+        "| # | Kind | TeX label | Title | Lines | Lean module | Lean declaration | Qualified Lean declaration | Lean decl found | H10 correspondence | Paper status | First-principles status | Migration status | H10 risk | Proof kind |",
+        "| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |",
     ]
     for entry in entries:
         lines.append(
             "| {idx} | {kind} | `{label}` | {title} | {start}-{end} | `{module}` | "
-            "`{decl_name}` | `{qualified_decl_name}` | `{status}` | `{first_principles_status}` | `{migration_status}` | `{proof_kind}` |".format(**entry)
+            "`{decl_name}` | `{qualified_decl_name}` | `{lean_decl_found}` | {correspondence_status} | "
+            "`{status}` | `{first_principles_status}` | `{migration_status}` | "
+            "`{exactness_status}` | `{proof_kind}` |".format(
+                **entry,
+                exactness_status="pending" if entry["exactness_lock_pending"] else "closed",
+            )
         )
+    if exactness_pending_entries:
+        lines.extend(
+            [
+                "",
+                "## Active H10 Correspondence Risks",
+                "",
+            ]
+        )
+        for entry in exactness_pending_entries:
+            lines.append(
+                "- `{label}` -> `{qualified_decl_name}`: {exactness_lock_note}".format(**entry)
+            )
+    lines.append("")
+    return "\n".join(lines)
+
+
+def render_h10_ledger(entries: list[dict[str, object]]) -> str:
+    status_counts = Counter(str(entry["correspondence_status"]) for entry in entries)
+    missing_entries = [entry for entry in entries if not entry["lean_decl_found"]]
+    conditional_entries = [
+        entry for entry in entries
+        if str(entry["correspondence_status"]) == "conditional Lean counterpart"
+    ]
+    proof_entries = [entry for entry in entries if entry["has_manuscript_proof"]]
+    proof_citation_entries = [
+        entry for entry in proof_entries if entry["manuscript_proof_cites_lean"]
+    ]
+    lines = [
+        "# H10 Formal Item Ledger",
+        "",
+        f"Canonical source: `{TEX_PATH.name}`",
+        "",
+        "This file is generated by `scripts/generate_formalization_manifest.py`.",
+        "It is the H10-facing ledger for every proof-bearing manuscript",
+        "`definition`, `lemma`, `proposition`, `corollary`, `theorem`, and",
+        "`assumptions` block.",
+        "",
+        "Completion rule:",
+        "- Every formal item must either have a concrete Lean declaration or be",
+        "  explicitly classified as a non-formal/narrative item.",
+        "- This manuscript currently treats every formal environment as formal; no",
+        "  formal environment is classified as narrative-only.",
+        "",
+        "## Summary",
+        f"- Formal items: `{len(entries)}`",
+        f"- Exact Lean counterparts: `{status_counts['exact Lean counterpart']}`",
+        f"- Conditional Lean counterparts: `{status_counts['conditional Lean counterpart']}`",
+        f"- Needs Lean wrapper: `{status_counts['needs Lean wrapper']}`",
+        f"- Missing Lean declarations: `{len(missing_entries)}`",
+        f"- H10 ledger has no blank Lean-declaration cells: `{'yes' if not missing_entries else 'no'}`",
+        f"- Manuscript proof environments with exact Lean citation: `{len(proof_citation_entries)}` / `{len(proof_entries)}`",
+        "",
+        "## Ledger",
+        "",
+        "| # | Kind | TeX label | Title | Lines | H10 correspondence | Lean declaration | Lean module | Proof kind | Proof cites Lean | H10 risk |",
+        "| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |",
+    ]
+    for entry in entries:
+        risk = "pending" if entry["exactness_lock_pending"] else "closed"
+        proof_citation = (
+            "yes"
+            if entry["manuscript_proof_cites_lean"]
+            else ("n/a" if not entry["has_manuscript_proof"] else "no")
+        )
+        lines.append(
+            "| {idx} | {kind} | `{label}` | {title} | {start}-{end} | {correspondence_status} | "
+            "`{qualified_decl_name}` | `{module}` | `{proof_kind}` | `{proof_citation}` | `{risk}` |".format(
+                **entry,
+                proof_citation=proof_citation,
+                risk=risk,
+            )
+        )
+    lines.extend(["", "## Conditional Counterparts", ""])
+    if conditional_entries:
+        for entry in conditional_entries:
+            lines.append(
+                "- `{label}` maps to `{qualified_decl_name}` and remains conditional in the H10 narrative.".format(
+                    **entry
+                )
+            )
+    else:
+        lines.append("None.")
+    lines.extend(["", "## Missing Lean Declarations", ""])
+    if missing_entries:
+        for entry in missing_entries:
+            lines.append(
+                "- `{label}` ({kind}) -> expected `{qualified_decl_name}`".format(**entry)
+            )
+    else:
+        lines.append("None.")
     lines.append("")
     return "\n".join(lines)
 
@@ -1178,6 +1633,20 @@ def render_audit(entries: list[dict[str, object]], axiom_map: dict[str, list[str
         and len(public_bridge_equation_hyp_entries) == 0
         and len(public_bridge_concrete_root_entries) == len(public_bridge_entries)
     )
+    exactness_pending_entries = [
+        entry for entry in entries if entry["exactness_lock_pending"]
+    ]
+    missing_lean_decl_entries = [
+        entry for entry in entries if not entry["lean_decl_found"]
+    ]
+    proof_entries = [entry for entry in entries if entry["has_manuscript_proof"]]
+    proof_citation_entries = [
+        entry for entry in proof_entries if entry["manuscript_proof_cites_lean"]
+    ]
+    missing_proof_citation_entries = [
+        entry for entry in proof_entries if not entry["manuscript_proof_cites_lean"]
+    ]
+    semantic_exactness_closed = len(exactness_pending_entries) == 0
     axiom_groups = axiom_status_groups(entries, axiom_map)
 
     lines = [
@@ -1188,7 +1657,7 @@ def render_audit(entries: list[dict[str, object]], axiom_map: dict[str, list[str
         "This file is generated by `scripts/generate_formalization_manifest.py`.",
         "",
         "The target notion of first-principles completion is specified in",
-        f"`{(ROOT / 'formalization_target.md').name}`.",
+        "`h10_lean_correspondence_punchlist.md`.",
         "",
         "## Paper-Completeness State",
         f"- Core declarations inventoried: `{len(entries)}`",
@@ -1196,6 +1665,8 @@ def render_audit(entries: list[dict[str, object]], axiom_map: dict[str, list[str
         f"- Wrapped declarations: `{status_counts['wrapped']}`",
         f"- Declared-only declarations: `{status_counts['declared']}`",
         f"- Unlabeled declarations in TeX: `{unlabeled_count}`",
+        f"- Missing Lean declarations: `{len(missing_lean_decl_entries)}`",
+        f"- Manuscript proof environments without exact Lean citation: `{len(missing_proof_citation_entries)}`",
         f"- Paper-complete manuscript coverage: `{'yes' if status_counts['declared'] == 0 and unlabeled_count == 0 else 'no'}`",
         f"- Paper-complete derivation: `{'yes' if status_counts['wrapped'] == 0 and status_counts['declared'] == 0 and unlabeled_count == 0 else 'no'}`",
         "",
@@ -1206,7 +1677,36 @@ def render_audit(entries: list[dict[str, object]], axiom_map: dict[str, list[str
         f"- Pending concrete migration declarations: `{migration_counts['pending-concrete-migration']}`",
         f"- Abstract-interface declarations with a concrete substrate bridge in repo: `{bridge_ready_abstract_count}`",
         f"- Concrete substrate modules present: `{len(CONCRETE_SUBSTRATE_MODULES)}`",
-        f"- First-principles complete: `{'yes' if fp_counts['abstract-interface'] == 0 and status_counts['wrapped'] == 0 and status_counts['declared'] == 0 and unlabeled_count == 0 and semantic_audit_closed else 'no'}`",
+        f"- Active H10 correspondence-risk declarations: `{len(exactness_pending_entries)}`",
+        f"- H10 correspondence risks closed: `{'yes' if semantic_exactness_closed else 'no'}`",
+        f"- First-principles complete: `{'yes' if fp_counts['abstract-interface'] == 0 and status_counts['wrapped'] == 0 and status_counts['declared'] == 0 and unlabeled_count == 0 and len(missing_lean_decl_entries) == 0 and len(missing_proof_citation_entries) == 0 and semantic_audit_closed and semantic_exactness_closed else 'no'}`",
+        "",
+        "Interpretation:",
+        "- The concrete-stack and proof-shape counters are mechanical Lean checks.",
+        "- The H10 correspondence-risk counter records paper-level semantic mismatches or conditional routes that survive those mechanical checks.",
+        "- A declaration with an active H10 risk may still compile and appear in the manifest, but it is not counted as fully first-principles closed.",
+        "",
+        "## Proof-Citation Surface",
+        f"- Manuscript proof environments audited: `{len(proof_entries)}`",
+        f"- Proof environments with exact Lean citation: `{len(proof_citation_entries)}` / `{len(proof_entries)}`",
+        f"- Proof-citation surface closed: `{'yes' if len(missing_proof_citation_entries) == 0 else 'no'}`",
+        "",
+        "Interpretation:",
+        "- A proof citation is counted only when the proof body contains the exact Lean declaration selected by the H10 ledger.",
+        "- Conditional companion proofs may cite compiling Lean declarations while still carrying H10 correspondence risks below.",
+        "",
+        "## Active H10 Correspondence Risks",
+        "",
+    ]
+    if exactness_pending_entries:
+        for entry in exactness_pending_entries:
+            lines.append(
+                "- `{label}` -> `{qualified_decl_name}`: {exactness_lock_note}".format(**entry)
+            )
+    else:
+        lines.append("None.")
+    lines.extend(
+        [
         "",
         "## Probabilistic Bridge Surface",
         f"- Public probabilistic bridge entries audited: `{len(public_bridge_entries)}`",
@@ -1227,7 +1727,7 @@ def render_audit(entries: list[dict[str, object]], axiom_map: dict[str, list[str
         f"- Rows with genuine unexpected axiom drift: `{len(axiom_groups[GENUINE_AXIOM_DRIFT_STATUS])}`",
         "- Exact per-declaration axiom dependencies are published in `lean_axiom_audit.md`.",
         "- The published axiom audit treats the compiled `native_decide` helper as expected while substantive Lean sources still use `native_decide`; only any remaining rows count as real drift.",
-        "- `fullyFirstPrinciples = true` is a trust-boundary and proof-shape statement; exact axiom dependencies are tracked separately by the published axiom audit.",
+        "- `fullyFirstPrinciples` combines trust-boundary, proof-shape, probabilistic-bridge, and H10 correspondence-risk closure; exact axiom dependencies are tracked separately by the published axiom audit.",
         "",
         "## Proof-Shape Snapshot",
         f"- Substantive entries: `{proof_kind_counts['substantive']}`",
@@ -1255,13 +1755,15 @@ def render_audit(entries: list[dict[str, object]], axiom_map: dict[str, list[str
         "- `proof kind` is a source-level audit of the current Lean proof body.",
         "- Phase 6 closes the manifest audit only when every theorem-like manifest entry lands in a non-suspicious proof class and every manifest definition is tagged as `definition`.",
         "",
-    ]
+        ]
+    )
     if fp_counts["abstract-interface"] == 0:
         lines.extend(
             [
                 "Trust-boundary note:",
                 "- The paper-facing theorem files now terminate directly at the concrete stack.",
                 "- No manifest-tracked declaration depends on an abstract `...Model` / `...Theory` proof layer.",
+                "- This trust-boundary note does not discharge any active H10 correspondence risk listed above.",
                 "",
             ]
         )
@@ -1650,9 +2152,10 @@ def render_progress_tracker() -> str:
         "# Lean Verification Progress Tracker",
         "",
         "This file is generated by `scripts/generate_formalization_manifest.py`.",
-        "It mirrors the frozen `lean_verification_punchlist.md` without editing it.",
+        "It is retained as the historical implementation tracker; the active",
+        "H10 correspondence source of truth is `h10_lean_correspondence_punchlist.md`.",
         "",
-        "The tracker records implementation status against the frozen punch list,",
+        "The tracker records implementation status against the earlier punch list,",
         "while the generated manifest/audit artifacts provide the concrete repo-side",
         "evidence for each completed item.",
         "",
@@ -1929,6 +2432,9 @@ def render_bridge(entries: list[dict[str, object]]) -> str:
     for entry in entries:
         module_groups.setdefault(str(entry["module"]), []).append(entry)
 
+    exactness_pending_count = sum(
+        bool(entry["exactness_lock_pending"]) for entry in entries
+    )
     bridge_ready_abstract_count = sum(
         1
         for entry in entries
@@ -1952,6 +2458,7 @@ def render_bridge(entries: list[dict[str, object]]) -> str:
         f"- Migrated-to-concrete declarations: `{sum(entry['migration_status'] == 'migrated-to-concrete' for entry in entries)}`",
         f"- Pending concrete migration declarations: `{sum(entry['migration_status'] == 'pending-concrete-migration' for entry in entries)}`",
         f"- Abstract-interface declarations whose module already has a concrete bridge in repo: `{bridge_ready_abstract_count}`",
+        f"- Active H10 correspondence risks outside the bridge axis: `{exactness_pending_count}`",
         "",
         "## Concrete Substrate Modules",
         "",
@@ -2004,6 +2511,9 @@ def render_bridge(entries: list[dict[str, object]]) -> str:
                 "`...Model` / `...Theory` proof boundary.",
                 "No manifest entry depends on such a layer, so it is no longer part of",
                 "the mathematical trust boundary.",
+                "This bridge closure is separate from H10 correspondence closure; active",
+                "H10 risks are tracked in `formalization_manifest.md`,",
+                "`formalization_audit.md`.",
                 "",
             ]
         )
@@ -2064,6 +2574,24 @@ def render_lean(entries: list[dict[str, object]]) -> str:
         and public_probabilistic_bridge_concrete_root_entry_count
         == public_probabilistic_bridge_entry_count
     )
+    exactness_lock_pending_entry_count = sum(
+        bool(entry["exactness_lock_pending"]) for entry in entries
+    )
+    missing_lean_declaration_entry_count = sum(
+        not bool(entry["lean_decl_found"]) for entry in entries
+    )
+    manuscript_proof_entry_count = sum(
+        bool(entry["has_manuscript_proof"]) for entry in entries
+    )
+    manuscript_proof_citation_entry_count = sum(
+        bool(entry["manuscript_proof_cites_lean"]) for entry in entries
+    )
+    missing_manuscript_proof_citation_entry_count = sum(
+        bool(entry["has_manuscript_proof"])
+        and not bool(entry["manuscript_proof_cites_lean"])
+        for entry in entries
+    )
+    semantic_exactness_closed = exactness_lock_pending_entry_count == 0
     semantic_audit_closed = (
         suspicious_manifest_entry_count == 0
         and definition_entries_tagged_count == definition_entry_count
@@ -2114,10 +2642,16 @@ def render_lean(entries: list[dict[str, object]]) -> str:
         "  leanModule : String",
         "  declName : String",
         "  qualifiedDeclName : String",
+        "  leanDeclFound : Bool",
+        "  hasManuscriptProof : Bool",
+        "  manuscriptProofCitesLean : Bool",
+        "  h10CorrespondenceStatus : String",
         "  status : FormalizationStatus",
         "  firstPrinciplesStatus : FirstPrinciplesStatus",
         "  migrationStatus : MigrationStatus",
         "  proofKind : ProofKind",
+        "  exactnessLockPending : Bool",
+        "  exactnessLockNote : String",
         "  publicProbabilisticBridgeSurface : Bool",
         "  publicProbabilisticBridgeWitnessHyp : Bool",
         "  publicProbabilisticBridgeEquationHyp : Bool",
@@ -2142,6 +2676,14 @@ def render_lean(entries: list[dict[str, object]]) -> str:
                 "      leanModule := " + lean_string(str(entry["module"])),
                 "      declName := " + lean_string(str(entry["decl_name"])),
                 "      qualifiedDeclName := " + lean_string(str(entry["qualified_decl_name"])),
+                "      leanDeclFound := "
+                + str(bool(entry["lean_decl_found"])).lower()
+                + "\n      hasManuscriptProof := "
+                + str(bool(entry["has_manuscript_proof"])).lower()
+                + "\n      manuscriptProofCitesLean := "
+                + str(bool(entry["manuscript_proof_cites_lean"])).lower()
+                + "\n      h10CorrespondenceStatus := "
+                + lean_string(str(entry["correspondence_status"])),
                 "      status := FormalizationStatus." + str(entry["status"]),
                 "      firstPrinciplesStatus := FirstPrinciplesStatus."
                 + ("concreteStack" if entry["first_principles_status"] == "concrete-stack" else "abstractInterface")
@@ -2159,6 +2701,10 @@ def render_lean(entries: list[dict[str, object]]) -> str:
                     "placeholder-truth": "placeholderTruth",
                     "heuristic-other": "heuristicOther",
                 }[str(entry["proof_kind"])]
+                + "\n      exactnessLockPending := "
+                + str(bool(entry["exactness_lock_pending"])).lower()
+                + "\n      exactnessLockNote := "
+                + lean_string(str(entry["exactness_lock_note"]))
                 + "\n      publicProbabilisticBridgeSurface := "
                 + str(bool(entry["public_probabilistic_bridge_surface"])).lower()
                 + "\n      publicProbabilisticBridgeWitnessHyp := "
@@ -2251,6 +2797,22 @@ def render_lean(entries: list[dict[str, object]]) -> str:
             "      entry.proofKind = ProofKind.fieldProjection ||",
             "      entry.proofKind = ProofKind.placeholderTruth ||",
             "      entry.proofKind = ProofKind.heuristicOther)",
+            "",
+            "def exactnessLockPendingEntryCount : Nat :=",
+            "  manifestEntries.countP (fun entry => entry.exactnessLockPending)",
+            "",
+            "def missingLeanDeclarationEntryCount : Nat :=",
+            "  manifestEntries.countP (fun entry => !entry.leanDeclFound)",
+            "",
+            "def manuscriptProofEntryCount : Nat :=",
+            "  manifestEntries.countP (fun entry => entry.hasManuscriptProof)",
+            "",
+            "def manuscriptProofCitationEntryCount : Nat :=",
+            "  manifestEntries.countP (fun entry => entry.manuscriptProofCitesLean)",
+            "",
+            "def missingManuscriptProofCitationEntryCount : Nat :=",
+            "  manifestEntries.countP (fun entry =>",
+            "    entry.hasManuscriptProof && !entry.manuscriptProofCitesLean)",
             "",
             "def publicProbabilisticBridgeEntryCount : Nat :=",
             "  manifestEntries.countP (fun entry => entry.publicProbabilisticBridgeSurface)",
@@ -2346,6 +2908,21 @@ def render_lean(entries: list[dict[str, object]]) -> str:
             f"theorem suspiciousManifestEntryCount_eq : suspiciousManifestEntryCount = {suspicious_manifest_entry_count} := by",
             "  native_decide",
             "",
+            f"theorem exactnessLockPendingEntryCount_eq : exactnessLockPendingEntryCount = {exactness_lock_pending_entry_count} := by",
+            "  native_decide",
+            "",
+            f"theorem missingLeanDeclarationEntryCount_eq : missingLeanDeclarationEntryCount = {missing_lean_declaration_entry_count} := by",
+            "  native_decide",
+            "",
+            f"theorem manuscriptProofEntryCount_eq : manuscriptProofEntryCount = {manuscript_proof_entry_count} := by",
+            "  native_decide",
+            "",
+            f"theorem manuscriptProofCitationEntryCount_eq : manuscriptProofCitationEntryCount = {manuscript_proof_citation_entry_count} := by",
+            "  native_decide",
+            "",
+            f"theorem missingManuscriptProofCitationEntryCount_eq : missingManuscriptProofCitationEntryCount = {missing_manuscript_proof_citation_entry_count} := by",
+            "  native_decide",
+            "",
             f"theorem publicProbabilisticBridgeEntryCount_eq : publicProbabilisticBridgeEntryCount = {public_probabilistic_bridge_entry_count} := by",
             "  native_decide",
             "",
@@ -2390,6 +2967,15 @@ def render_lean(entries: list[dict[str, object]]) -> str:
             "    manifestDefinitionEntriesTaggedAsDefinitionCount = manifestDefinitionEntryCount &&",
             "    manifestTheoremLikeSemanticallyAuditedEntryCount = manifestTheoremLikeEntryCount",
             "",
+            "def semanticExactnessClosed : Bool :=",
+            "  exactnessLockPendingEntryCount = 0",
+            "",
+            "def h10CorrespondenceLedgerComplete : Bool :=",
+            "  missingLeanDeclarationEntryCount = 0",
+            "",
+            "def manuscriptProofCitationSurfaceClosed : Bool :=",
+            "  missingManuscriptProofCitationEntryCount = 0",
+            "",
             "def publicProbabilisticBridgeSurfaceClosed : Bool :=",
             f"  publicProbabilisticBridgeEntryCount = {len(PUBLIC_PROBABILISTIC_BRIDGE_LABELS)} &&",
             "    publicProbabilisticBridgeWitnessHypEntryCount = 0 &&",
@@ -2403,7 +2989,9 @@ def render_lean(entries: list[dict[str, object]]) -> str:
             "  paperFullyDerived",
             "",
             "def fullyFirstPrinciples : Bool :=",
-            "  abstractInterfaceEntryCount = 0 && paperFullyDerived && semanticAuditClosed && publicProbabilisticBridgeSurfaceClosed",
+            "  abstractInterfaceEntryCount = 0 && paperFullyDerived && semanticAuditClosed &&",
+            "    semanticExactnessClosed && h10CorrespondenceLedgerComplete &&",
+            "    manuscriptProofCitationSurfaceClosed && publicProbabilisticBridgeSurfaceClosed",
             "",
             f"theorem paperFullyCovered_eq : paperFullyCovered = {str(sum(entry['status'] == 'declared' for entry in entries) == 0 and sum(str(entry['label']).startswith('auto__') for entry in entries) == 0).lower()} := by",
             "  native_decide",
@@ -2414,6 +3002,15 @@ def render_lean(entries: list[dict[str, object]]) -> str:
             f"theorem semanticAuditClosed_eq : semanticAuditClosed = {str(semantic_audit_closed).lower()} := by",
             "  native_decide",
             "",
+            f"theorem semanticExactnessClosed_eq : semanticExactnessClosed = {str(semantic_exactness_closed).lower()} := by",
+            "  native_decide",
+            "",
+            f"theorem h10CorrespondenceLedgerComplete_eq : h10CorrespondenceLedgerComplete = {str(missing_lean_declaration_entry_count == 0).lower()} := by",
+            "  native_decide",
+            "",
+            f"theorem manuscriptProofCitationSurfaceClosed_eq : manuscriptProofCitationSurfaceClosed = {str(missing_manuscript_proof_citation_entry_count == 0).lower()} := by",
+            "  native_decide",
+            "",
             f"theorem publicProbabilisticBridgeSurfaceClosed_eq : publicProbabilisticBridgeSurfaceClosed = {str(public_probabilistic_bridge_surface_closed).lower()} := by",
             "  native_decide",
             "",
@@ -2421,7 +3018,7 @@ def render_lean(entries: list[dict[str, object]]) -> str:
             "",
             "theorem fullyDerived_eq : fullyDerived = paperFullyDerived := rfl",
             "",
-            f"theorem fullyFirstPrinciples_eq : fullyFirstPrinciples = {str(sum(entry['first_principles_status'] == 'abstract-interface' for entry in entries) == 0 and sum(entry['status'] == 'wrapped' for entry in entries) == 0 and sum(entry['status'] == 'declared' for entry in entries) == 0 and sum(str(entry['label']).startswith('auto__') for entry in entries) == 0 and semantic_audit_closed and public_probabilistic_bridge_surface_closed).lower()} := by",
+            f"theorem fullyFirstPrinciples_eq : fullyFirstPrinciples = {str(sum(entry['first_principles_status'] == 'abstract-interface' for entry in entries) == 0 and sum(entry['status'] == 'wrapped' for entry in entries) == 0 and sum(entry['status'] == 'declared' for entry in entries) == 0 and sum(str(entry['label']).startswith('auto__') for entry in entries) == 0 and semantic_audit_closed and semantic_exactness_closed and missing_lean_declaration_entry_count == 0 and missing_manuscript_proof_citation_entry_count == 0 and public_probabilistic_bridge_surface_closed).lower()} := by",
             "  native_decide",
             "",
             "end SemanticConvergence",
@@ -2432,10 +3029,13 @@ def render_lean(entries: list[dict[str, object]]) -> str:
 
 def main() -> None:
     lean_decls = parse_lean_declarations()
-    entries = enrich_manifest_entries(parse_entries(), lean_decls)
+    entries = enrich_manifest_entries(
+        parse_entries(), lean_decls, parse_proof_bodies_by_label()
+    )
     write_if_changed(AXIOM_AUDIT_LEAN, render_axiom_audit_lean(entries))
     axiom_map = run_axiom_audit(entries)
     write_if_changed(MANIFEST_MD, render_markdown(entries, axiom_map))
+    write_if_changed(H10_LEDGER_MD, render_h10_ledger(entries))
     write_if_changed(AUDIT_MD, render_audit(entries, axiom_map))
     write_if_changed(BRIDGE_MD, render_bridge(entries))
     write_if_changed(THEOREM_CENSUS_MD, render_theorem_census(entries, lean_decls))

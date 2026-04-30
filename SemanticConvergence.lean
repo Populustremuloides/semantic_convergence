@@ -21,8 +21,13 @@ import SemanticConvergence.ConcreteNoise
 import SemanticConvergence.ConcreteSelfReference
 import SemanticConvergence.ConcreteBoundary
 import SemanticConvergence.ConcreteSurrogate
+import SemanticConvergence.HellingerContraction
 import SemanticConvergence.Hierarchy
 import SemanticConvergence.Functional
+import SemanticConvergence.DiscreteConvexDuality
+import SemanticConvergence.KLInstance
+import SemanticConvergence.CompactKernel
+import SemanticConvergence.MartingaleContraction
 import SemanticConvergence.Belief
 import SemanticConvergence.Semantic
 import SemanticConvergence.Noise
@@ -30,4 +35,5 @@ import SemanticConvergence.Rates
 import SemanticConvergence.SelfReference
 import SemanticConvergence.Boundary
 import SemanticConvergence.Surrogate
+import SemanticConvergence.Ontology
 import SemanticConvergence.Manifest

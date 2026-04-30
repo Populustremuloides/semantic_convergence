@@ -2,10 +2,16 @@
 
 # Lean / Lake build outputs
 .lake/
+lake-packages/
 build/
 *.olean
 *.ilean
+*.trace
 *.c
+
+# Downloaded Lean/toolchain archives
+*.tar.zst
+lean-*.tar.*
 
 # Python cache
 __pycache__/

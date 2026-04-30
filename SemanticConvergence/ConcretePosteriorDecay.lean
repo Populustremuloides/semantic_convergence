@@ -180,6 +180,21 @@ def oneStepObserverFiberPosteriorOdds (U : ConcretePrefixMachine A O)
   classical
   exact U.oneStepClassPosteriorOdds π h a (U.observerFiber ω pstar) o
 
+/-- One-step residual class odds, oriented as complement-versus-class. -/
+def oneStepClassResidualOdds (U : ConcretePrefixMachine A O)
+    (π : ConcretePolicy A O) (h : FullHist A O) (a : A)
+    (C : PredSet U.Program) [DecidablePred C] (o : O) : Rat :=
+  let den := U.oneStepClassPosteriorMass π h a C o
+  if den = 0 then 0 else U.oneStepComplementPosteriorMass π h a C o / den
+
+/-- One-step residual observer-fiber odds, oriented as complement-versus-class. -/
+def oneStepObserverFiberResidualOdds (U : ConcretePrefixMachine A O)
+    (π : ConcretePolicy A O) (h : FullHist A O) (a : A)
+    (ω : Observer (EncodedProgram A O))
+    (pstar : EncodedProgram A O) (o : O) : Rat := by
+  classical
+  exact U.oneStepClassResidualOdds π h a (U.observerFiber ω pstar) o
+
 /--
 Residual class posterior odds, oriented as complement-versus-class rather than class-versus-
 complement.
@@ -202,6 +217,45 @@ def residualObserverFiberPosteriorOdds (U : ConcretePrefixMachine A O)
     (pstar : EncodedProgram A O) : Rat := by
   classical
   exact U.residualClassPosteriorOdds π h (U.observerFiber ω pstar)
+
+/--
+If the posterior class and complement masses after appending an observation agree with
+the explicit one-step Bayes update, then the residual odds agree as well.
+
+This is the final algebraic bridge from posterior-mass update equations to the
+residual-odds update consumed by the trajectory-level convergence theorem.
+-/
+theorem residualClassPosteriorOdds_eq_oneStepClassResidualOdds_of_posteriorMass_eq
+    (U : ConcretePrefixMachine A O)
+    (π : ConcretePolicy A O) (hNext h : FullHist A O) (a : A)
+    (C : PredSet U.Program) [DecidablePred C] (o : O)
+    (hClass :
+      U.posteriorClassMass π hNext C =
+        U.oneStepClassPosteriorMass π h a C o)
+    (hComp :
+      U.complementPosteriorMass π hNext C =
+        U.oneStepComplementPosteriorMass π h a C o) :
+    U.residualClassPosteriorOdds π hNext C =
+      U.oneStepClassResidualOdds π h a C o := by
+  simp [residualClassPosteriorOdds, oneStepClassResidualOdds, hClass, hComp]
+
+/-- Observer-fiber specialization of the posterior-mass-to-residual-odds bridge. -/
+theorem residualObserverFiberPosteriorOdds_eq_oneStepObserverFiberResidualOdds_of_posteriorMass_eq
+    (U : ConcretePrefixMachine A O)
+    (π : ConcretePolicy A O) (hNext h : FullHist A O) (a : A)
+    (ω : Observer (EncodedProgram A O))
+    (pstar : EncodedProgram A O) (o : O)
+    (hClass :
+      U.posteriorClassMass π hNext (U.observerFiber ω pstar) =
+        U.oneStepClassPosteriorMass π h a (U.observerFiber ω pstar) o)
+    (hComp :
+      U.complementPosteriorMass π hNext (U.observerFiber ω pstar) =
+        U.oneStepComplementPosteriorMass π h a (U.observerFiber ω pstar) o) :
+    U.residualObserverFiberPosteriorOdds π hNext ω pstar =
+      U.oneStepObserverFiberResidualOdds π h a ω pstar o := by
+  exact
+    U.residualClassPosteriorOdds_eq_oneStepClassResidualOdds_of_posteriorMass_eq
+      π hNext h a (U.observerFiber ω pstar) o hClass hComp
 
 /-- Smoothed one-step class observation mass in the positive-support companion substrate. -/
 def softOneStepClassObservationMass (U : ConcretePrefixMachine A O)
@@ -810,6 +864,44 @@ theorem oneStepObserverFiberPosteriorOdds_eq_zero_of_outside_zero
     π h a (U.observerFiber ω pstar) o
     (U.oneStepObserverFiberComplementPosteriorMass_eq_zero_of_outside_zero
       π h a ω pstar o hZero)
+
+/-- Observer-fiber one-step residual odds collapse to zero at any zero-out observation. -/
+theorem oneStepObserverFiberResidualOdds_eq_zero_of_outside_zero
+    (U : ConcretePrefixMachine A O)
+    (π : ConcretePolicy A O) (h : FullHist A O) (a : A)
+    (ω : Observer (EncodedProgram A O))
+    (pstar : EncodedProgram A O) (o : O)
+    (hZero : (U.predictiveLawOutsideClass π h a (U.observerFiber ω pstar)).mass o = 0) :
+    U.oneStepObserverFiberResidualOdds π h a ω pstar o = 0 := by
+  classical
+  unfold oneStepObserverFiberResidualOdds oneStepClassResidualOdds
+  have hCompZero :
+      U.oneStepComplementPosteriorMass π h a (U.observerFiber ω pstar) o = 0 :=
+    U.oneStepObserverFiberComplementPosteriorMass_eq_zero_of_outside_zero
+      π h a ω pstar o hZero
+  simp [hCompZero]
+
+/--
+Per-step residual posterior-decay bound at a zero-out observation, stated in the same
+residual-odds orientation as the public trajectory recurrence.
+-/
+theorem oneStepObserverFiberResidualOdds_le_decayBound_of_outside_zero
+    (U : ConcretePrefixMachine A O)
+    (π : ConcretePolicy A O) (h : FullHist A O) (a : A)
+    (ω : Observer (EncodedProgram A O))
+    (pstar : EncodedProgram A O) (o : O)
+    (δ : Rat)
+    (hOdds0 : 0 ≤ U.residualObserverFiberPosteriorOdds π h ω pstar)
+    (hZero : (U.predictiveLawOutsideClass π h a (U.observerFiber ω pstar)).mass o = 0) :
+    U.oneStepObserverFiberResidualOdds π h a ω pstar o ≤
+      posteriorDecayFactor δ * U.residualObserverFiberPosteriorOdds π h ω pstar := by
+  have hCollapse :
+      U.oneStepObserverFiberResidualOdds π h a ω pstar o = 0 :=
+    U.oneStepObserverFiberResidualOdds_eq_zero_of_outside_zero π h a ω pstar o hZero
+  have hBoundNonneg :
+      0 ≤ posteriorDecayFactor δ * U.residualObserverFiberPosteriorOdds π h ω pstar := by
+    exact mul_nonneg (posteriorDecayFactor_nonneg δ) hOdds0
+  simpa [hCollapse] using hBoundNonneg
 
 /--
 Per-step posterior-decay bound at a zero-out observation.

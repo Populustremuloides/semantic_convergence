@@ -129,6 +129,31 @@ open ConcretePrefixMachine
 variable {A : Type u} {O : Type v}
 variable [Encodable A] [Encodable O]
 
+/--
+H10-facing package for the zero-out/rate companion stack.
+
+The main H10 convergence theorem uses the Hellinger spine. This package is the
+separate finite-horizon certificate used by the stronger residual-odds rate
+corollaries: concrete substrate bookkeeping, realized prefix residual updates,
+and a finite initial residual-odds denominator.
+-/
+structure ZeroOutRatePackage
+    [DecidableEq A] [DecidableEq O] [BEq A] [LawfulBEq A] [BEq O] [LawfulBEq O]
+    (U : ConcretePrefixMachine A O)
+    (π : ConcretePolicy A O) (hπ : ProbabilisticPolicy π)
+    (hSem : ∀ c hc, ProbabilisticKernel (U.semantics c hc))
+    (penv pstar : U.Program)
+    (ω : Observer (EncodedProgram A O))
+    (T : Nat) : Prop where
+  codes_nodup : U.CodesNodup
+  policy_support_nodup : PolicySupportNodup π
+  semantics_support_nodup : SemanticsSupportNodup U
+  realized_updates : HasRealizedPrefixResidualUpdates U π hπ hSem penv pstar ω T
+  initial_residual_finite :
+    (U.toCountablePrefixMachine hSem).initialResidualObserverFiberOdds
+        (toCountablePolicy π hπ) (U.liftObserver ω)
+        (U.toCountableEncodedProgram hSem pstar) ≠ ⊤
+
 /-- Internal witness-transport helper for `lem:one-step-drift`. -/
 theorem lem_one_step_drift_of_witness
     (U : CountablePrefixMachine A O)
@@ -160,15 +185,7 @@ theorem lem_one_step_drift
     (penv pstar : U.Program)
     (ω : Observer (EncodedProgram A O))
     (δ : Rat) (T : Nat)
-    (hStep :
-      ∀ ξ, ξ ∈ ((U.toCountablePrefixMachine hSem).trajectoryLaw
-        (toCountablePolicy π hπ) (U.toCountableProgram hSem penv) T).support →
-        ∀ n, n < T →
-          U.residualObserverFiberPosteriorOdds π (prefixFullHist ξ (n + 1)) ω
-              (U.toEncodedProgram pstar) ≤
-            posteriorDecayFactor δ *
-              U.residualObserverFiberPosteriorOdds π (prefixFullHist ξ n) ω
-                (U.toEncodedProgram pstar)) :
+    (hUpdates : HasRealizedPrefixResidualUpdates U π hπ hSem penv pstar ω T) :
     ∀ᵐ ξ ∂((U.toCountablePrefixMachine hSem).trajectoryLaw
         (toCountablePolicy π hπ) (U.toCountableProgram hSem penv) T).toMeasure,
       ∀ n, n < T →
@@ -184,6 +201,17 @@ theorem lem_one_step_drift
   let penvc := U.toCountableProgram hSem penv
   let ωc := U.liftObserver ω
   let pstarc := U.toCountableEncodedProgram hSem pstar
+  have hStep :
+      ∀ ξ, ξ ∈ ((U.toCountablePrefixMachine hSem).trajectoryLaw
+        (toCountablePolicy π hπ) (U.toCountableProgram hSem penv) T).support →
+        ∀ n, n < T →
+          U.residualObserverFiberPosteriorOdds π (prefixFullHist ξ (n + 1)) ω
+              (U.toEncodedProgram pstar) ≤
+            posteriorDecayFactor δ *
+              U.residualObserverFiberPosteriorOdds π (prefixFullHist ξ n) ω
+                (U.toEncodedProgram pstar) :=
+    prefixwiseResidualDecay_of_realizedPrefixResidualUpdates
+      U π hπ hSem penv pstar ω δ T hUpdates
   have hWitness : Uc.HasSupportwiseResidualContractionWitness πc penvc ωc pstarc δ T := by
     simpa [Uc, πc, penvc, ωc, pstarc] using
       U.hasSupportwiseResidualContractionWitness_of_prefixwiseResidualDecay
@@ -241,15 +269,7 @@ theorem prop_exp_rate
     (penv pstar : U.Program)
     (ω : Observer (EncodedProgram A O))
     (δ : Rat) (T : Nat)
-    (hStep :
-      ∀ ξ, ξ ∈ ((U.toCountablePrefixMachine hSem).trajectoryLaw
-        (toCountablePolicy π hπ) (U.toCountableProgram hSem penv) T).support →
-        ∀ n, n < T →
-          U.residualObserverFiberPosteriorOdds π (prefixFullHist ξ (n + 1)) ω
-              (U.toEncodedProgram pstar) ≤
-            posteriorDecayFactor δ *
-              U.residualObserverFiberPosteriorOdds π (prefixFullHist ξ n) ω
-                (U.toEncodedProgram pstar)) :
+    (hUpdates : HasRealizedPrefixResidualUpdates U π hπ hSem penv pstar ω T) :
     ∀ᵐ ξ ∂((U.toCountablePrefixMachine hSem).trajectoryLaw
         (toCountablePolicy π hπ) (U.toCountableProgram hSem penv) T).toMeasure,
       ∀ N, N ≤ T →
@@ -265,6 +285,17 @@ theorem prop_exp_rate
   let penvc := U.toCountableProgram hSem penv
   let ωc := U.liftObserver ω
   let pstarc := U.toCountableEncodedProgram hSem pstar
+  have hStep :
+      ∀ ξ, ξ ∈ ((U.toCountablePrefixMachine hSem).trajectoryLaw
+        (toCountablePolicy π hπ) (U.toCountableProgram hSem penv) T).support →
+        ∀ n, n < T →
+          U.residualObserverFiberPosteriorOdds π (prefixFullHist ξ (n + 1)) ω
+              (U.toEncodedProgram pstar) ≤
+            posteriorDecayFactor δ *
+              U.residualObserverFiberPosteriorOdds π (prefixFullHist ξ n) ω
+                (U.toEncodedProgram pstar) :=
+    prefixwiseResidualDecay_of_realizedPrefixResidualUpdates
+      U π hπ hSem penv pstar ω δ T hUpdates
   have hWitness : Uc.HasSupportwiseResidualContractionWitness πc penvc ωc pstarc δ T := by
     simpa [Uc, πc, penvc, ωc, pstarc] using
       U.hasSupportwiseResidualContractionWitness_of_prefixwiseResidualDecay
@@ -309,15 +340,7 @@ theorem prop_kernel_exp_rate
     {p q : U.Program}
     (δ : Rat) (T : Nat)
     (hView : ω.view (U.toEncodedProgram p) = ω.view (U.toEncodedProgram q))
-    (hStep :
-      ∀ ξ, ξ ∈ ((U.toCountablePrefixMachine hSem).trajectoryLaw
-        (toCountablePolicy π hπ) (U.toCountableProgram hSem penv) T).support →
-        ∀ n, n < T →
-          U.residualObserverFiberPosteriorOdds π (prefixFullHist ξ (n + 1)) ω
-              (U.toEncodedProgram p) ≤
-            posteriorDecayFactor δ *
-              U.residualObserverFiberPosteriorOdds π (prefixFullHist ξ n) ω
-                (U.toEncodedProgram p)) :
+    (hUpdates : HasRealizedPrefixResidualUpdates U π hπ hSem penv p ω T) :
     ∀ᵐ ξ ∂((U.toCountablePrefixMachine hSem).trajectoryLaw
         (toCountablePolicy π hπ) (U.toCountableProgram hSem penv) T).toMeasure,
       ∀ N, N ≤ T →
@@ -334,6 +357,17 @@ theorem prop_kernel_exp_rate
   let ωc := U.liftObserver ω
   let pc := U.toCountableEncodedProgram hSem p
   let qc := U.toCountableEncodedProgram hSem q
+  have hStep :
+      ∀ ξ, ξ ∈ ((U.toCountablePrefixMachine hSem).trajectoryLaw
+        (toCountablePolicy π hπ) (U.toCountableProgram hSem penv) T).support →
+        ∀ n, n < T →
+          U.residualObserverFiberPosteriorOdds π (prefixFullHist ξ (n + 1)) ω
+              (U.toEncodedProgram p) ≤
+            posteriorDecayFactor δ *
+              U.residualObserverFiberPosteriorOdds π (prefixFullHist ξ n) ω
+                (U.toEncodedProgram p) :=
+    prefixwiseResidualDecay_of_realizedPrefixResidualUpdates
+      U π hπ hSem penv p ω δ T hUpdates
   have hWitness :
       Uc.HasSupportwiseResidualContractionWitness πc penvc ωc pc δ T := by
     simpa [Uc, πc, penvc, ωc, pc] using
@@ -381,15 +415,7 @@ theorem thm_exp_rate_concentration
     {p q : U.Program}
     (δ : Rat) (T : Nat)
     (hView : ω.view (U.toEncodedProgram p) = ω.view (U.toEncodedProgram q))
-    (hStep :
-      ∀ ξ, ξ ∈ ((U.toCountablePrefixMachine hSem).trajectoryLaw
-        (toCountablePolicy π hπ) (U.toCountableProgram hSem penv) T).support →
-        ∀ n, n < T →
-          U.residualObserverFiberPosteriorOdds π (prefixFullHist ξ (n + 1)) ω
-              (U.toEncodedProgram p) ≤
-            posteriorDecayFactor δ *
-              U.residualObserverFiberPosteriorOdds π (prefixFullHist ξ n) ω
-                (U.toEncodedProgram p))
+    (hUpdates : HasRealizedPrefixResidualUpdates U π hπ hSem penv p ω T)
     (hInitTop :
       (U.toCountablePrefixMachine hSem).initialResidualObserverFiberOdds
           (toCountablePolicy π hπ) (U.liftObserver ω)
@@ -410,6 +436,17 @@ theorem thm_exp_rate_concentration
   let ωc := U.liftObserver ω
   let pc := U.toCountableEncodedProgram hSem p
   let qc := U.toCountableEncodedProgram hSem q
+  have hStep :
+      ∀ ξ, ξ ∈ ((U.toCountablePrefixMachine hSem).trajectoryLaw
+        (toCountablePolicy π hπ) (U.toCountableProgram hSem penv) T).support →
+        ∀ n, n < T →
+          U.residualObserverFiberPosteriorOdds π (prefixFullHist ξ (n + 1)) ω
+              (U.toEncodedProgram p) ≤
+            posteriorDecayFactor δ *
+              U.residualObserverFiberPosteriorOdds π (prefixFullHist ξ n) ω
+                (U.toEncodedProgram p) :=
+    prefixwiseResidualDecay_of_realizedPrefixResidualUpdates
+      U π hπ hSem penv p ω δ T hUpdates
   have hWitness :
       Uc.HasSupportwiseResidualContractionWitness πc penvc ωc pc δ T := by
     simpa [Uc, πc, penvc, ωc, pc] using
@@ -425,6 +462,149 @@ theorem thm_exp_rate_concentration
     exact hInitTop (hInitEq.trans hTop)
   simpa [Uc, πc, penvc, ωc, qc] using
     cor_separating_support_finite_time_of_witness Uc πc penvc ωc qc δ T hWitness' hInitTop'
+
+/-- H10 package wrapper for the one-step residual-odds contraction certificate. -/
+theorem zeroOutRatePackage_oneStepResidual
+    [DecidableEq A] [DecidableEq O] [BEq A] [LawfulBEq A] [BEq O] [LawfulBEq O]
+    (U : ConcretePrefixMachine A O)
+    (π : ConcretePolicy A O) (hπ : ProbabilisticPolicy π)
+    (hSem : ∀ c hc, ProbabilisticKernel (U.semantics c hc))
+    (penv pstar : U.Program)
+    (ω : Observer (EncodedProgram A O))
+    (δ : Rat) (T : Nat)
+    (h𝒵 : ZeroOutRatePackage U π hπ hSem penv pstar ω T) :
+    ∀ᵐ ξ ∂((U.toCountablePrefixMachine hSem).trajectoryLaw
+        (toCountablePolicy π hπ) (U.toCountableProgram hSem penv) T).toMeasure,
+      ∀ n, n < T →
+        (U.toCountablePrefixMachine hSem).residualObserverFiberProcess
+            (toCountablePolicy π hπ) (U.liftObserver ω)
+            (U.toCountableEncodedProgram hSem pstar) (n + 1) ξ ≤
+          posteriorDecayFactorENNReal δ *
+            (U.toCountablePrefixMachine hSem).residualObserverFiberProcess
+              (toCountablePolicy π hπ) (U.liftObserver ω)
+              (U.toCountableEncodedProgram hSem pstar) n ξ :=
+  lem_one_step_drift U h𝒵.codes_nodup π hπ h𝒵.policy_support_nodup
+    hSem h𝒵.semantics_support_nodup penv pstar ω δ T h𝒵.realized_updates
+
+/-- H10 package wrapper for the finite-horizon residual-odds rate certificate. -/
+theorem zeroOutRatePackage_residualRate
+    [DecidableEq A] [DecidableEq O] [BEq A] [LawfulBEq A] [BEq O] [LawfulBEq O]
+    (U : ConcretePrefixMachine A O)
+    (π : ConcretePolicy A O) (hπ : ProbabilisticPolicy π)
+    (hSem : ∀ c hc, ProbabilisticKernel (U.semantics c hc))
+    (penv pstar : U.Program)
+    (ω : Observer (EncodedProgram A O))
+    (δ : Rat) (T : Nat)
+    (h𝒵 : ZeroOutRatePackage U π hπ hSem penv pstar ω T) :
+    ∀ᵐ ξ ∂((U.toCountablePrefixMachine hSem).trajectoryLaw
+        (toCountablePolicy π hπ) (U.toCountableProgram hSem penv) T).toMeasure,
+      ∀ N, N ≤ T →
+        (U.toCountablePrefixMachine hSem).residualObserverFiberProcess
+            (toCountablePolicy π hπ) (U.liftObserver ω)
+            (U.toCountableEncodedProgram hSem pstar) N ξ ≤
+          posteriorDecayFactorENNReal δ ^ N *
+            (U.toCountablePrefixMachine hSem).initialResidualObserverFiberOdds
+              (toCountablePolicy π hπ) (U.liftObserver ω)
+              (U.toCountableEncodedProgram hSem pstar) :=
+  prop_exp_rate U h𝒵.codes_nodup π hπ h𝒵.policy_support_nodup
+    hSem h𝒵.semantics_support_nodup penv pstar ω δ T h𝒵.realized_updates
+
+/-- H10 package wrapper for the finite-time posterior-share lower bound. -/
+theorem zeroOutRatePackage_posteriorShareFiniteTime
+    [DecidableEq A] [DecidableEq O] [BEq A] [LawfulBEq A] [BEq O] [LawfulBEq O]
+    (U : ConcretePrefixMachine A O)
+    (π : ConcretePolicy A O) (hπ : ProbabilisticPolicy π)
+    (hSem : ∀ c hc, ProbabilisticKernel (U.semantics c hc))
+    (penv pstar : U.Program)
+    (ω : Observer (EncodedProgram A O))
+    (δ : Rat) (T : Nat)
+    (h𝒵 : ZeroOutRatePackage U π hπ hSem penv pstar ω T) :
+    ∀ᵐ ξ ∂((U.toCountablePrefixMachine hSem).trajectoryLaw
+        (toCountablePolicy π hπ) (U.toCountableProgram hSem penv) T).toMeasure,
+      ∀ N, N ≤ T →
+        (1 + posteriorDecayFactorENNReal δ ^ N *
+          (U.toCountablePrefixMachine hSem).initialResidualObserverFiberOdds
+            (toCountablePolicy π hπ) (U.liftObserver ω)
+            (U.toCountableEncodedProgram hSem pstar))⁻¹ ≤
+          (U.toCountablePrefixMachine hSem).observerFiberPosteriorShareProcess
+            (toCountablePolicy π hπ) (U.liftObserver ω)
+            (U.toCountableEncodedProgram hSem pstar) N ξ :=
+  cor_separating_support_finite_time U h𝒵.codes_nodup π hπ
+    h𝒵.policy_support_nodup hSem h𝒵.semantics_support_nodup penv pstar
+    ω δ T h𝒵.realized_updates h𝒵.initial_residual_finite
+
+/-- H10 alias preserving the paper's selector-rate label on the zero-out stack. -/
+theorem zeroOutRatePackage_expRate
+    [DecidableEq A] [DecidableEq O] [BEq A] [LawfulBEq A] [BEq O] [LawfulBEq O]
+    (U : ConcretePrefixMachine A O)
+    (π : ConcretePolicy A O) (hπ : ProbabilisticPolicy π)
+    (hSem : ∀ c hc, ProbabilisticKernel (U.semantics c hc))
+    (penv pstar : U.Program)
+    (ω : Observer (EncodedProgram A O))
+    (δ : Rat) (T : Nat)
+    (h𝒵 : ZeroOutRatePackage U π hπ hSem penv pstar ω T) :
+    ∀ᵐ ξ ∂((U.toCountablePrefixMachine hSem).trajectoryLaw
+        (toCountablePolicy π hπ) (U.toCountableProgram hSem penv) T).toMeasure,
+      ∀ N, N ≤ T →
+        (U.toCountablePrefixMachine hSem).residualObserverFiberProcess
+            (toCountablePolicy π hπ) (U.liftObserver ω)
+            (U.toCountableEncodedProgram hSem pstar) N ξ ≤
+          posteriorDecayFactorENNReal δ ^ N *
+            (U.toCountablePrefixMachine hSem).initialResidualObserverFiberOdds
+              (toCountablePolicy π hπ) (U.liftObserver ω)
+              (U.toCountableEncodedProgram hSem pstar) :=
+  zeroOutRatePackage_residualRate U π hπ hSem penv pstar ω δ T h𝒵
+
+/-- H10 package wrapper for same-view transfer of the residual-odds rate. -/
+theorem zeroOutRatePackage_sameViewResidualRate
+    [DecidableEq A] [DecidableEq O] [BEq A] [LawfulBEq A] [BEq O] [LawfulBEq O]
+    (U : ConcretePrefixMachine A O)
+    (π : ConcretePolicy A O) (hπ : ProbabilisticPolicy π)
+    (hSem : ∀ c hc, ProbabilisticKernel (U.semantics c hc))
+    (penv : U.Program)
+    (ω : Observer (EncodedProgram A O))
+    {p q : U.Program}
+    (δ : Rat) (T : Nat)
+    (hView : ω.view (U.toEncodedProgram p) = ω.view (U.toEncodedProgram q))
+    (h𝒵 : ZeroOutRatePackage U π hπ hSem penv p ω T) :
+    ∀ᵐ ξ ∂((U.toCountablePrefixMachine hSem).trajectoryLaw
+        (toCountablePolicy π hπ) (U.toCountableProgram hSem penv) T).toMeasure,
+      ∀ N, N ≤ T →
+        (U.toCountablePrefixMachine hSem).residualObserverFiberProcess
+            (toCountablePolicy π hπ) (U.liftObserver ω)
+            (U.toCountableEncodedProgram hSem q) N ξ ≤
+          posteriorDecayFactorENNReal δ ^ N *
+            (U.toCountablePrefixMachine hSem).initialResidualObserverFiberOdds
+              (toCountablePolicy π hπ) (U.liftObserver ω)
+              (U.toCountableEncodedProgram hSem q) :=
+  prop_kernel_exp_rate U h𝒵.codes_nodup π hπ h𝒵.policy_support_nodup
+    hSem h𝒵.semantics_support_nodup penv ω δ T hView h𝒵.realized_updates
+
+/-- H10 package wrapper for same-view finite-time posterior-share transfer. -/
+theorem zeroOutRatePackage_sameViewPosteriorShareFiniteTime
+    [DecidableEq A] [DecidableEq O] [BEq A] [LawfulBEq A] [BEq O] [LawfulBEq O]
+    (U : ConcretePrefixMachine A O)
+    (π : ConcretePolicy A O) (hπ : ProbabilisticPolicy π)
+    (hSem : ∀ c hc, ProbabilisticKernel (U.semantics c hc))
+    (penv : U.Program)
+    (ω : Observer (EncodedProgram A O))
+    {p q : U.Program}
+    (δ : Rat) (T : Nat)
+    (hView : ω.view (U.toEncodedProgram p) = ω.view (U.toEncodedProgram q))
+    (h𝒵 : ZeroOutRatePackage U π hπ hSem penv p ω T) :
+    ∀ᵐ ξ ∂((U.toCountablePrefixMachine hSem).trajectoryLaw
+        (toCountablePolicy π hπ) (U.toCountableProgram hSem penv) T).toMeasure,
+      ∀ N, N ≤ T →
+        (1 + posteriorDecayFactorENNReal δ ^ N *
+          (U.toCountablePrefixMachine hSem).initialResidualObserverFiberOdds
+            (toCountablePolicy π hπ) (U.liftObserver ω)
+            (U.toCountableEncodedProgram hSem q))⁻¹ ≤
+          (U.toCountablePrefixMachine hSem).observerFiberPosteriorShareProcess
+            (toCountablePolicy π hπ) (U.liftObserver ω)
+            (U.toCountableEncodedProgram hSem q) N ξ :=
+  thm_exp_rate_concentration U h𝒵.codes_nodup π hπ
+    h𝒵.policy_support_nodup hSem h𝒵.semantics_support_nodup penv ω
+    δ T hView h𝒵.realized_updates h𝒵.initial_residual_finite
 
 end CountablePaperRates
 

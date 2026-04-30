@@ -6,13 +6,13 @@ It is a source-level heuristic audit of theorem proof bodies. It does not
 replace mathematical review; it exists to surface likely projection /
 tautology / placeholder patterns quickly.
 
-- Total `theorem` declarations audited: `406`
-- Suspicious theorem declarations: `31`
-- Substantive: `331`
-- Constructive existential: `24`
-- Rate composition: `10`
-- Single helper application: `13`
-- Definitional unfold: `18`
+- Total `theorem` declarations audited: `910`
+- Suspicious theorem declarations: `87`
+- Substantive: `763`
+- Constructive existential: `34`
+- Rate composition: `17`
+- Single helper application: `43`
+- Definitional unfold: `44`
 - Field projection: `0`
 - Placeholder truth: `0`
 
@@ -20,6 +20,20 @@ tautology / placeholder patterns quickly.
 
 | Module | Decl | Lines | Manifest-tracked | Proof kind | Body excerpt |
 | --- | --- | --- | --- | --- | --- |
+| `SemanticConvergence.CompactKernel` | `SemanticConvergence.CompactKernel.HasFullSupport` | `31-37` | `no` | `definitional-unfold` | `hμ hs_open hs_nonempty` |
+| `SemanticConvergence.CompactKernel` | `SemanticConvergence.CompactKernel.BoundedKernelScore.prodFun_apply` | `138-141` | `no` | `definitional-unfold` | `rfl` |
+| `SemanticConvergence.CompactKernel` | `SemanticConvergence.CompactKernel.BoundedKernelScore.lower_le_prodFun` | `146-149` | `no` | `single-lemma-application` | `B.lower_le z.1 z.2` |
+| `SemanticConvergence.CompactKernel` | `SemanticConvergence.CompactKernel.BoundedKernelScore.prodFun_le_upper` | `150-154` | `no` | `single-lemma-application` | `B.le_upper z.1 z.2` |
+| `SemanticConvergence.CompactKernel` | `SemanticConvergence.CompactKernel.BoundedKernelScore.absBound_nonneg` | `158-161` | `no` | `single-lemma-application` | `by exact le_trans (abs_nonneg B.lower) (le_max_left _ _)` |
+| `SemanticConvergence.CompactKernel` | `SemanticConvergence.CompactKernel.referenceMeasure_univ` | `206-212` | `no` | `definitional-unfold` | `by exact measure_univ` |
+| `SemanticConvergence.CompactKernel` | `SemanticConvergence.CompactKernel.scoreIntegral_integrable` | `256-261` | `no` | `single-lemma-application` | `B.integrable_prodFun κ` |
+| `SemanticConvergence.CompactKernel` | `SemanticConvergence.CompactKernel.scaledScore_apply` | `316-320` | `no` | `definitional-unfold` | `rfl` |
+| `SemanticConvergence.CompactKernel` | `SemanticConvergence.CompactKernel.scaledScore_measurable` | `321-325` | `no` | `single-lemma-application` | `B.measurable_prodFun.const_mul (β / γ)` |
+| `SemanticConvergence.CompactKernel` | `SemanticConvergence.CompactKernel.integral_exp_scaledScore_pos` | `481-488` | `no` | `single-lemma-application` | `integral_exp_pos (exp_scaledScore_integrable ref hβ hγ B)` |
+| `SemanticConvergence.CompactKernel` | `SemanticConvergence.CompactKernel.gibbsMeasure_absolutelyContinuous` | `505-510` | `no` | `single-lemma-application` | `by exact withDensity_absolutelyContinuous ref (gibbsDensity ref β γ B)` |
+| `SemanticConvergence.CompactKernel` | `SemanticConvergence.CompactKernel.kernelKL_gibbs_eq_top_of_not_ac_reference` | `668-676` | `no` | `single-lemma-application` | `kernelKL_eq_top_of_not_ac (not_absolutelyContinuous_gibbsMeasure_of_not_absolutelyContinuous_reference ref B hκref)` |
+| `SemanticConvergence.CompactKernel` | `SemanticConvergence.CompactKernel.Setup.reference_eq_referenceMeasure` | `938-942` | `no` | `definitional-unfold` | `rfl` |
+| `SemanticConvergence.CompactKernel` | `SemanticConvergence.CompactKernel.Setup.action_ball_ne_zero` | `959-971` | `no` | `single-lemma-application` | `S.action_fullSupport.ball_ne_zero x hε end Setup end CompactKernel end end SemanticConvergence` |
 | `SemanticConvergence.ConcreteBelief` | `SemanticConvergence.ConcretePrefixMachine.mem_allPrograms` | `29-33` | `no` | `single-lemma-application` | `List.mem_attach U.codes p` |
 | `SemanticConvergence.ConcreteBelief` | `SemanticConvergence.ConcretePrefixMachine.toEncodedProgram_code` | `38-42` | `no` | `definitional-unfold` | `rfl` |
 | `SemanticConvergence.ConcreteBoundary` | `SemanticConvergence.ConcretePrefixMachine.riskMinusInformationGain_of_rfl` | `177-186` | `no` | `single-lemma-application` | `U.expectedFreeEnergyRat_eq_risk_minus_informationGain π h a ω pstar` |
@@ -29,38 +43,89 @@ tautology / placeholder patterns quickly.
 | `SemanticConvergence.ConcreteCore` | `SemanticConvergence.listWeightedSum_cons` | `19-25` | `no` | `definitional-unfold` | `rfl` |
 | `SemanticConvergence.ConcreteCore` | `SemanticConvergence.reachableHist_mem_support` | `250-255` | `no` | `single-lemma-application` | `(histLaw π κ t).support_complete h hReach omit [BEq A] [LawfulBEq A] [BEq O] [LawfulBEq O] in` |
 | `SemanticConvergence.ConcreteCore` | `SemanticConvergence.reachableFullHist_mem_support` | `256-261` | `no` | `single-lemma-application` | `(fullHistLaw π κ t).support_complete h hReach` |
-| `SemanticConvergence.ConcreteFunctional` | `SemanticConvergence.argminOnList_spec` | `456-464` | `no` | `single-lemma-application` | `Classical.choose_spec (exists_minimizerOnList xs f hxs) end FiniteArgmin end end SemanticConvergence` |
+| `SemanticConvergence.ConcreteFunctional` | `SemanticConvergence.argminOnList_spec` | `849-857` | `no` | `single-lemma-application` | `Classical.choose_spec (exists_minimizerOnList xs f hxs) end FiniteArgmin end end SemanticConvergence` |
 | `SemanticConvergence.ConcreteNoise` | `SemanticConvergence.decodable_implies_supportLeftInvertible` | `66-80` | `no` | `definitional-unfold` | `hDec end Channels namespace ConcretePrefixMachine variable {A : Type u} {O : Type v} {O' : Type w} variable [DecidableEq A] [DecidableEq O] [BEq A] [LawfulBEq A] [BEq O] [LawfulBEq` |
+| `SemanticConvergence.ConcretePMF` | `SemanticConvergence.ConcreteLaw.toPMF_apply` | `44-47` | `no` | `definitional-unfold` | `rfl` |
+| `SemanticConvergence.ConcretePosteriorDecay` | `SemanticConvergence.ConcretePrefixMachine.residualObserverFiberPosteriorOdds_eq_oneStepObserverFiberResidualOdds_of_posteriorMass_eq` | `243-260` | `no` | `single-lemma-application` | `by exact U.residualClassPosteriorOdds_eq_oneStepClassResidualOdds_of_posteriorMass_eq π hNext h a (U.observerFiber ω pstar) o hClass hComp` |
 | `SemanticConvergence.ConcretePrior` | `SemanticConvergence.pow2_ne_zero` | `51-53` | `no` | `single-lemma-application` | `Nat.ne_of_gt (pow2_pos n)` |
-| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.ae_residualObserverFiberRecurrence_of_witness` | `338-356` | `no` | `single-lemma-application` | `by exact U.ae_residualObserverFiberRecurrence_of_supportwise π penv ω pstar δ T (U.hasSupportwiseResidualRecurrence_of_witness π penv ω pstar δ T hWitness)` |
-| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.ae_residualObserverFiberRateBound_of_witness` | `357-372` | `no` | `single-lemma-application` | `by exact U.ae_residualObserverFiberRateBound_of_supportwise π penv ω pstar δ T (U.hasSupportwiseResidualRecurrence_of_witness π penv ω pstar δ T hWitness)` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.posteriorWeight_ne_zero_of_likelihood_ne_zero` | `1641-1656` | `no` | `single-lemma-application` | `by exact ne_of_gt (by simpa [CountablePrefixMachine.posteriorWeight] using ENNReal.mul_pos (U.universalWeight_ne_zero p) hLik)` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.trueLawHellingerNormalizer` | `2633-2644` | `no` | `single-lemma-application` | `by exact exp_predictiveLawTrueHellingerSeparation_mul_affinity hAff omit [Encodable O] in` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.observerFiberBhattacharyyaScore_eq_predictiveLawSeparation` | `2743-2753` | `no` | `definitional-unfold` | `rfl` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.observerFiberStepBhattacharyyaScore_eq` | `2754-2769` | `no` | `definitional-unfold` | `rfl` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.observerFiberTrueLawHellingerScore_eq` | `2906-2923` | `no` | `definitional-unfold` | `rfl` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.realizedCumulativeSeparationProcess_eq_sum` | `3435-3440` | `no` | `definitional-unfold` | `rfl` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.realizedHellingerEnvelopeProcess_eq` | `3441-3451` | `no` | `definitional-unfold` | `rfl` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.realizedObserverFiberCumulativeBhattacharyyaSeparationProcess_eq_sum` | `3452-3462` | `no` | `definitional-unfold` | `rfl` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.realizedObserverFiberCumulativeBhattacharyyaSeparationProcess_eq_realizedCumulative` | `3463-3472` | `no` | `definitional-unfold` | `rfl` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.realizedObserverFiberHellingerEnvelopeProcess_eq` | `3473-3485` | `no` | `definitional-unfold` | `rfl` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.realizedObserverFiberHellingerEnvelopeProcess_eq_realizedHellingerEnvelope` | `3486-3503` | `no` | `definitional-unfold` | `rfl` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.hellingerConvergenceSpine_of_realized_processes` | `3504-3537` | `no` | `single-lemma-application` | `by exact HellingerConvergenceSpine.of_processes (U.ae_realizedResidualOddsProcess_nonneg π ω pstar) hM_martingale hM_bdd hS_diverges` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.hellingerConvergenceSpine_of_observerFiberBhattacharyya_processes` | `3538-3573` | `no` | `single-lemma-application` | `by exact HellingerConvergenceSpine.of_processes (U.ae_realizedResidualOddsProcess_nonneg π ω pstar) hM_martingale hM_bdd hS_diverges` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.infiniteRealizedBhattacharyyaSeparationProcess_eq` | `3739-3744` | `no` | `definitional-unfold` | `rfl` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.infiniteRealizedCumulativeSeparationProcess_eq_sum` | `3757-3762` | `no` | `definitional-unfold` | `rfl` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.infiniteRealizedObserverFiberCumulativeBhattacharyyaSeparationProcess_eq_sum` | `3763-3773` | `no` | `definitional-unfold` | `rfl` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.infiniteRealizedObserverFiberCumulativeBhattacharyyaSeparationProcess_eq_realizedCumulative` | `3774-3783` | `no` | `definitional-unfold` | `rfl` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.infiniteRealizedObserverFiberHellingerEnvelopeProcess_eq` | `3784-3796` | `no` | `definitional-unfold` | `rfl` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.infiniteRealizedObserverFiberHellingerEnvelopeProcess_eq_realizedHellingerEnvelope` | `3797-3816` | `no` | `definitional-unfold` | `rfl` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.hellingerConvergenceSpine_of_realized_processes_uniform_separation_floor` | `3844-3872` | `no` | `single-lemma-application` | `by exact U.hellingerConvergenceSpine_of_realized_processes π ω pstar B hM_martingale hM_bdd (ae_realizedCumulativeSeparationProcess_tendsto_atTop_of_uniform_floor B hFloor)` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.hasObserverFiberBhattacharyyaUniformSeparationFloor_of_affinityCeiling_policySupport` | `3978-3999` | `no` | `single-lemma-application` | `U.hasObserverFiberBhattacharyyaUniformSeparationFloor_of_policySupportFloor π ω pstar (U.hasObserverFiberBhattacharyyaFloorOnPolicySupport_of_affinityCeiling π ω pstar hCeiling) hR` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.infiniteHasObserverFiberBhattacharyyaUniformSeparationFloor_of_affinityCeiling_policySupport` | `4252-4272` | `no` | `single-lemma-application` | `U.infiniteHasObserverFiberBhattacharyyaUniformSeparationFloor_of_policySupportFloor π ω pstar (U.infiniteHasObserverFiberBhattacharyyaFloorOnPolicySupport_of_affinityCeiling π ω ps` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.hellingerConvergenceSpine_of_infiniteObserverFiberBhattacharyya_affinityCeiling_policySupport` | `4382-4416` | `no` | `single-lemma-application` | `U.hellingerConvergenceSpine_of_infiniteObserverFiberBhattacharyya_uniform_separation_floor π ω pstar hM_martingale hM_bdd (U.infiniteHasObserverFiberBhattacharyyaUniformSeparationF` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.hellingerConvergenceSpine_of_observerFiberBhattacharyya_uniform_separation_floor` | `4548-4574` | `no` | `single-lemma-application` | `by exact U.hellingerConvergenceSpine_of_observerFiberBhattacharyya_processes π ω pstar hM_martingale hM_bdd (U.ae_realizedObserverFiberCumulativeBhattacharyyaSeparation_tendsto_atT` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.ae_residualObserverFiberRecurrence_of_witness` | `6058-6076` | `no` | `single-lemma-application` | `by exact U.ae_residualObserverFiberRecurrence_of_supportwise π penv ω pstar δ T (U.hasSupportwiseResidualRecurrence_of_witness π penv ω pstar δ T hWitness)` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.ae_residualObserverFiberRateBound_of_witness` | `6077-6092` | `no` | `single-lemma-application` | `by exact U.ae_residualObserverFiberRateBound_of_supportwise π penv ω pstar δ T (U.hasSupportwiseResidualRecurrence_of_witness π penv ω pstar δ T hWitness)` |
 | `SemanticConvergence.ConcreteRates` | `SemanticConvergence.ConcretePrefixMachine.hasSeparatingSupportFloor_of_weight` | `219-225` | `no` | `definitional-unfold` | `hWeight` |
 | `SemanticConvergence.ConcreteRates` | `SemanticConvergence.ConcretePrefixMachine.hasExpectedGainLowerBound_of_value` | `226-236` | `no` | `definitional-unfold` | `hGain` |
 | `SemanticConvergence.ConcreteSelfReference` | `SemanticConvergence.ConcretePrefixMachine.isolationObstructed_of_witness` | `117-125` | `no` | `definitional-unfold` | `hObs` |
 | `SemanticConvergence.ConcreteSemantic` | `SemanticConvergence.ConcretePrefixMachine.softPredictiveLawInClass_mass_pos_of_reference` | `384-394` | `no` | `single-lemma-application` | `by exact ConcreteLaw.soften_mass_pos_of_nonneg_of_ref_pos hInNonneg hε hRef` |
 | `SemanticConvergence.ConcreteSemantic` | `SemanticConvergence.ConcretePrefixMachine.softPredictiveLawOutsideClass_mass_pos_of_reference` | `395-406` | `no` | `single-lemma-application` | `by exact ConcreteLaw.soften_mass_pos_of_nonneg_of_ref_pos hOutNonneg hε hRef set_option linter.unusedSectionVars false in` |
-| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcreteLaw.toPMF_apply` | `44-47` | `no` | `definitional-unfold` | `rfl` |
-| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.toCountablePolicy_apply` | `729-735` | `no` | `single-lemma-application` | `rfl @[simp]` |
-| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.toCountableKernel_apply` | `736-741` | `no` | `definitional-unfold` | `rfl` |
-| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.toCountableEncodedProgram_code` | `953-959` | `no` | `definitional-unfold` | `rfl` |
+| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.toCountablePolicy_apply` | `1160-1166` | `no` | `single-lemma-application` | `rfl @[simp]` |
+| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.toCountableKernel_apply` | `1167-1172` | `no` | `definitional-unfold` | `rfl` |
+| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.toCountableEncodedProgram_code` | `1384-1390` | `no` | `definitional-unfold` | `rfl` |
 | `SemanticConvergence.ConcreteSurrogate` | `SemanticConvergence.ConcretePrefixMachine.amortizedSurrogate_from_witness` | `122-146` | `no` | `single-lemma-application` | `U.surrogateChosenLaw_hasSeparatingSupport_of_argmin π h actions hActions ω pstar refLaw reg hSep` |
-| `SemanticConvergence.Functional` | `SemanticConvergence.listSumENNReal_nil` | `30-33` | `no` | `definitional-unfold` | `rfl` |
-| `SemanticConvergence.Functional` | `SemanticConvergence.listSumENNReal_cons` | `34-37` | `no` | `definitional-unfold` | `rfl` |
-| `SemanticConvergence.Functional` | `SemanticConvergence.argminOnListENNReal_spec` | `115-120` | `no` | `single-lemma-application` | `Classical.choose_spec (exists_minimizerOnListENNReal xs f hxs)` |
-| `SemanticConvergence.Manifest` | `SemanticConvergence.manifestEntryCount_eq` | `1767-1768` | `no` | `definitional-unfold` | `rfl` |
-| `SemanticConvergence.Manifest` | `SemanticConvergence.concreteSubstrateModuleCount_eq` | `1953-1954` | `no` | `definitional-unfold` | `rfl` |
-| `SemanticConvergence.Manifest` | `SemanticConvergence.fullyCovered_eq` | `2012-2013` | `no` | `definitional-unfold` | `rfl` |
-| `SemanticConvergence.Manifest` | `SemanticConvergence.fullyDerived_eq` | `2014-2015` | `no` | `definitional-unfold` | `rfl` |
+| `SemanticConvergence.Functional` | `SemanticConvergence.listSumENNReal_nil` | `40-43` | `no` | `definitional-unfold` | `rfl` |
+| `SemanticConvergence.Functional` | `SemanticConvergence.listSumENNReal_cons` | `44-47` | `no` | `definitional-unfold` | `rfl` |
+| `SemanticConvergence.Functional` | `SemanticConvergence.argminOnListENNReal_spec` | `125-130` | `no` | `single-lemma-application` | `Classical.choose_spec (exists_minimizerOnListENNReal xs f hxs)` |
+| `SemanticConvergence.Functional` | `SemanticConvergence.observerClassPriorWeight_ne_top` | `813-823` | `no` | `single-lemma-application` | `by exact ne_of_lt (lt_of_le_of_lt (observerClassPriorWeight_le_one U ω hq c) ENNReal.one_lt_top)` |
+| `SemanticConvergence.HellingerContraction` | `SemanticConvergence.ConcretePrefixMachine.softObserverFiberResidualLikelihoodRatio_nonneg` | `37-66` | `no` | `single-lemma-application` | `by exact U.softClassResidualLikelihoodRatio_nonneg π h a (U.observerFiber ω pstar) refLaw ε o hOut0 hInPos` |
+| `SemanticConvergence.Manifest` | `SemanticConvergence.manifestEntryCount_eq` | `2510-2511` | `no` | `definitional-unfold` | `rfl` |
+| `SemanticConvergence.Manifest` | `SemanticConvergence.concreteSubstrateModuleCount_eq` | `2727-2728` | `no` | `definitional-unfold` | `rfl` |
+| `SemanticConvergence.Manifest` | `SemanticConvergence.fullyCovered_eq` | `2806-2807` | `no` | `definitional-unfold` | `rfl` |
+| `SemanticConvergence.Manifest` | `SemanticConvergence.fullyDerived_eq` | `2808-2809` | `no` | `definitional-unfold` | `rfl` |
+| `SemanticConvergence.MartingaleContraction` | `SemanticConvergence.posteriorShare_tendsto_one_of_exponential_martingale_spine` | `60-78` | `no` | `single-lemma-application` | `posteriorShare_tendsto_one_of_residualOdds_tendsto_zero (residualOdds_tendsto_zero_of_exponential_martingale_spine hR_nonneg hM hS hIdentity)` |
+| `SemanticConvergence.MartingaleContraction` | `SemanticConvergence.HellingerConvergenceSpine` | `265-278` | `yes` | `single-lemma-application` | `ae_posteriorShare_tendsto_one_of_martingale_exponential_spine h.residual_nonneg h.envelope_martingale h.envelope_l1_bounded h.cumulative_separation_diverges h.sqrt_residual_identit` |
+| `SemanticConvergence.Ontology` | `SemanticConvergence.Ontology.Observer.refines_refl` | `48-50` | `no` | `single-lemma-application` | `observerRefines_refl ω` |
+| `SemanticConvergence.Ontology` | `SemanticConvergence.Ontology.Observer.refines_trans` | `51-61` | `no` | `single-lemma-application` | `observerRefines_trans h₁₂ h₂₃ section Countable variable {A : Type u} {O : Type v} variable [Encodable A] [Encodable O]` |
+| `SemanticConvergence.Semantic` | `SemanticConvergence.KernelReferenceLawTrueLawHellingerSemanticallySeparatedAt_of_classPredictive_fiberSemantics` | `1164-1196` | `no` | `single-lemma-application` | `KernelReferenceLawTrueLawHellingerSemanticallySeparatedAt_of_classPredictive_calibrated U π penv ω pstar κ h refLaw (KernelReferenceLawClassPredictiveCalibratedAt_of_posteriorSuppo` |
+| `SemanticConvergence.Semantic` | `SemanticConvergence.KernelReferenceLawTrueLawHellingerSafeAt_of_classPredictive_calibrated` | `1294-1320` | `no` | `single-lemma-application` | `KernelReferenceLawTrueLawHellingerSafeAt_of_semanticSeparation U π penv ω pstar κ h refLaw (KernelReferenceLawTrueLawHellingerSemanticallySeparatedAt_of_classPredictive_calibrated ` |
+| `SemanticConvergence.Semantic` | `SemanticConvergence.KernelReferenceLawTrueLawHellingerSafeAt_of_classPredictive_fiberSemantics` | `1321-1351` | `no` | `single-lemma-application` | `KernelReferenceLawTrueLawHellingerSafeAt_of_semanticSeparation U π penv ω pstar κ h refLaw (KernelReferenceLawTrueLawHellingerSemanticallySeparatedAt_of_classPredictive_fiberSemant` |
+| `SemanticConvergence.Semantic` | `SemanticConvergence.hasTrueEnvironmentSupportOutsideZeroOuts_of_observerFiberSupportSeparation` | `3796-3815` | `no` | `definitional-unfold` | `hasTrueEnvironmentSupportOutsideZeroOuts_of_concreteSupport U π hπ hSem penv pstar ω T (hasTrueEnvironmentConcreteSupportOutsideZeroOuts_of_observerFiberSupportSeparation U π hπ hS` |
+| `SemanticConvergence.Semantic` | `SemanticConvergence.hasRealizedPrefixOutsideZeroOuts_of_observerFiberSupportSeparation` | `3843-3862` | `no` | `definitional-unfold` | `hasRealizedPrefixOutsideZeroOuts_of_trueEnvironmentSupport U π hπ hSem penv pstar ω T (hasTrueEnvironmentSupportOutsideZeroOuts_of_observerFiberSupportSeparation U π hπ hSem penv p` |
+| `SemanticConvergence.Semantic` | `SemanticConvergence.hasRealizedPrefixResidualUpdates_of_posteriorMassUpdates_zeroOuts` | `3935-3960` | `no` | `definitional-unfold` | `hasRealizedPrefixResidualUpdates_of_posteriorMassUpdates U π hπ hSem penv pstar ω T hMass (hasRealizedPrefixResidualNonneg_of_concrete U hCodes π hπ hπN hSem hSemN penv pstar ω T) ` |
+| `SemanticConvergence.Semantic` | `SemanticConvergence.hasRealizedPrefixResidualUpdates_of_posteriorMassUpdates_trueEnvironmentSupport` | `3961-3984` | `no` | `definitional-unfold` | `hasRealizedPrefixResidualUpdates_of_posteriorMassUpdates_zeroOuts U hCodes π hπ hπN hSem hSemN penv pstar ω T hMass (hasRealizedPrefixOutsideZeroOuts_of_trueEnvironmentSupport U π ` |
+| `SemanticConvergence.Semantic` | `SemanticConvergence.hasRealizedPrefixResidualUpdates_of_posteriorMassUpdates_concreteEnvironmentSupport` | `3985-4010` | `no` | `definitional-unfold` | `hasRealizedPrefixResidualUpdates_of_posteriorMassUpdates_trueEnvironmentSupport U hCodes π hπ hπN hSem hSemN penv pstar ω T hMass (hasTrueEnvironmentSupportOutsideZeroOuts_of_concr` |
+| `SemanticConvergence.Semantic` | `SemanticConvergence.hasRealizedPrefixResidualUpdates_of_posteriorMassUpdates_observerFiberSupportSeparation` | `4011-4034` | `no` | `definitional-unfold` | `hasRealizedPrefixResidualUpdates_of_posteriorMassUpdates_concreteEnvironmentSupport U hCodes π hπ hπN hSem hSemN penv pstar ω T hMass (hasTrueEnvironmentConcreteSupportOutsideZeroO` |
+| `SemanticConvergence.Semantic` | `SemanticConvergence.thm_separating_support_convergence_of_observerFiberSupportSeparation` | `4237-4269` | `no` | `single-lemma-application` | `thm_separating_support_convergence U hCodes π hπ hπN hSem hSemN penv pstar ω δ T (hasRealizedPrefixResidualUpdates_of_posteriorMassUpdates_observerFiberSupportSeparation U hCodes π` |
+| `SemanticConvergence.Semantic` | `SemanticConvergence.thm_separating_support_rate_of_observerFiberSupportSeparation` | `4347-4379` | `no` | `single-lemma-application` | `thm_separating_support_rate U hCodes π hπ hπN hSem hSemN penv pstar ω δ T (hasRealizedPrefixResidualUpdates_of_posteriorMassUpdates_observerFiberSupportSeparation U hCodes π hπ hπN` |
 
 ## Full Theorem Table
 
 | Module | Decl | Lines | Manifest-tracked | Proof kind |
 | --- | --- | --- | --- | --- |
-| `SemanticConvergence.Belief` | `SemanticConvergence.lem_prior_invariance` | `28-34` | `yes` | `definition` |
-| `SemanticConvergence.Belief` | `SemanticConvergence.lem_prior_necessity` | `35-42` | `yes` | `definition` |
-| `SemanticConvergence.Belief` | `SemanticConvergence.lem_variational` | `43-56` | `yes` | `substantive` |
-| `SemanticConvergence.Belief` | `SemanticConvergence.lem_kl_necessity` | `57-71` | `yes` | `substantive` |
-| `SemanticConvergence.Belief` | `SemanticConvergence.lem_merging` | `72-84` | `yes` | `substantive` |
+| `SemanticConvergence.Belief` | `SemanticConvergence.lem_prior_invariance` | `37-43` | `yes` | `definition` |
+| `SemanticConvergence.Belief` | `SemanticConvergence.lem_prior_necessity` | `44-294` | `yes` | `substantive` |
+| `SemanticConvergence.Belief` | `SemanticConvergence.lem_variational` | `295-431` | `yes` | `substantive` |
+| `SemanticConvergence.Belief` | `SemanticConvergence.posteriorIGap_ne_top` | `432-468` | `no` | `substantive` |
+| `SemanticConvergence.Belief` | `SemanticConvergence.lem_variational_igap` | `469-559` | `no` | `substantive` |
+| `SemanticConvergence.Belief` | `SemanticConvergence.lem_kl_necessity` | `560-587` | `yes` | `substantive` |
+| `SemanticConvergence.Belief` | `SemanticConvergence.lem_posterior_gap_necessity` | `588-614` | `no` | `substantive` |
+| `SemanticConvergence.Belief` | `SemanticConvergence.prop_two_observer_minimizer` | `615-735` | `yes` | `substantive` |
+| `SemanticConvergence.Belief` | `SemanticConvergence.prop_kernel_functional_minimizer` | `736-867` | `yes` | `substantive` |
+| `SemanticConvergence.Belief` | `SemanticConvergence.prop_kernel_functional_minimizer_finiteAction` | `868-915` | `no` | `substantive` |
+| `SemanticConvergence.Belief` | `SemanticConvergence.def_compact_kernel_functional_measureEReal_eq_top_of_not_ac` | `931-953` | `no` | `substantive` |
+| `SemanticConvergence.Belief` | `SemanticConvergence.prop_compact_kernel_functional_minimizer_measure` | `978-1101` | `no` | `substantive` |
+| `SemanticConvergence.Belief` | `SemanticConvergence.prop_kernel_functional_minimizer_compact` | `1102-1142` | `yes` | `substantive` |
+| `SemanticConvergence.Belief` | `SemanticConvergence.lem_merging` | `1143-1155` | `yes` | `substantive` |
 | `SemanticConvergence.Boundary` | `SemanticConvergence.prop_boundary_identity` | `75-87` | `yes` | `substantive` |
 | `SemanticConvergence.Boundary` | `SemanticConvergence.lem_risk_ig` | `88-98` | `yes` | `definition` |
 | `SemanticConvergence.Boundary` | `SemanticConvergence.cor_efe_specialization` | `99-109` | `yes` | `definition` |
@@ -70,6 +135,75 @@ tautology / placeholder patterns quickly.
 | `SemanticConvergence.Boundary` | `SemanticConvergence.thm_observer_promotion_failure` | `212-218` | `yes` | `substantive` |
 | `SemanticConvergence.Boundary` | `SemanticConvergence.cor_observer_promotion_universal` | `219-225` | `yes` | `substantive` |
 | `SemanticConvergence.Boundary` | `SemanticConvergence.cor_promotion_contrast` | `226-238` | `yes` | `substantive` |
+| `SemanticConvergence.CompactKernel` | `SemanticConvergence.CompactKernel.HasFullSupport` | `31-37` | `no` | `definitional-unfold` |
+| `SemanticConvergence.CompactKernel` | `SemanticConvergence.CompactKernel.HasFullSupport` | `38-45` | `no` | `substantive` |
+| `SemanticConvergence.CompactKernel` | `SemanticConvergence.CompactKernel.ballMassFloor_le_ball` | `51-56` | `no` | `substantive` |
+| `SemanticConvergence.CompactKernel` | `SemanticConvergence.CompactKernel.exists_positive_le_ball_mass_floor` | `57-95` | `no` | `constructive-existential` |
+| `SemanticConvergence.CompactKernel` | `SemanticConvergence.CompactKernel.ballMassFloor_ne_zero_of_fullSupport` | `96-114` | `no` | `substantive` |
+| `SemanticConvergence.CompactKernel` | `SemanticConvergence.CompactKernel.BoundedKernelScore.prodFun_apply` | `138-141` | `no` | `definitional-unfold` |
+| `SemanticConvergence.CompactKernel` | `SemanticConvergence.CompactKernel.BoundedKernelScore.measurable_prodFun` | `142-145` | `no` | `substantive` |
+| `SemanticConvergence.CompactKernel` | `SemanticConvergence.CompactKernel.BoundedKernelScore.lower_le_prodFun` | `146-149` | `no` | `single-lemma-application` |
+| `SemanticConvergence.CompactKernel` | `SemanticConvergence.CompactKernel.BoundedKernelScore.prodFun_le_upper` | `150-154` | `no` | `single-lemma-application` |
+| `SemanticConvergence.CompactKernel` | `SemanticConvergence.CompactKernel.BoundedKernelScore.absBound_nonneg` | `158-161` | `no` | `single-lemma-application` |
+| `SemanticConvergence.CompactKernel` | `SemanticConvergence.CompactKernel.BoundedKernelScore.norm_prodFun_le_absBound` | `162-176` | `no` | `substantive` |
+| `SemanticConvergence.CompactKernel` | `SemanticConvergence.CompactKernel.BoundedKernelScore.integrable_prodFun` | `177-188` | `no` | `substantive` |
+| `SemanticConvergence.CompactKernel` | `SemanticConvergence.CompactKernel.referenceMeasure_eq_prod` | `193-205` | `no` | `substantive` |
+| `SemanticConvergence.CompactKernel` | `SemanticConvergence.CompactKernel.referenceMeasure_univ` | `206-212` | `no` | `definitional-unfold` |
+| `SemanticConvergence.CompactKernel` | `SemanticConvergence.CompactKernel.kernelKL_eq_top_of_not_ac` | `216-220` | `no` | `substantive` |
+| `SemanticConvergence.CompactKernel` | `SemanticConvergence.CompactKernel.kernelKL_ne_top_iff` | `221-226` | `no` | `substantive` |
+| `SemanticConvergence.CompactKernel` | `SemanticConvergence.CompactKernel.kernelKL_eq_zero_iff_eq` | `227-232` | `no` | `substantive` |
+| `SemanticConvergence.CompactKernel` | `SemanticConvergence.CompactKernel.kernelKL_toReal_nonneg` | `233-237` | `no` | `substantive` |
+| `SemanticConvergence.CompactKernel` | `SemanticConvergence.CompactKernel.kernelKL_toReal_eq_zero_iff_eq_of_ne_top` | `238-252` | `no` | `substantive` |
+| `SemanticConvergence.CompactKernel` | `SemanticConvergence.CompactKernel.scoreIntegral_integrable` | `256-261` | `no` | `single-lemma-application` |
+| `SemanticConvergence.CompactKernel` | `SemanticConvergence.CompactKernel.scoreIntegral_lower_bound` | `262-272` | `no` | `substantive` |
+| `SemanticConvergence.CompactKernel` | `SemanticConvergence.CompactKernel.scoreIntegral_upper_bound` | `273-284` | `no` | `substantive` |
+| `SemanticConvergence.CompactKernel` | `SemanticConvergence.CompactKernel.kernelObjectiveEReal_eq_top_of_not_ac` | `302-311` | `no` | `substantive` |
+| `SemanticConvergence.CompactKernel` | `SemanticConvergence.CompactKernel.scaledScore_apply` | `316-320` | `no` | `definitional-unfold` |
+| `SemanticConvergence.CompactKernel` | `SemanticConvergence.CompactKernel.scaledScore_measurable` | `321-325` | `no` | `single-lemma-application` |
+| `SemanticConvergence.CompactKernel` | `SemanticConvergence.CompactKernel.scaledScore_integrable` | `326-341` | `no` | `substantive` |
+| `SemanticConvergence.CompactKernel` | `SemanticConvergence.CompactKernel.integral_scaledScore` | `342-347` | `no` | `substantive` |
+| `SemanticConvergence.CompactKernel` | `SemanticConvergence.CompactKernel.exp_scaledScore_integrable` | `348-362` | `no` | `substantive` |
+| `SemanticConvergence.CompactKernel` | `SemanticConvergence.CompactKernel.gibbsWeight_measurable` | `367-372` | `no` | `substantive` |
+| `SemanticConvergence.CompactKernel` | `SemanticConvergence.CompactKernel.gibbsWeight_ne_zero` | `373-378` | `no` | `substantive` |
+| `SemanticConvergence.CompactKernel` | `SemanticConvergence.CompactKernel.gibbsWeight_ne_top` | `379-384` | `no` | `substantive` |
+| `SemanticConvergence.CompactKernel` | `SemanticConvergence.CompactKernel.gibbsWeight_lower_bound` | `385-395` | `no` | `substantive` |
+| `SemanticConvergence.CompactKernel` | `SemanticConvergence.CompactKernel.gibbsWeight_upper_bound` | `396-407` | `no` | `substantive` |
+| `SemanticConvergence.CompactKernel` | `SemanticConvergence.CompactKernel.partition_lower_bound` | `412-423` | `no` | `substantive` |
+| `SemanticConvergence.CompactKernel` | `SemanticConvergence.CompactKernel.partition_upper_bound` | `424-435` | `no` | `substantive` |
+| `SemanticConvergence.CompactKernel` | `SemanticConvergence.CompactKernel.partition_ne_zero` | `436-449` | `no` | `substantive` |
+| `SemanticConvergence.CompactKernel` | `SemanticConvergence.CompactKernel.partition_ne_top` | `450-457` | `no` | `substantive` |
+| `SemanticConvergence.CompactKernel` | `SemanticConvergence.CompactKernel.partition_eq_ofReal_integral_exp` | `458-470` | `no` | `substantive` |
+| `SemanticConvergence.CompactKernel` | `SemanticConvergence.CompactKernel.partition_toReal_eq_integral_exp` | `471-480` | `no` | `substantive` |
+| `SemanticConvergence.CompactKernel` | `SemanticConvergence.CompactKernel.integral_exp_scaledScore_pos` | `481-488` | `no` | `single-lemma-application` |
+| `SemanticConvergence.CompactKernel` | `SemanticConvergence.CompactKernel.gibbsDensity_measurable` | `493-500` | `no` | `substantive` |
+| `SemanticConvergence.CompactKernel` | `SemanticConvergence.CompactKernel.gibbsMeasure_absolutelyContinuous` | `505-510` | `no` | `single-lemma-application` |
+| `SemanticConvergence.CompactKernel` | `SemanticConvergence.CompactKernel.gibbsMeasure_univ` | `511-530` | `no` | `substantive` |
+| `SemanticConvergence.CompactKernel` | `SemanticConvergence.CompactKernel.gibbsMeasure_isProbabilityMeasure` | `531-537` | `no` | `substantive` |
+| `SemanticConvergence.CompactKernel` | `SemanticConvergence.CompactKernel.partition_upper_bound_unit_interval` | `538-556` | `no` | `substantive` |
+| `SemanticConvergence.CompactKernel` | `SemanticConvergence.CompactKernel.one_le_gibbsWeight_of_nonnegative` | `557-573` | `no` | `substantive` |
+| `SemanticConvergence.CompactKernel` | `SemanticConvergence.CompactKernel.gibbsDensity_unit_interval_floor` | `574-595` | `no` | `substantive` |
+| `SemanticConvergence.CompactKernel` | `SemanticConvergence.CompactKernel.gibbsMeasure_reference_mass_floor` | `596-614` | `no` | `substantive` |
+| `SemanticConvergence.CompactKernel` | `SemanticConvergence.CompactKernel.gibbsMeasure_product_mass_floor` | `615-633` | `no` | `substantive` |
+| `SemanticConvergence.CompactKernel` | `SemanticConvergence.CompactKernel.gibbsMeasure_eq_tilted` | `634-651` | `no` | `substantive` |
+| `SemanticConvergence.CompactKernel` | `SemanticConvergence.CompactKernel.reference_absolutelyContinuous_gibbsMeasure` | `652-659` | `no` | `substantive` |
+| `SemanticConvergence.CompactKernel` | `SemanticConvergence.CompactKernel.not_absolutelyContinuous_gibbsMeasure_of_not_absolutelyContinuous_reference` | `660-667` | `no` | `substantive` |
+| `SemanticConvergence.CompactKernel` | `SemanticConvergence.CompactKernel.kernelKL_gibbs_eq_top_of_not_ac_reference` | `668-676` | `no` | `single-lemma-application` |
+| `SemanticConvergence.CompactKernel` | `SemanticConvergence.CompactKernel.llr_gibbs_integrable_of_reference` | `677-692` | `no` | `substantive` |
+| `SemanticConvergence.CompactKernel` | `SemanticConvergence.CompactKernel.kernelKL_gibbs_ne_top_of_reference` | `693-704` | `no` | `substantive` |
+| `SemanticConvergence.CompactKernel` | `SemanticConvergence.CompactKernel.gibbs_llr_reference_integrable` | `705-743` | `no` | `substantive` |
+| `SemanticConvergence.CompactKernel` | `SemanticConvergence.CompactKernel.gibbs_kernelKL_reference_ne_top` | `744-752` | `no` | `substantive` |
+| `SemanticConvergence.CompactKernel` | `SemanticConvergence.CompactKernel.kernelKL_toReal_eq_integral_llr_of_probability` | `753-765` | `no` | `substantive` |
+| `SemanticConvergence.CompactKernel` | `SemanticConvergence.CompactKernel.kernelKL_gibbs_toReal_decomposition` | `766-811` | `no` | `substantive` |
+| `SemanticConvergence.CompactKernel` | `SemanticConvergence.CompactKernel.kernelObjectiveReal_decomposition` | `812-828` | `no` | `substantive` |
+| `SemanticConvergence.CompactKernel` | `SemanticConvergence.CompactKernel.kernelObjectiveReal_gibbs_value` | `829-843` | `no` | `substantive` |
+| `SemanticConvergence.CompactKernel` | `SemanticConvergence.CompactKernel.kernelObjectiveReal_gibbs_gap` | `844-857` | `no` | `substantive` |
+| `SemanticConvergence.CompactKernel` | `SemanticConvergence.CompactKernel.kernelObjectiveReal_gibbs_le` | `858-872` | `no` | `substantive` |
+| `SemanticConvergence.CompactKernel` | `SemanticConvergence.CompactKernel.kernelObjectiveReal_eq_gibbs_iff` | `873-901` | `no` | `substantive` |
+| `SemanticConvergence.CompactKernel` | `SemanticConvergence.CompactKernel.kernelObjectiveReal_gibbs_unique_minimizer` | `902-920` | `no` | `substantive` |
+| `SemanticConvergence.CompactKernel` | `SemanticConvergence.CompactKernel.Setup.reference_eq_referenceMeasure` | `938-942` | `no` | `definitional-unfold` |
+| `SemanticConvergence.CompactKernel` | `SemanticConvergence.CompactKernel.Setup.reference_isProbability` | `943-951` | `no` | `substantive` |
+| `SemanticConvergence.CompactKernel` | `SemanticConvergence.CompactKernel.Setup.reference_univ` | `952-958` | `no` | `substantive` |
+| `SemanticConvergence.CompactKernel` | `SemanticConvergence.CompactKernel.Setup.action_ball_ne_zero` | `959-971` | `no` | `single-lemma-application` |
 | `SemanticConvergence.ConcreteBelief` | `SemanticConvergence.ConcretePrefixMachine.mem_allPrograms` | `29-33` | `no` | `single-lemma-application` |
 | `SemanticConvergence.ConcreteBelief` | `SemanticConvergence.ConcretePrefixMachine.toEncodedProgram_code` | `38-42` | `no` | `definitional-unfold` |
 | `SemanticConvergence.ConcreteBelief` | `SemanticConvergence.ConcretePrefixMachine.observerFiber_eq_of_sameView` | `129-137` | `no` | `substantive` |
@@ -103,11 +237,18 @@ tautology / placeholder patterns quickly.
 | `SemanticConvergence.ConcreteCore` | `SemanticConvergence.kernelEqOnReachablePairs_trans` | `297-305` | `no` | `substantive` |
 | `SemanticConvergence.ConcreteCore` | `SemanticConvergence.CountableConcrete.appendEvent_length` | `330-335` | `no` | `substantive` |
 | `SemanticConvergence.ConcreteCore` | `SemanticConvergence.CountableConcrete.reachableHist_iff_ne_zero` | `364-374` | `no` | `substantive` |
-| `SemanticConvergence.ConcreteFunctional` | `SemanticConvergence.ConcreteLaw.restrict_mass_of_pos` | `42-46` | `no` | `substantive` |
-| `SemanticConvergence.ConcreteFunctional` | `SemanticConvergence.ConcreteLaw.restrict_mass_of_neg` | `47-54` | `no` | `substantive` |
-| `SemanticConvergence.ConcreteFunctional` | `SemanticConvergence.lawL1_self` | `385-409` | `no` | `substantive` |
-| `SemanticConvergence.ConcreteFunctional` | `SemanticConvergence.exists_minimizerOnList` | `413-452` | `no` | `constructive-existential` |
-| `SemanticConvergence.ConcreteFunctional` | `SemanticConvergence.argminOnList_spec` | `456-464` | `no` | `single-lemma-application` |
+| `SemanticConvergence.ConcreteFunctional` | `SemanticConvergence.ConcreteLaw.restrict_mass_of_pos` | `52-56` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteFunctional` | `SemanticConvergence.ConcreteLaw.restrict_mass_of_neg` | `57-64` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteFunctional` | `SemanticConvergence.listWeightedSumReal_eq_finset_sum` | `408-422` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteFunctional` | `SemanticConvergence.actionExpectationReal_eq_support_sum_toPMF` | `449-480` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteFunctional` | `SemanticConvergence.encodedProgramPriorWeight_pos` | `501-510` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteFunctional` | `SemanticConvergence.concreteKLDivergenceTerm_eq_exactKL_of_positiveRef` | `511-544` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteFunctional` | `SemanticConvergence.beliefRegularizer_eq_support_sum_toPMF` | `554-579` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteFunctional` | `SemanticConvergence.classLawRegularizer_eq_support_sum_toPMF` | `616-642` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteFunctional` | `SemanticConvergence.kernelLawRegularizer_eq_support_sum_toPMF` | `694-725` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteFunctional` | `SemanticConvergence.lawL1_self` | `778-802` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteFunctional` | `SemanticConvergence.exists_minimizerOnList` | `806-845` | `no` | `constructive-existential` |
+| `SemanticConvergence.ConcreteFunctional` | `SemanticConvergence.argminOnList_spec` | `849-857` | `no` | `single-lemma-application` |
 | `SemanticConvergence.ConcreteHierarchy` | `SemanticConvergence.EncodedProgram.intSemClass_self` | `104-110` | `no` | `substantive` |
 | `SemanticConvergence.ConcreteHierarchy` | `SemanticConvergence.EncodedProgram.intSemClass_subset_policyPred` | `111-117` | `no` | `substantive` |
 | `SemanticConvergence.ConcreteHierarchy` | `SemanticConvergence.EncodedProgram.policyPred_subset_historyCompat` | `118-125` | `no` | `substantive` |
@@ -126,6 +267,10 @@ tautology / placeholder patterns quickly.
 | `SemanticConvergence.ConcreteNoise` | `SemanticConvergence.ConcretePrefixMachine.noisySemanticSeparation_eq_of_sameView` | `110-122` | `no` | `substantive` |
 | `SemanticConvergence.ConcreteNoise` | `SemanticConvergence.ConcretePrefixMachine.identityChannel_is_decodable` | `123-126` | `no` | `substantive` |
 | `SemanticConvergence.ConcreteNoise` | `SemanticConvergence.ConcretePrefixMachine.identityChannel_is_supportLeftInvertible` | `127-135` | `no` | `substantive` |
+| `SemanticConvergence.ConcretePMF` | `SemanticConvergence.ConcreteLaw.mass_eq_zero_of_not_mem_support` | `27-32` | `no` | `substantive` |
+| `SemanticConvergence.ConcretePMF` | `SemanticConvergence.ConcreteLaw.toENNRealMass_eq_zero_of_not_mem_support` | `33-38` | `no` | `substantive` |
+| `SemanticConvergence.ConcretePMF` | `SemanticConvergence.ConcreteLaw.toPMF_apply` | `44-47` | `no` | `definitional-unfold` |
+| `SemanticConvergence.ConcretePMF` | `SemanticConvergence.ConcreteLaw.mem_support_toPMF_iff` | `48-75` | `no` | `substantive` |
 | `SemanticConvergence.ConcretePosteriorDecay` | `SemanticConvergence.ConcretePrefixMachine.posteriorDecayRate_pos_of_pos` | `33-42` | `no` | `substantive` |
 | `SemanticConvergence.ConcretePosteriorDecay` | `SemanticConvergence.ConcretePrefixMachine.posteriorDecayRate_eq_of_pos` | `43-46` | `no` | `substantive` |
 | `SemanticConvergence.ConcretePosteriorDecay` | `SemanticConvergence.ConcretePrefixMachine.posteriorDecayRate_lt_one_of_pos` | `47-55` | `no` | `substantive` |
@@ -135,29 +280,33 @@ tautology / placeholder patterns quickly.
 | `SemanticConvergence.ConcretePosteriorDecay` | `SemanticConvergence.ConcretePrefixMachine.posteriorDecayFactor_le_half_of_pos` | `82-88` | `no` | `substantive` |
 | `SemanticConvergence.ConcretePosteriorDecay` | `SemanticConvergence.ConcretePrefixMachine.posteriorDecayFactor_pos_of_pos` | `89-98` | `no` | `substantive` |
 | `SemanticConvergence.ConcretePosteriorDecay` | `SemanticConvergence.ConcretePrefixMachine.nStepPosteriorDecayBound_of_stepBound` | `99-122` | `no` | `substantive` |
-| `SemanticConvergence.ConcretePosteriorDecay` | `SemanticConvergence.ConcretePrefixMachine.residualObserverFiberPosteriorOdds_eq_of_sameView` | `242-257` | `no` | `substantive` |
-| `SemanticConvergence.ConcretePosteriorDecay` | `SemanticConvergence.ConcretePrefixMachine.softOneStepObserverFiberResidualOdds_eq_of_sameView` | `258-279` | `no` | `substantive` |
-| `SemanticConvergence.ConcretePosteriorDecay` | `SemanticConvergence.ConcretePrefixMachine.exists_supported_action_of_positiveSeparatingSupportFloor` | `280-295` | `no` | `constructive-existential` |
-| `SemanticConvergence.ConcretePosteriorDecay` | `SemanticConvergence.ConcretePrefixMachine.oneStepComplementObservationMass_eq_zero_of_predictiveLawOutsideClass_zero` | `296-303` | `no` | `substantive` |
-| `SemanticConvergence.ConcretePosteriorDecay` | `SemanticConvergence.ConcretePrefixMachine.oneStepComplementPosteriorMass_eq_zero_of_predictiveLawOutsideClass_zero` | `304-312` | `no` | `substantive` |
-| `SemanticConvergence.ConcretePosteriorDecay` | `SemanticConvergence.ConcretePrefixMachine.oneStepObservationOddsRaw_eq_classPosteriorOdds_mul_likelihoodRatio` | `313-326` | `no` | `substantive` |
-| `SemanticConvergence.ConcretePosteriorDecay` | `SemanticConvergence.ConcretePrefixMachine.oneStepClassPosteriorOdds_eq_oneStepObservationOddsRaw` | `327-340` | `no` | `substantive` |
-| `SemanticConvergence.ConcretePosteriorDecay` | `SemanticConvergence.ConcretePrefixMachine.oneStepObserverFiberPosteriorOdds_eq_mul_likelihoodRatio` | `341-355` | `no` | `substantive` |
-| `SemanticConvergence.ConcretePosteriorDecay` | `SemanticConvergence.ConcretePrefixMachine.softOneStepClassResidualOdds_eq_mul_likelihoodRatio` | `356-373` | `no` | `substantive` |
-| `SemanticConvergence.ConcretePosteriorDecay` | `SemanticConvergence.ConcretePrefixMachine.softOneStepObserverFiberResidualOdds_eq_mul_likelihoodRatio` | `374-389` | `no` | `substantive` |
-| `SemanticConvergence.ConcretePosteriorDecay` | `SemanticConvergence.ConcretePrefixMachine.softOneStepObserverFiberResidualOdds_pos_of_positive` | `390-422` | `no` | `substantive` |
-| `SemanticConvergence.ConcretePosteriorDecay` | `SemanticConvergence.ConcretePrefixMachine.softPredictiveResidualLikelihoodRatio_lt_one_of_zeroOut` | `423-451` | `no` | `substantive` |
-| `SemanticConvergence.ConcretePosteriorDecay` | `SemanticConvergence.ConcretePrefixMachine.softPredictiveResidualLikelihoodRatio_lt_one_of_zeroOut_supportUnion` | `452-495` | `no` | `substantive` |
-| `SemanticConvergence.ConcretePosteriorDecay` | `SemanticConvergence.ConcretePrefixMachine.softPredictiveResidualLikelihoodRatio_le_decayFactor_of_zeroOut_supportUnion` | `496-557` | `no` | `substantive` |
-| `SemanticConvergence.ConcretePosteriorDecay` | `SemanticConvergence.ConcretePrefixMachine.softObserverFiberResidualWitness_of_zeroOut` | `558-612` | `no` | `substantive` |
-| `SemanticConvergence.ConcretePosteriorDecay` | `SemanticConvergence.ConcretePrefixMachine.exists_softObserverFiberResidualWitness_of_positiveFloor` | `613-661` | `no` | `constructive-existential` |
-| `SemanticConvergence.ConcretePosteriorDecay` | `SemanticConvergence.ConcretePrefixMachine.softOneStepObserverFiberResidualOdds_le_decayBound_of_zeroOut_supportUnion` | `662-728` | `no` | `substantive` |
-| `SemanticConvergence.ConcretePosteriorDecay` | `SemanticConvergence.ConcretePrefixMachine.exists_softOneStepObserverFiberResidualOdds_le_decayBound_of_positiveFloor` | `729-775` | `no` | `constructive-existential` |
-| `SemanticConvergence.ConcretePosteriorDecay` | `SemanticConvergence.ConcretePrefixMachine.oneStepClassPosteriorOdds_eq_zero_of_complementPosteriorMass_eq_zero` | `776-785` | `no` | `substantive` |
-| `SemanticConvergence.ConcretePosteriorDecay` | `SemanticConvergence.ConcretePrefixMachine.oneStepObserverFiberComplementPosteriorMass_eq_zero_of_outside_zero` | `786-799` | `no` | `substantive` |
-| `SemanticConvergence.ConcretePosteriorDecay` | `SemanticConvergence.ConcretePrefixMachine.oneStepObserverFiberPosteriorOdds_eq_zero_of_outside_zero` | `800-824` | `no` | `substantive` |
-| `SemanticConvergence.ConcretePosteriorDecay` | `SemanticConvergence.ConcretePrefixMachine.oneStepObserverFiberPosteriorOdds_le_decayBound_of_outside_zero` | `825-852` | `no` | `substantive` |
-| `SemanticConvergence.ConcretePosteriorDecay` | `SemanticConvergence.ConcretePrefixMachine.oneStepObserverFiberPosteriorOdds_le_decayBound_of_positiveFloor` | `853-885` | `no` | `constructive-existential` |
+| `SemanticConvergence.ConcretePosteriorDecay` | `SemanticConvergence.ConcretePrefixMachine.residualClassPosteriorOdds_eq_oneStepClassResidualOdds_of_posteriorMass_eq` | `228-242` | `no` | `substantive` |
+| `SemanticConvergence.ConcretePosteriorDecay` | `SemanticConvergence.ConcretePrefixMachine.residualObserverFiberPosteriorOdds_eq_oneStepObserverFiberResidualOdds_of_posteriorMass_eq` | `243-260` | `no` | `single-lemma-application` |
+| `SemanticConvergence.ConcretePosteriorDecay` | `SemanticConvergence.ConcretePrefixMachine.residualObserverFiberPosteriorOdds_eq_of_sameView` | `296-311` | `no` | `substantive` |
+| `SemanticConvergence.ConcretePosteriorDecay` | `SemanticConvergence.ConcretePrefixMachine.softOneStepObserverFiberResidualOdds_eq_of_sameView` | `312-333` | `no` | `substantive` |
+| `SemanticConvergence.ConcretePosteriorDecay` | `SemanticConvergence.ConcretePrefixMachine.exists_supported_action_of_positiveSeparatingSupportFloor` | `334-349` | `no` | `constructive-existential` |
+| `SemanticConvergence.ConcretePosteriorDecay` | `SemanticConvergence.ConcretePrefixMachine.oneStepComplementObservationMass_eq_zero_of_predictiveLawOutsideClass_zero` | `350-357` | `no` | `substantive` |
+| `SemanticConvergence.ConcretePosteriorDecay` | `SemanticConvergence.ConcretePrefixMachine.oneStepComplementPosteriorMass_eq_zero_of_predictiveLawOutsideClass_zero` | `358-366` | `no` | `substantive` |
+| `SemanticConvergence.ConcretePosteriorDecay` | `SemanticConvergence.ConcretePrefixMachine.oneStepObservationOddsRaw_eq_classPosteriorOdds_mul_likelihoodRatio` | `367-380` | `no` | `substantive` |
+| `SemanticConvergence.ConcretePosteriorDecay` | `SemanticConvergence.ConcretePrefixMachine.oneStepClassPosteriorOdds_eq_oneStepObservationOddsRaw` | `381-394` | `no` | `substantive` |
+| `SemanticConvergence.ConcretePosteriorDecay` | `SemanticConvergence.ConcretePrefixMachine.oneStepObserverFiberPosteriorOdds_eq_mul_likelihoodRatio` | `395-409` | `no` | `substantive` |
+| `SemanticConvergence.ConcretePosteriorDecay` | `SemanticConvergence.ConcretePrefixMachine.softOneStepClassResidualOdds_eq_mul_likelihoodRatio` | `410-427` | `no` | `substantive` |
+| `SemanticConvergence.ConcretePosteriorDecay` | `SemanticConvergence.ConcretePrefixMachine.softOneStepObserverFiberResidualOdds_eq_mul_likelihoodRatio` | `428-443` | `no` | `substantive` |
+| `SemanticConvergence.ConcretePosteriorDecay` | `SemanticConvergence.ConcretePrefixMachine.softOneStepObserverFiberResidualOdds_pos_of_positive` | `444-476` | `no` | `substantive` |
+| `SemanticConvergence.ConcretePosteriorDecay` | `SemanticConvergence.ConcretePrefixMachine.softPredictiveResidualLikelihoodRatio_lt_one_of_zeroOut` | `477-505` | `no` | `substantive` |
+| `SemanticConvergence.ConcretePosteriorDecay` | `SemanticConvergence.ConcretePrefixMachine.softPredictiveResidualLikelihoodRatio_lt_one_of_zeroOut_supportUnion` | `506-549` | `no` | `substantive` |
+| `SemanticConvergence.ConcretePosteriorDecay` | `SemanticConvergence.ConcretePrefixMachine.softPredictiveResidualLikelihoodRatio_le_decayFactor_of_zeroOut_supportUnion` | `550-611` | `no` | `substantive` |
+| `SemanticConvergence.ConcretePosteriorDecay` | `SemanticConvergence.ConcretePrefixMachine.softObserverFiberResidualWitness_of_zeroOut` | `612-666` | `no` | `substantive` |
+| `SemanticConvergence.ConcretePosteriorDecay` | `SemanticConvergence.ConcretePrefixMachine.exists_softObserverFiberResidualWitness_of_positiveFloor` | `667-715` | `no` | `constructive-existential` |
+| `SemanticConvergence.ConcretePosteriorDecay` | `SemanticConvergence.ConcretePrefixMachine.softOneStepObserverFiberResidualOdds_le_decayBound_of_zeroOut_supportUnion` | `716-782` | `no` | `substantive` |
+| `SemanticConvergence.ConcretePosteriorDecay` | `SemanticConvergence.ConcretePrefixMachine.exists_softOneStepObserverFiberResidualOdds_le_decayBound_of_positiveFloor` | `783-829` | `no` | `constructive-existential` |
+| `SemanticConvergence.ConcretePosteriorDecay` | `SemanticConvergence.ConcretePrefixMachine.oneStepClassPosteriorOdds_eq_zero_of_complementPosteriorMass_eq_zero` | `830-839` | `no` | `substantive` |
+| `SemanticConvergence.ConcretePosteriorDecay` | `SemanticConvergence.ConcretePrefixMachine.oneStepObserverFiberComplementPosteriorMass_eq_zero_of_outside_zero` | `840-853` | `no` | `substantive` |
+| `SemanticConvergence.ConcretePosteriorDecay` | `SemanticConvergence.ConcretePrefixMachine.oneStepObserverFiberPosteriorOdds_eq_zero_of_outside_zero` | `854-868` | `no` | `substantive` |
+| `SemanticConvergence.ConcretePosteriorDecay` | `SemanticConvergence.ConcretePrefixMachine.oneStepObserverFiberResidualOdds_eq_zero_of_outside_zero` | `869-887` | `no` | `substantive` |
+| `SemanticConvergence.ConcretePosteriorDecay` | `SemanticConvergence.ConcretePrefixMachine.oneStepObserverFiberResidualOdds_le_decayBound_of_outside_zero` | `888-916` | `no` | `substantive` |
+| `SemanticConvergence.ConcretePosteriorDecay` | `SemanticConvergence.ConcretePrefixMachine.oneStepObserverFiberPosteriorOdds_le_decayBound_of_outside_zero` | `917-944` | `no` | `substantive` |
+| `SemanticConvergence.ConcretePosteriorDecay` | `SemanticConvergence.ConcretePrefixMachine.oneStepObserverFiberPosteriorOdds_le_decayBound_of_positiveFloor` | `945-977` | `no` | `constructive-existential` |
 | `SemanticConvergence.ConcretePrior` | `SemanticConvergence.codeIsPrefix_refl` | `16-19` | `no` | `substantive` |
 | `SemanticConvergence.ConcretePrior` | `SemanticConvergence.codeIsPrefix_trans` | `20-31` | `no` | `substantive` |
 | `SemanticConvergence.ConcretePrior` | `SemanticConvergence.pow2_pos` | `44-50` | `no` | `substantive` |
@@ -167,22 +316,226 @@ tautology / placeholder patterns quickly.
 | `SemanticConvergence.ConcretePrior` | `SemanticConvergence.ConcretePrefixMachine.PrefixExtension` | `163-167` | `no` | `substantive` |
 | `SemanticConvergence.ConcretePrior` | `SemanticConvergence.ConcretePrefixMachine.PrefixExtension` | `168-182` | `no` | `substantive` |
 | `SemanticConvergence.ConcretePrior` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.toEncodedProgram_code` | `252-262` | `no` | `substantive` |
-| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.residualObserverFiberPosteriorOdds_eq_of_sameView` | `101-112` | `no` | `substantive` |
-| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.residualObserverFiberProcess_zero_eq_initial` | `113-122` | `no` | `substantive` |
-| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.initialResidualObserverFiberOdds_eq_of_sameView` | `123-133` | `no` | `substantive` |
-| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.residualObserverFiberProcess_eq_of_sameView` | `134-146` | `no` | `substantive` |
-| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.residualObserverFiberProcess_adapted` | `147-163` | `no` | `substantive` |
-| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.observerFiberPosteriorShareProcess_adapted` | `164-181` | `no` | `substantive` |
-| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.observerFiberPosteriorShare_eq_one_of_residual_eq_zero` | `182-191` | `no` | `substantive` |
-| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.hasSupportwiseResidualContractionWitness_of_sameView` | `226-242` | `no` | `substantive` |
-| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.hasSupportwiseResidualRecurrence_of_witness` | `243-259` | `no` | `substantive` |
-| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.supportwise_residualObserverFiberRateBound_of_recurrence` | `260-292` | `no` | `substantive` |
-| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.ae_residualObserverFiberRecurrence_of_supportwise` | `293-314` | `no` | `substantive` |
-| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.ae_residualObserverFiberRateBound_of_supportwise` | `315-337` | `no` | `substantive` |
-| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.ae_residualObserverFiberRecurrence_of_witness` | `338-356` | `no` | `single-lemma-application` |
-| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.ae_residualObserverFiberRateBound_of_witness` | `357-372` | `no` | `single-lemma-application` |
-| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.posteriorShareFromResidual_lowerBound_of_le` | `373-386` | `no` | `substantive` |
-| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.ae_observerFiberPosteriorShareLowerBound_of_witness` | `387-423` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.infiniteHistoryPrefix_length` | `102-106` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.infiniteHistoryPrefix_ofPrefixWithTail_of_le` | `107-120` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.infiniteHistoryPrefix_ofPrefixWithTail` | `121-130` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.infiniteHistoryPrefix_ofPrefixWithTail_appendEvent_current` | `131-150` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.infiniteHistoryPrefix_take_of_le` | `151-163` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.infiniteHistoryPrefix_eq_of_le_eq` | `164-173` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.infiniteHistoryPrefix_succ_eq_appendEvent` | `174-185` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.infiniteHistoryPrefix_succ_eq_appendEvent_realized` | `186-195` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.appendEvent_eq_appendEvent_iff` | `196-214` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.histPMF_appendEvent` | `215-388` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.infiniteHistoryPrefix_eq_of_succ_eq` | `389-404` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.infiniteRealizedEvent_eq_of_prefix_succ_eq` | `405-421` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.infiniteRealizedAction_eq_of_prefix_succ_eq` | `422-430` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.infiniteRealizedAction_eq_of_prefix_eq_of_lt` | `431-441` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.infiniteRealizedObservation_eq_of_prefix_succ_eq` | `442-450` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.infiniteRealizedObservation_eq_of_prefix_eq_of_lt` | `451-460` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.InfiniteTrajectoryLaw` | `499-507` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.InfiniteTrajectoryLaw` | `508-516` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.InfiniteBayesGibbsTrajectoryLaw` | `517-531` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.ionescuIicPrefix_frestrictLe` | `580-586` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.ionescuIicPrefix_length` | `587-592` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.ionescuStreamPrefix_length` | `593-598` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.ionescuStreamPrefix_succ_eq_appendEvent` | `599-605` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.measurable_eventStreamPrefix` | `606-620` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.measurable_infiniteTrajectory_event` | `621-626` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.measurable_infiniteHistoryPrefix` | `627-633` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.measurableSet_infinitePrefixCylinderAt` | `634-641` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.measurable_ionescuStreamPrefix` | `642-659` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.pmf_tsum_toReal_eq_one` | `668-677` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.pmf_summable_toReal_mul_of_integrable` | `678-705` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.ionescuNextEventPMF_apply` | `706-743` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.integral_ionescuStepKernel_eq_tsum_action_observation` | `772-832` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.integral_ionescuStepKernel_eq_tsum_action_observation_of_integrable` | `833-876` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.condExp_ionescuTrajectory_traj` | `909-937` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.martingale_ionescuTrajectory_of_kernel_integral` | `938-975` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.ionescuIicSuccExtend_last` | `996-1004` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.ionescuIicPrefix_succ_eq_appendEvent` | `1005-1018` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.ionescuIicPrefix_succExtend` | `1019-1030` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.ionescuIicSuccExtend_frestrictLe` | `1031-1054` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.martingale_ionescuTrajectoryMeasure_of_prefix_kernel_integral` | `1055-1156` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.infiniteHistoryPrefix_ionescuStreamToInfiniteTrajectory` | `1164-1170` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.measurable_ionescuStreamPrefix_piLE` | `1171-1194` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.measurable_ionescuStreamToInfiniteTrajectory` | `1195-1209` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.ionescuInfiniteTrajectoryMeasure_isProbabilityMeasure` | `1216-1227` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.infinitePrefixMeasurableSpace_le` | `1240-1245` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.measurable_infiniteHistoryPrefix_prefixMeasurableSpace` | `1246-1251` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.infinitePrefixMeasurableSpace_mono` | `1252-1280` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.measurable_ionescuStreamToInfiniteTrajectory_prefix` | `1287-1298` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.stronglyAdapted_ionescuPullbackInfiniteProcess` | `1308-1321` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.integrable_infiniteTrajectory_of_ionescuPullback` | `1322-1345` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.setIntegral_infiniteTrajectory_eq_of_ionescuPullback_martingale` | `1346-1393` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.martingale_infiniteTrajectory_of_ionescuPullback_martingale` | `1394-1421` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.martingale_eLpNorm_one_bounded_of_nonneg_initial_integral_le` | `1422-1457` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.eq_of_adaptedToInfinitePrefixFiltration` | `1465-1475` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.eq_of_infinitePrefixFiltration_levelsets` | `1476-1486` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.infinitePrefixFactor_comp_eq` | `1497-1512` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.infinitePrefixFactor_eq_of_prefix` | `1513-1523` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.measurable_of_infinitePrefixFiltration_levelsets_real` | `1524-1545` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.stronglyMeasurable_of_infinitePrefixFiltration_levelsets_real` | `1546-1552` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.stronglyAdapted_of_adaptedToInfinitePrefixFiltration_real` | `1553-1562` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.infinitePrefixCylinderAt_mem_infinitePrefixFiltration` | `1563-1571` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.infiniteHistoryPrefix_adapted` | `1572-1580` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.infiniteRealizedAction_mem_infinitePrefixFiltration_succ` | `1581-1593` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.infiniteRealizedObservation_mem_infinitePrefixFiltration_succ` | `1594-1609` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.universalWeight_ne_zero` | `1620-1640` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.posteriorWeight_ne_zero_of_likelihood_ne_zero` | `1641-1656` | `no` | `single-lemma-application` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.posteriorTotalWeight_le_universalWeightMass` | `1661-1679` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.posteriorTotalWeight_ne_top_of_universalWeightMass_ne_top` | `1680-1691` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.observerFiberPosteriorWeight_le_posteriorTotalWeight` | `1692-1704` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.observerFiberComplementWeight_le_posteriorTotalWeight` | `1705-1717` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.observerFiberPosteriorWeight_ne_top_of_posteriorTotalWeight_ne_top` | `1718-1732` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.observerFiberComplementWeight_ne_top_of_posteriorTotalWeight_ne_top` | `1733-1751` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.likelihood_appendEvent` | `1752-1763` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.posteriorWeight_appendEvent` | `1764-1777` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.observerFiberPosteriorWeight_ne_zero_of_program_likelihood_ne_zero` | `1778-1807` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.observerFiberComplementWeight_ne_zero_of_program_likelihood_ne_zero` | `1808-1834` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.observerFiberPredictiveWeight_ne_zero_of_program_support` | `1927-1969` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.observerFiberPosteriorWeight_appendEvent` | `1970-2018` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.observerFiberComplementWeight_appendEvent` | `2019-2068` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.residualObserverFiberPosteriorOdds_appendEvent_eq_predictiveWeight_ratio` | `2069-2098` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.ennreal_residual_mul_predictiveRatio_eq_predictiveWeightRatio` | `2099-2127` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.residualObserverFiberPosteriorOdds_appendEvent_eq_residual_mul_predictiveRatio` | `2151-2184` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.sqrt_residualObserverFiberPosteriorOdds_appendEvent_eq` | `2185-2210` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.observerFiberPredictiveWeight_tsum_eq_posteriorWeight` | `2211-2225` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.observerFiberPredictiveWeight_le_posteriorWeight` | `2226-2239` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.observerFiberPredictiveWeight_ne_top_of_posteriorWeight_ne_top` | `2240-2259` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.observerFiberPredictiveWeight_eq_posteriorWeight_mul_programSemantics_of_fiber_semantics` | `2260-2303` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.observerFiberPredictiveLawInClass_eq_programSemantics_of_fiber_semantics` | `2304-2326` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.observerFiberComplementPredictiveWeight_tsum_eq_complementWeight` | `2327-2341` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.observerFiberComplementPredictiveWeight_le_complementWeight` | `2342-2356` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.observerFiberComplementPredictiveWeight_ne_top_of_complementWeight_ne_top` | `2357-2371` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.observerFiberPredictiveLawInClass_tsum_eq_one` | `2372-2394` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.observerFiberPredictiveLawOutsideClass_tsum_eq_one` | `2395-2419` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.real_mul_sqrt_div_eq_sqrt_mul_of_nonneg` | `2432-2458` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.predictiveLawBhattacharyyaAffinity_eq_expect_sqrt_likelihoodRatio` | `2459-2476` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.predictiveLawBhattacharyyaSeparation_eq_zero_of_nonpos` | `2483-2489` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.predictiveLawBhattacharyyaSeparation_eq_neg_log_of_pos` | `2490-2500` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.exp_predictiveLawBhattacharyyaSeparation_mul_affinity` | `2501-2515` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.classPredictiveHellingerNormalizer` | `2516-2532` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.conditionalLawHellingerNormalizer_of_eq_classPredictive` | `2533-2551` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.predictiveLawTrueHellingerAffinity_eq_bhattacharyyaAffinity_of_eq_classPredictive` | `2566-2580` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.predictiveLawTrueHellingerSeparation_eq_neg_log_of_pos` | `2587-2598` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.predictiveLawTrueHellingerSeparation_eq_bhattacharyyaSeparation_of_eq_classPredictive` | `2599-2617` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.exp_predictiveLawTrueHellingerSeparation_mul_affinity` | `2618-2632` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.trueLawHellingerNormalizer` | `2633-2644` | `no` | `single-lemma-application` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.predictiveLawTrueHellingerSeparation_ge_of_affinity_le_exp_neg` | `2645-2663` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.predictiveLawTrueHellingerAffinity_le_exp_neg_of_separation_ge` | `2664-2682` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.predictiveLawBhattacharyyaSeparation_ge_of_affinity_le_exp_neg` | `2683-2701` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.predictiveLawBhattacharyyaAffinity_le_exp_neg_of_separation_ge` | `2702-2713` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.observerFiberBhattacharyyaScore_eq_predictiveLawSeparation` | `2743-2753` | `no` | `definitional-unfold` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.observerFiberStepBhattacharyyaScore_eq` | `2754-2769` | `no` | `definitional-unfold` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.observerFiberClassPredictiveHellingerNormalizer` | `2770-2793` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.observerFiberProgramLawHellingerNormalizer_of_eq_classPredictive` | `2794-2822` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.observerFiberTrueLawHellingerAffinity_eq_predictiveLawAffinity_of_calibrated` | `2850-2872` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.observerFiberTrueLawHellingerScore_eq_bhattacharyyaScore_of_calibrated` | `2873-2894` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.observerFiberTrueLawHellingerScore_eq` | `2906-2923` | `no` | `definitional-unfold` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.observerFiberTrueLawHellingerNormalizer` | `2924-2952` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.observerFiberTrueLawHellinger_oneStep_sqrtResidual_normalized` | `2953-3057` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.observerFiberTrueLawHellinger_actionObservation_tsum_normalized` | `3058-3162` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.observerFiberTrueLawHellingerScore_ge_of_affinity_ceiling` | `3163-3186` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.observerFiberTrueLawHellingerAffinity_le_exp_neg_of_score_ge` | `3187-3207` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.observerFiberBhattacharyyaScore_ge_of_affinity_ceiling` | `3208-3228` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.observerFiberPredictiveLawAffinity_le_exp_neg_of_score_ge` | `3229-3243` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.observerFiberPredictiveWeight_eq_of_sameView` | `3244-3256` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.observerFiberComplementPredictiveWeight_eq_of_sameView` | `3257-3269` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.observerFiberPredictiveLawInClass_eq_of_sameView` | `3270-3282` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.observerFiberPredictiveLawOutsideClass_eq_of_sameView` | `3283-3295` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.observerFiberBhattacharyyaScore_eq_of_sameView` | `3296-3308` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.realizedResidualOddsProcess_nonneg` | `3380-3387` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.ae_realizedResidualOddsProcess_nonneg` | `3388-3397` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.realizedBhattacharyyaSeparationProcess_of_lt` | `3398-3405` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.realizedBhattacharyyaSeparationProcess_of_not_lt` | `3406-3411` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.realizedObserverFiberBhattacharyyaSeparationProcess_of_lt` | `3412-3423` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.realizedObserverFiberBhattacharyyaSeparationProcess_of_not_lt` | `3424-3434` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.realizedCumulativeSeparationProcess_eq_sum` | `3435-3440` | `no` | `definitional-unfold` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.realizedHellingerEnvelopeProcess_eq` | `3441-3451` | `no` | `definitional-unfold` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.realizedObserverFiberCumulativeBhattacharyyaSeparationProcess_eq_sum` | `3452-3462` | `no` | `definitional-unfold` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.realizedObserverFiberCumulativeBhattacharyyaSeparationProcess_eq_realizedCumulative` | `3463-3472` | `no` | `definitional-unfold` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.realizedObserverFiberHellingerEnvelopeProcess_eq` | `3473-3485` | `no` | `definitional-unfold` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.realizedObserverFiberHellingerEnvelopeProcess_eq_realizedHellingerEnvelope` | `3486-3503` | `no` | `definitional-unfold` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.hellingerConvergenceSpine_of_realized_processes` | `3504-3537` | `no` | `single-lemma-application` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.hellingerConvergenceSpine_of_observerFiberBhattacharyya_processes` | `3538-3573` | `no` | `single-lemma-application` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.infiniteRealizedResidualOddsProcess_nonneg` | `3692-3700` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.ae_infiniteRealizedResidualOddsProcess_nonneg` | `3701-3710` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.infiniteRealizedHellingerEnvelopeProcess_nonneg` | `3711-3720` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.infiniteRealizedObserverFiberTrueLawHellingerEnvelopeProcess_nonneg` | `3721-3738` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.infiniteRealizedBhattacharyyaSeparationProcess_eq` | `3739-3744` | `no` | `definitional-unfold` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.infiniteRealizedObserverFiberBhattacharyyaSeparationProcess_eq` | `3745-3756` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.infiniteRealizedCumulativeSeparationProcess_eq_sum` | `3757-3762` | `no` | `definitional-unfold` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.infiniteRealizedObserverFiberCumulativeBhattacharyyaSeparationProcess_eq_sum` | `3763-3773` | `no` | `definitional-unfold` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.infiniteRealizedObserverFiberCumulativeBhattacharyyaSeparationProcess_eq_realizedCumulative` | `3774-3783` | `no` | `definitional-unfold` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.infiniteRealizedObserverFiberHellingerEnvelopeProcess_eq` | `3784-3796` | `no` | `definitional-unfold` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.infiniteRealizedObserverFiberHellingerEnvelopeProcess_eq_realizedHellingerEnvelope` | `3797-3816` | `no` | `definitional-unfold` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.ae_realizedCumulativeSeparationProcess_tendsto_atTop_of_uniform_floor` | `3827-3843` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.hellingerConvergenceSpine_of_realized_processes_uniform_separation_floor` | `3844-3872` | `no` | `single-lemma-application` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.hasObserverFiberBhattacharyyaFloorOnPolicySupport_of_affinityCeiling` | `3937-3956` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.hasObserverFiberBhattacharyyaUniformSeparationFloor_of_policySupportFloor` | `3957-3977` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.hasObserverFiberBhattacharyyaUniformSeparationFloor_of_affinityCeiling_policySupport` | `3978-3999` | `no` | `single-lemma-application` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.infiniteHasObserverFiberTrueLawHellingerAffinityCeilingOnPolicySupport_of_actionRule` | `4122-4145` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.ae_infiniteRealizedCumulativeSeparationProcess_tendsto_atTop_of_uniform_floor` | `4160-4175` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.hellingerConvergenceSpine_of_infinite_realized_processes_uniform_separation_floor` | `4176-4207` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.infiniteHasObserverFiberBhattacharyyaFloorOnPolicySupport_of_affinityCeiling` | `4208-4228` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.infiniteHasObserverFiberBhattacharyyaUniformSeparationFloor_of_policySupportFloor` | `4229-4251` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.infiniteHasObserverFiberBhattacharyyaUniformSeparationFloor_of_affinityCeiling_policySupport` | `4252-4272` | `no` | `single-lemma-application` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.infiniteHasObserverFiberTrueLawHellingerUniformSeparationFloor_of_affinityCeiling_policySupport` | `4273-4297` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.ae_infiniteRealizedObserverFiberTrueLawCumulativeHellingerSeparation_tendsto_atTop_of_uniform_floor` | `4298-4323` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.ae_infiniteRealizedObserverFiberCumulativeBhattacharyyaSeparation_tendsto_atTop_of_uniform_floor` | `4324-4346` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.hellingerConvergenceSpine_of_infiniteObserverFiberBhattacharyya_uniform_separation_floor` | `4347-4381` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.hellingerConvergenceSpine_of_infiniteObserverFiberBhattacharyya_affinityCeiling_policySupport` | `4382-4416` | `no` | `single-lemma-application` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.hellingerConvergenceSpine_of_infiniteObserverFiberTrueLawHellinger_affinityCeiling_policySupport` | `4417-4464` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.hellingerConvergenceSpine_of_infiniteObserverFiberTrueLawHellinger_affinityCeiling_policySupport_of_martingale` | `4465-4520` | `no` | `constructive-existential` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.ae_realizedObserverFiberCumulativeBhattacharyyaSeparation_tendsto_atTop_of_uniform_floor` | `4521-4547` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.hellingerConvergenceSpine_of_observerFiberBhattacharyya_uniform_separation_floor` | `4548-4574` | `no` | `single-lemma-application` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.residualObserverFiberPosteriorOdds_eq_of_sameView` | `4582-4593` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.residualObserverFiberProcess_zero_eq_initial` | `4594-4603` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.initialResidualObserverFiberOdds_eq_of_sameView` | `4604-4614` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.residualObserverFiberProcess_eq_of_sameView` | `4615-4627` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.residualObserverFiberProcess_adapted` | `4628-4644` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.observerFiberPosteriorShareProcess_adapted` | `4645-4662` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.infiniteResidualObserverFiberProcess_adapted` | `4663-4679` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.infiniteRealizedResidualOddsProcess_adapted` | `4680-4700` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.infiniteRealizedBhattacharyyaSeparationProcess_mem_infinitePrefixFiltration_succ` | `4701-4723` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.infiniteRealizedObserverFiberBhattacharyyaSeparationProcess_mem_infinitePrefixFiltration_succ` | `4724-4739` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.infiniteRealizedBhattacharyyaSeparationProcess_eq_of_prefix_eq_of_lt` | `4740-4755` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.infiniteRealizedCumulativeSeparationProcess_adapted` | `4756-4777` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.infiniteRealizedObserverFiberCumulativeBhattacharyyaSeparationProcess_adapted` | `4778-4791` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.infiniteRealizedHellingerEnvelopeProcess_adapted` | `4792-4822` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.infiniteRealizedObserverFiberHellingerEnvelopeProcess_adapted` | `4823-4839` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.infiniteRealizedHellingerEnvelopeProcess_stronglyAdapted_prefixFiltration` | `4840-4854` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.infiniteRealizedObserverFiberHellingerEnvelopeProcess_stronglyAdapted_prefixFiltration` | `4855-4864` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.infiniteRealizedObserverFiberTrueLawHellingerEnvelopeProcess_stronglyAdapted_prefixFiltration` | `4865-4881` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.infiniteRealizedCumulativeSeparationProcess_succ` | `4882-4895` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.infiniteRealizedHellingerEnvelopeProcess_prefixFactor_shape` | `4896-4942` | `no` | `constructive-existential` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.infiniteRealizedObserverFiberTrueLawHellingerEnvelopeProcess_prefixFactor_shape` | `4943-4974` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.infiniteRealizedHellingerEnvelopeProcess_prefixFactor_succ_shape` | `4975-5072` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.infiniteRealizedObserverFiberTrueLawHellingerEnvelopeProcess_prefixFactor_succ_shape` | `5073-5115` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.infiniteRealizedObserverFiberTrueLawHellinger_prefix_kernel_integral_of_step_shape` | `5116-5279` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.infiniteRealizedObserverFiberTrueLawHellinger_prefix_kernel_integral` | `5280-5402` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.infiniteRealizedObserverFiberTrueLawHellinger_prefix_kernel_integral_of_obligations` | `5457-5533` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.infiniteRealizedObserverFiberTrueLawHellinger_rawIonescuMartingale_of_prefix_kernel_integral` | `5534-5616` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.infiniteRealizedObserverFiberTrueLawHellinger_rawIonescuMartingale_of_prefix_kernel_obligations` | `5617-5641` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.infiniteRealizedHellingerEnvelopeProcess_martingale_of_condExp_succ` | `5642-5661` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.infiniteRealizedObserverFiberHellingerEnvelopeProcess_martingale_of_condExp_succ` | `5662-5680` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.infiniteRealizedHellingerEnvelopeProcess_integrable_of_ae_enorm_bound` | `5681-5704` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.infiniteRealizedObserverFiberHellingerEnvelopeProcess_integrable_of_ae_enorm_bound` | `5705-5727` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.infiniteRealizedObserverFiberHellingerEnvelopeProcess_martingale_of_condExp_succ_of_bound` | `5728-5751` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.infiniteRealizedHellingerEnvelopeProcess_l1_bounded_of_ae_enorm_bound` | `5752-5769` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.infiniteRealizedObserverFiberHellingerEnvelopeProcess_l1_bounded_of_ae_enorm_bound` | `5770-5786` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.infiniteRealizedObserverFiberHellingerConvergenceSpine_of_condExp_succ` | `5787-5828` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.infiniteRealizedObserverFiberTrueLawHellingerConvergenceSpine_of_condExp_affinityCeiling` | `5829-5901` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.observerFiberPosteriorShare_eq_one_of_residual_eq_zero` | `5902-5911` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.hasSupportwiseResidualContractionWitness_of_sameView` | `5946-5962` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.hasSupportwiseResidualRecurrence_of_witness` | `5963-5979` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.supportwise_residualObserverFiberRateBound_of_recurrence` | `5980-6012` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.ae_residualObserverFiberRecurrence_of_supportwise` | `6013-6034` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.ae_residualObserverFiberRateBound_of_supportwise` | `6035-6057` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.ae_residualObserverFiberRecurrence_of_witness` | `6058-6076` | `no` | `single-lemma-application` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.ae_residualObserverFiberRateBound_of_witness` | `6077-6092` | `no` | `single-lemma-application` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.posteriorShareFromResidual_lowerBound_of_le` | `6093-6106` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.ae_observerFiberPosteriorShareLowerBound_of_witness` | `6107-6143` | `no` | `substantive` |
 | `SemanticConvergence.ConcreteRates` | `SemanticConvergence.ConcretePrefixMachine.posteriorRateFactorFromFloor_succ_lt` | `66-91` | `no` | `rate-composition` |
 | `SemanticConvergence.ConcreteRates` | `SemanticConvergence.ConcretePrefixMachine.posteriorRateBound_of_positiveDecay` | `92-125` | `no` | `rate-composition` |
 | `SemanticConvergence.ConcreteRates` | `SemanticConvergence.ConcretePrefixMachine.observerFiberLogOdds_eq_of_sameView` | `141-151` | `no` | `substantive` |
@@ -234,70 +587,108 @@ tautology / placeholder patterns quickly.
 | `SemanticConvergence.ConcreteSemantic` | `SemanticConvergence.ConcretePrefixMachine.fullSupportActionLaw_hasSeparatingSupportOn` | `506-538` | `no` | `substantive` |
 | `SemanticConvergence.ConcreteSemantic` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.semanticSeparation_eq_of_sameView` | `554-565` | `no` | `substantive` |
 | `SemanticConvergence.ConcreteSemantic` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.semanticGain_eq_of_sameView` | `566-584` | `no` | `substantive` |
-| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcreteLaw.mass_eq_zero_of_not_mem_support` | `27-32` | `no` | `substantive` |
-| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcreteLaw.toENNRealMass_eq_zero_of_not_mem_support` | `33-38` | `no` | `substantive` |
-| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcreteLaw.toPMF_apply` | `44-47` | `no` | `definitional-unfold` |
-| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcreteLaw.mem_support_toPMF_iff` | `48-77` | `no` | `substantive` |
-| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcreteBridge.appendEvent_eq_appendEvent_iff` | `78-98` | `no` | `substantive` |
-| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcreteBridge.countHistOfHist_length` | `103-107` | `no` | `substantive` |
-| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcreteBridge.countHistOfHist_histOfCountHist` | `112-119` | `no` | `substantive` |
-| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcreteBridge.histOfCountHist_countHistOfHist_apply` | `120-125` | `no` | `substantive` |
-| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcreteBridge.countHistOfHist_snoc` | `126-138` | `no` | `substantive` |
-| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcreteBridge.countHistOfHist_injective` | `139-145` | `no` | `substantive` |
-| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcreteBridge.hist_cast_apply` | `146-151` | `no` | `substantive` |
-| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcreteBridge.snoc_eq_snoc_iff` | `152-166` | `no` | `substantive` |
-| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcreteBridge.hist_snoc_decompose` | `167-179` | `no` | `substantive` |
-| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.listWeightedSum_eq_if_mem` | `180-205` | `no` | `substantive` |
-| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.CountableConcrete.histPMF_appendEvent` | `206-385` | `no` | `substantive` |
-| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.mass_eq_if_mem_support` | `405-413` | `no` | `substantive` |
-| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.allPrograms_nodup` | `414-426` | `no` | `substantive` |
-| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.eraseDups_nodup` | `427-444` | `no` | `substantive` |
-| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.listWeightedSum_div_right` | `445-454` | `no` | `substantive` |
-| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.listWeightedSum_filter_eq` | `455-466` | `no` | `substantive` |
-| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.listWeightedSum_filter_cond_eq` | `467-478` | `no` | `substantive` |
-| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.finset_sum_toFinset_eq_listWeightedSum` | `479-489` | `no` | `substantive` |
-| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.sum_programFintype_eq_listWeightedSum` | `490-500` | `no` | `substantive` |
-| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.histLaw_support_nodup` | `501-515` | `no` | `substantive` |
-| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.map_snoc_mass` | `516-551` | `no` | `substantive` |
-| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.actionStep_snoc_mass` | `552-626` | `no` | `substantive` |
-| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.histLaw_snoc_mass` | `627-693` | `no` | `substantive` |
-| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.histLaw_mass_nonneg` | `694-718` | `no` | `substantive` |
-| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.toCountablePolicy_apply` | `729-735` | `no` | `single-lemma-application` |
-| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.toCountableKernel_apply` | `736-741` | `no` | `definitional-unfold` |
-| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.mem_support_toCountablePolicy_iff` | `742-749` | `no` | `substantive` |
-| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.mem_support_toCountableKernel_iff` | `750-759` | `no` | `substantive` |
-| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.policy_cast_mass` | `763-770` | `no` | `substantive` |
-| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.kernel_cast_mass` | `771-778` | `no` | `substantive` |
-| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.histPMF_countHistOfHist_eq_histLaw` | `779-925` | `no` | `substantive` |
-| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.codeList_nodup` | `929-932` | `no` | `substantive` |
-| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.mem_codeList` | `933-936` | `no` | `substantive` |
-| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.semantics_eq_of_proof_irrel` | `937-943` | `no` | `substantive` |
-| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.toCountableEncodedProgram_code` | `953-959` | `no` | `definitional-unfold` |
-| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.toCountableProgram_programCode` | `1018-1033` | `no` | `substantive` |
-| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.toConcreteProgram_code` | `1034-1040` | `no` | `substantive` |
-| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.toConcreteProgram_toCountableProgram` | `1041-1048` | `no` | `substantive` |
-| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.toCountableProgram_toConcreteProgram` | `1049-1060` | `no` | `substantive` |
-| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.liftObserver_view_toCountableEncodedProgram` | `1084-1093` | `no` | `substantive` |
-| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.liftObserver_sameView_toCountableEncodedProgram_iff` | `1094-1112` | `no` | `substantive` |
-| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.observerFiber_toCountableProgram_iff` | `1113-1143` | `no` | `substantive` |
-| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.programSemantics_toCountableProgram_eq` | `1144-1161` | `no` | `substantive` |
-| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.likelihood_toCountableProgram_eq` | `1162-1184` | `no` | `substantive` |
-| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.posteriorWeight_toCountableProgram_eq` | `1185-1213` | `no` | `substantive` |
-| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.bayesNumeratorLaw_mass_nonneg` | `1214-1236` | `no` | `substantive` |
-| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.classMass_normalizeOnPrograms_eq` | `1237-1252` | `no` | `substantive` |
-| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.posteriorClassMass_eq_bayesNumeratorClassMass_div_evidence` | `1253-1271` | `no` | `substantive` |
-| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.observerFiberBayesNumeratorMass_toCountable_eq` | `1272-1383` | `no` | `substantive` |
-| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.bayesNumeratorClassMass_nonneg` | `1384-1415` | `no` | `substantive` |
-| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.bayesNumeratorClassMass_le_evidence` | `1416-1447` | `no` | `substantive` |
-| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.evidence_ne_zero_of_bayesNumeratorClassMass_ne_zero` | `1448-1468` | `no` | `substantive` |
-| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.observerFiberComplementBayesNumeratorMass_toCountable_eq` | `1469-1615` | `no` | `substantive` |
-| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.residualObserverFiberPosteriorOdds_toCountable_eq` | `1616-1724` | `no` | `substantive` |
-| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.histPMF_mem_support_length` | `1725-1746` | `no` | `substantive` |
-| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.trajectoryLaw_mem_support_length` | `1747-1756` | `no` | `substantive` |
-| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.residualObserverFiberProcess_toCountable_eq_of_prefix_length` | `1757-1783` | `no` | `substantive` |
-| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.prefixFullHist_hist_length` | `1789-1798` | `no` | `definition` |
-| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.prefixwiseResidualDecayENNReal_of_rat` | `1799-1853` | `no` | `substantive` |
-| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.hasSupportwiseResidualContractionWitness_of_prefixwiseResidualDecay` | `1854-1905` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcreteBridge.appendEvent_eq_appendEvent_iff` | `19-39` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcreteBridge.countHistOfHist_length` | `44-48` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcreteBridge.countHistOfHist_histOfCountHist` | `53-60` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcreteBridge.histOfCountHist_countHistOfHist_apply` | `61-65` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcreteBridge.asFullHist_histOfCountHist_countHistOfHist` | `66-75` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcreteBridge.countHistOfHist_snoc` | `76-88` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcreteBridge.countHistOfHist_injective` | `89-95` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcreteBridge.hist_cast_apply` | `96-101` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcreteBridge.snoc_eq_snoc_iff` | `102-116` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcreteBridge.hist_snoc_decompose` | `117-129` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.listWeightedSum_eq_if_mem` | `130-156` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.CountableConcrete.histPMF_appendEvent` | `157-330` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.CountableConcrete.histPMF_mem_support_length_countable` | `331-352` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.CountableConcrete.histPMF_eq_zero_of_length_ne` | `353-365` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.ionescuNextEventPMF_apply` | `366-402` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.ionescuStepKernel_singleton_apply` | `403-438` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.ionescuTrajectoryMeasure_streamPrefix_appendEvent` | `439-563` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.ionescuTrajectoryMeasure_streamPrefix_eq_histPMF` | `564-618` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.mass_eq_if_mem_support` | `674-682` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.allPrograms_nodup` | `683-695` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.eraseDups_nodup` | `696-713` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.listWeightedSum_div_right` | `714-723` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.listWeightedSum_nonneg` | `724-737` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.listWeightedSum_eq_zero_of_nonneg_of_mem` | `738-760` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.listWeightedSum_const_mul` | `761-770` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.listWeightedSum_filter_eq` | `771-782` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.listWeightedSum_filter_cond_eq` | `783-794` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.listWeightedSum_filter_not_cond_eq` | `795-803` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.listWeightedSum_filter_add_filter_not` | `804-818` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.finset_sum_toFinset_eq_listWeightedSum` | `819-829` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.sum_programFintype_eq_listWeightedSum` | `830-840` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.histLaw_support_nodup` | `841-855` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.map_snoc_mass` | `856-891` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.actionStep_snoc_mass` | `892-966` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.histLaw_snoc_mass` | `967-1033` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.bayesNumeratorLaw_snoc_mass` | `1034-1053` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.bayesNumeratorClassMass_snoc_eq` | `1054-1090` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.evidence_snoc_eq` | `1091-1124` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.histLaw_mass_nonneg` | `1125-1149` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.toCountablePolicy_apply` | `1160-1166` | `no` | `single-lemma-application` |
+| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.toCountableKernel_apply` | `1167-1172` | `no` | `definitional-unfold` |
+| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.mem_support_toCountablePolicy_iff` | `1173-1180` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.mem_support_toCountableKernel_iff` | `1181-1190` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.policy_cast_mass` | `1194-1201` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.kernel_cast_mass` | `1202-1209` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.histPMF_countHistOfHist_eq_histLaw` | `1210-1356` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.codeList_nodup` | `1360-1363` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.mem_codeList` | `1364-1367` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.semantics_eq_of_proof_irrel` | `1368-1374` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.toCountableEncodedProgram_code` | `1384-1390` | `no` | `definitional-unfold` |
+| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.toCountableProgram_programCode` | `1449-1464` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.toConcreteProgram_code` | `1465-1471` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.toConcreteProgram_toCountableProgram` | `1472-1479` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.toCountableProgram_toConcreteProgram` | `1480-1491` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.liftObserver_view_toCountableEncodedProgram` | `1515-1524` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.liftObserver_sameView_toCountableEncodedProgram_iff` | `1525-1543` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.observerFiber_toCountableProgram_iff` | `1544-1574` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.programSemantics_toCountableProgram_eq` | `1575-1592` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.likelihood_toCountableProgram_eq` | `1593-1615` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.posteriorWeight_toCountableProgram_eq` | `1616-1644` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.bayesNumeratorLaw_mass_nonneg` | `1645-1667` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.classMass_normalizeOnPrograms_eq` | `1668-1683` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.posteriorClassMass_eq_bayesNumeratorClassMass_div_evidence` | `1684-1702` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.oneStepClassObservationMass_eq_posterior_weighted_obs_of_class_ne_zero` | `1703-1767` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.oneStepComplementObservationMass_eq_posterior_weighted_obs_of_complement_ne_zero` | `1768-1784` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.oneStepClassObservationMass_eq_bayesNumerator_obs_div_evidence_of_class_ne_zero` | `1785-1810` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.oneStepComplementObservationMass_eq_bayesNumerator_obs_div_evidence_of_complement_ne_zero` | `1811-1829` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.oneStepObservationEvidence_eq_bayesNumerator_obs_div_evidence_of_split_ne_zero` | `1830-1853` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.posteriorClassMass_snoc_eq_oneStepClassPosteriorMass_of_split_ne_zero` | `1854-1927` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.complementPosteriorMass_snoc_eq_oneStepComplementPosteriorMass_of_split_ne_zero` | `1928-2028` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.observerFiberBayesNumeratorMass_toCountable_eq` | `2029-2140` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.bayesNumeratorClassMass_nonneg` | `2141-2172` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.evidence_nonneg` | `2173-2191` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.posteriorClassMass_nonneg` | `2192-2212` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.complementPosteriorMass_nonneg` | `2213-2226` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.residualClassPosteriorOdds_nonneg` | `2227-2246` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.residualObserverFiberPosteriorOdds_nonneg` | `2247-2262` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.bayesNumeratorClassMass_le_evidence` | `2263-2294` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.evidence_ne_zero_of_bayesNumeratorClassMass_ne_zero` | `2295-2315` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.observerFiberComplementBayesNumeratorMass_toCountable_eq` | `2316-2462` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.residualObserverFiberPosteriorOdds_toCountable_eq` | `2463-2571` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.histPMF_mem_support_length` | `2572-2593` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.histPMF_historyPrefix_mem_support` | `2594-2644` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.histPMF_appendEvent_mem_support_observation` | `2645-2668` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.histPMF_appendEvent_mem_support_action` | `2669-2702` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.infiniteTrajectoryLaw_realized_action_mem_support` | `2703-2785` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.infiniteBayesGibbsTrajectoryLaw_realized_action_mem_support` | `2786-2807` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.infiniteBayesGibbsTrajectoryLaw_of_ionescu_hellingerConvergenceSpine_of_affinityCeiling` | `2808-2878` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.infiniteBayesGibbsTrajectoryLaw_of_ionescu_hellingerConvergenceSpine_of_condExp_affinityCeiling` | `2879-2961` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.infiniteBayesGibbsTrajectoryLaw_of_ionescu_trueLawHellingerConvergenceSpine_of_condExp_affinityCeiling` | `2962-3037` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.infiniteBayesGibbsTrajectoryLaw_of_ionescu_trueLawHellingerConvergenceSpine_of_martingale_affinityCeiling` | `3038-3101` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.infiniteBayesGibbsTrajectoryLaw_of_ionescu_trueLawHellingerConvergenceSpine_of_rawIonescuMartingale_affinityCeiling` | `3102-3165` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.trajectoryLaw_historyPrefix_mem_support` | `3166-3179` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.trajectoryLaw_realized_observation_mem_support` | `3180-3203` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.trajectoryLaw_realized_action_mem_support` | `3204-3226` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.trajectoryLaw_mem_support_length` | `3227-3238` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.countable_historyPrefix_succ_eq_appendEvent_get` | `3239-3256` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.finiteHorizon_realizedObserverFiberBhattacharyyaSeparation_floor_of_affinityCeiling` | `3257-3293` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.residualObserverFiberProcess_toCountable_eq_of_prefix_length` | `3294-3320` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.prefixFullHist_hist_length` | `3326-3335` | `no` | `definition` |
+| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.prefixwiseResidualDecayENNReal_of_rat` | `3336-3390` | `no` | `substantive` |
+| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.hasSupportwiseResidualContractionWitness_of_prefixwiseResidualDecay` | `3391-3442` | `no` | `substantive` |
 | `SemanticConvergence.ConcreteSurrogate` | `SemanticConvergence.ConcretePrefixMachine.surrogateEnergy_eq_of_sameView` | `63-74` | `no` | `substantive` |
 | `SemanticConvergence.ConcreteSurrogate` | `SemanticConvergence.ConcretePrefixMachine.surrogateArgmin_spec` | `75-88` | `no` | `substantive` |
 | `SemanticConvergence.ConcreteSurrogate` | `SemanticConvergence.ConcretePrefixMachine.surrogateChosenLaw_supportsArgmin` | `89-99` | `no` | `substantive` |
@@ -311,36 +702,88 @@ tautology / placeholder patterns quickly.
 | `SemanticConvergence.ConcreteSurrogate` | `SemanticConvergence.ConcretePrefixMachine.separatingSupportWeight_eq_of_all_separating` | `249-271` | `no` | `substantive` |
 | `SemanticConvergence.ConcreteSurrogate` | `SemanticConvergence.ConcretePrefixMachine.surrogateImplementedLaw_hasSeparatingSupportFloor` | `272-314` | `no` | `substantive` |
 | `SemanticConvergence.ConcreteSurrogate` | `SemanticConvergence.ConcretePrefixMachine.surrogateImplementedLaw_hasSeparatingSupportOn` | `315-355` | `no` | `substantive` |
+| `SemanticConvergence.DiscreteConvexDuality` | `SemanticConvergence.exactBoundedLossFormula_eq_top_of_positive_mass_zero_ref` | `1319-2085` | `no` | `substantive` |
+| `SemanticConvergence.DiscreteConvexDuality` | `SemanticConvergence.exactBoundedLossFormula_ge_kl` | `2086-2481` | `no` | `substantive` |
+| `SemanticConvergence.DiscreteConvexDuality` | `SemanticConvergence.genericExpectedLoss_add_genericWeightKLDivergence_eq_negativeLogPartition` | `2576-2657` | `no` | `substantive` |
+| `SemanticConvergence.DiscreteConvexDuality` | `SemanticConvergence.genericExpectedLoss_add_genericWeightKLDivergence_eq_genericGibbsGap_sub_logPartition` | `2658-2724` | `no` | `substantive` |
+| `SemanticConvergence.DiscreteConvexDuality` | `SemanticConvergence.genericKLVariationalObjective_lower_bound` | `2725-2812` | `no` | `substantive` |
+| `SemanticConvergence.DiscreteConvexDuality` | `SemanticConvergence.exactBoundedLossFormula_has_near_kl_minimizer` | `2813-2838` | `no` | `constructive-existential` |
+| `SemanticConvergence.DiscreteConvexDuality` | `SemanticConvergence.exactBoundedLossFormula_has_near_gibbs_gap_minimizer` | `2839-3216` | `no` | `constructive-existential` |
+| `SemanticConvergence.DiscreteConvexDuality` | `SemanticConvergence.genericRealDivergence_eq_kl_of_exact_gibbs_attainment` | `3217-3243` | `no` | `substantive` |
+| `SemanticConvergence.DiscreteConvexDuality` | `SemanticConvergence.generic_divergence_eq_kl_of_exact_gibbs_attainment` | `3244-3867` | `no` | `substantive` |
+| `SemanticConvergence.DiscreteConvexDuality` | `SemanticConvergence.exactBoundedLossFormula_eq_kl` | `3868-4021` | `no` | `substantive` |
+| `SemanticConvergence.DiscreteConvexDuality` | `SemanticConvergence.genericWeightKLDivergence_satisfies_ExactBoundedLossFormula` | `4022-4081` | `no` | `substantive` |
+| `SemanticConvergence.DiscreteConvexDuality` | `SemanticConvergence.klDivergenceOnSimplex_eq_kl_of_probabilityWeight` | `4086-4090` | `no` | `substantive` |
+| `SemanticConvergence.DiscreteConvexDuality` | `SemanticConvergence.klDivergenceOnSimplex_satisfies_OffSimplexTop` | `4091-4096` | `no` | `substantive` |
+| `SemanticConvergence.DiscreteConvexDuality` | `SemanticConvergence.klDivergenceOnSimplex_satisfies_ProperOnSimplex` | `4097-4117` | `no` | `substantive` |
+| `SemanticConvergence.DiscreteConvexDuality` | `SemanticConvergence.klDivergenceOnSimplex_satisfies_ExactBoundedLossFormula` | `4118-4164` | `no` | `substantive` |
+| `SemanticConvergence.DiscreteConvexDuality` | `SemanticConvergence.genericWeightKLDivergence_self_instantiation` | `4165-4184` | `no` | `substantive` |
 | `SemanticConvergence.Foundations` | `SemanticConvergence.observerRefines_refl` | `65-69` | `no` | `substantive` |
 | `SemanticConvergence.Foundations` | `SemanticConvergence.observerRefines_trans` | `70-78` | `no` | `substantive` |
 | `SemanticConvergence.Foundations` | `SemanticConvergence.constantOnSetoid_iff_exists_quotientLift` | `91-111` | `no` | `constructive-existential` |
 | `SemanticConvergence.Foundations` | `SemanticConvergence.quotientLift_unique` | `112-124` | `no` | `substantive` |
 | `SemanticConvergence.Foundations` | `SemanticConvergence.quotientObserver_eq_iff` | `125-133` | `no` | `substantive` |
-| `SemanticConvergence.Functional` | `SemanticConvergence.listSumENNReal_nil` | `30-33` | `no` | `definitional-unfold` |
-| `SemanticConvergence.Functional` | `SemanticConvergence.listSumENNReal_cons` | `34-37` | `no` | `definitional-unfold` |
-| `SemanticConvergence.Functional` | `SemanticConvergence.listSumENNReal_eq_zero_iff` | `38-59` | `no` | `substantive` |
-| `SemanticConvergence.Functional` | `SemanticConvergence.listSumENNReal_ne_top` | `60-71` | `no` | `substantive` |
-| `SemanticConvergence.Functional` | `SemanticConvergence.exists_minimizerOnListENNReal` | `75-110` | `no` | `constructive-existential` |
-| `SemanticConvergence.Functional` | `SemanticConvergence.argminOnListENNReal_spec` | `115-120` | `no` | `single-lemma-application` |
-| `SemanticConvergence.Functional` | `SemanticConvergence.posteriorWeight_ne_top` | `141-156` | `no` | `substantive` |
-| `SemanticConvergence.Functional` | `SemanticConvergence.posteriorWeightKLDivergenceTerm_eq_zero_iff` | `157-203` | `no` | `substantive` |
-| `SemanticConvergence.Functional` | `SemanticConvergence.posteriorWeight_samePosteriorWeights` | `210-219` | `no` | `substantive` |
-| `SemanticConvergence.Functional` | `SemanticConvergence.samePosteriorWeights_of_def_afe_eq_zero` | `220-234` | `no` | `substantive` |
-| `SemanticConvergence.Functional` | `SemanticConvergence.def_afe_eq_zero_iff_samePosteriorWeights` | `235-248` | `no` | `substantive` |
-| `SemanticConvergence.Functional` | `SemanticConvergence.observerClassReferenceWeightOnTargets_ne_top` | `303-315` | `no` | `substantive` |
-| `SemanticConvergence.Functional` | `SemanticConvergence.observerClassGibbsWeightOnTargets_ne_top` | `336-349` | `no` | `substantive` |
-| `SemanticConvergence.Functional` | `SemanticConvergence.countableKernelReferenceWeightOnTargets_ne_top` | `422-437` | `no` | `substantive` |
-| `SemanticConvergence.Functional` | `SemanticConvergence.countableKernelGibbsWeightOnTargets_ne_top` | `448-462` | `no` | `substantive` |
-| `SemanticConvergence.Functional` | `SemanticConvergence.prop_belief_invariance_above` | `520-530` | `yes` | `substantive` |
-| `SemanticConvergence.Functional` | `SemanticConvergence.cor_twins_frozen_ratio` | `531-541` | `yes` | `substantive` |
-| `SemanticConvergence.Functional` | `SemanticConvergence.cor_canonical_pair` | `542-549` | `yes` | `substantive` |
-| `SemanticConvergence.Functional` | `SemanticConvergence.prop_goal_dialed` | `550-564` | `yes` | `substantive` |
-| `SemanticConvergence.Functional` | `SemanticConvergence.prop_two_observer_minimizer` | `565-629` | `yes` | `substantive` |
-| `SemanticConvergence.Functional` | `SemanticConvergence.prop_kernel_functional_minimizer` | `630-717` | `yes` | `substantive` |
-| `SemanticConvergence.Functional` | `SemanticConvergence.prop_kernel_functional_minimizer_compact` | `718-738` | `yes` | `substantive` |
-| `SemanticConvergence.Functional` | `SemanticConvergence.prop_belief_illtyped_below` | `739-747` | `yes` | `substantive` |
-| `SemanticConvergence.Functional` | `SemanticConvergence.prop_action_cap` | `748-770` | `yes` | `substantive` |
-| `SemanticConvergence.Functional` | `SemanticConvergence.thm_meeting_point` | `771-778` | `yes` | `substantive` |
+| `SemanticConvergence.Functional` | `SemanticConvergence.listSumENNReal_nil` | `40-43` | `no` | `definitional-unfold` |
+| `SemanticConvergence.Functional` | `SemanticConvergence.listSumENNReal_cons` | `44-47` | `no` | `definitional-unfold` |
+| `SemanticConvergence.Functional` | `SemanticConvergence.listSumENNReal_eq_zero_iff` | `48-69` | `no` | `substantive` |
+| `SemanticConvergence.Functional` | `SemanticConvergence.listSumENNReal_ne_top` | `70-81` | `no` | `substantive` |
+| `SemanticConvergence.Functional` | `SemanticConvergence.exists_minimizerOnListENNReal` | `85-120` | `no` | `constructive-existential` |
+| `SemanticConvergence.Functional` | `SemanticConvergence.argminOnListENNReal_spec` | `125-130` | `no` | `single-lemma-application` |
+| `SemanticConvergence.Functional` | `SemanticConvergence.posteriorWeight_ne_top` | `151-166` | `no` | `substantive` |
+| `SemanticConvergence.Functional` | `SemanticConvergence.posteriorWeightKLDivergenceTerm_eq_zero_iff` | `167-216` | `no` | `substantive` |
+| `SemanticConvergence.Functional` | `SemanticConvergence.posteriorWeight_samePosteriorWeights` | `223-230` | `no` | `substantive` |
+| `SemanticConvergence.Functional` | `SemanticConvergence.samePosteriorWeights_of_def_afe_eq_zero` | `231-245` | `no` | `substantive` |
+| `SemanticConvergence.Functional` | `SemanticConvergence.def_afe_eq_zero_iff_samePosteriorWeights` | `246-259` | `no` | `substantive` |
+| `SemanticConvergence.Functional` | `SemanticConvergence.observerClassReferenceWeightOnTargets_ne_top` | `446-458` | `no` | `substantive` |
+| `SemanticConvergence.Functional` | `SemanticConvergence.observerClassGibbsWeightOnTargets_ne_top` | `479-492` | `no` | `substantive` |
+| `SemanticConvergence.Functional` | `SemanticConvergence.observerClassPriorWeight_le_one` | `789-812` | `no` | `substantive` |
+| `SemanticConvergence.Functional` | `SemanticConvergence.observerClassPriorWeight_ne_top` | `813-823` | `no` | `single-lemma-application` |
+| `SemanticConvergence.Functional` | `SemanticConvergence.observerClassPriorWeight_tsum_eq_one` | `824-858` | `no` | `substantive` |
+| `SemanticConvergence.Functional` | `SemanticConvergence.observerClassPriorWeight_pos_of_exists` | `859-878` | `no` | `constructive-existential` |
+| `SemanticConvergence.Functional` | `SemanticConvergence.observerClassScore_eq_of_rep` | `879-899` | `no` | `substantive` |
+| `SemanticConvergence.Functional` | `SemanticConvergence.observerClassScore_nonneg` | `900-911` | `no` | `substantive` |
+| `SemanticConvergence.Functional` | `SemanticConvergence.observerClassScore_le_one` | `912-1228` | `no` | `substantive` |
+| `SemanticConvergence.Functional` | `SemanticConvergence.observerClassGibbsIGap_eq_zero_iff` | `1229-1383` | `no` | `substantive` |
+| `SemanticConvergence.Functional` | `SemanticConvergence.observerClassGibbs_variational_igap` | `1384-1523` | `no` | `substantive` |
+| `SemanticConvergence.Functional` | `SemanticConvergence.observerClassGibbsIGap_ne_top` | `1524-1577` | `no` | `substantive` |
+| `SemanticConvergence.Functional` | `SemanticConvergence.countableKernelReferenceWeightOnTargets_ne_top` | `1594-1609` | `no` | `substantive` |
+| `SemanticConvergence.Functional` | `SemanticConvergence.countableKernelGibbsWeightOnTargets_ne_top` | `1620-1634` | `no` | `substantive` |
+| `SemanticConvergence.Functional` | `SemanticConvergence.prop_belief_invariance_above` | `1692-1702` | `yes` | `substantive` |
+| `SemanticConvergence.Functional` | `SemanticConvergence.cor_twins_frozen_ratio` | `1703-1713` | `yes` | `substantive` |
+| `SemanticConvergence.Functional` | `SemanticConvergence.cor_canonical_pair` | `1714-1721` | `yes` | `substantive` |
+| `SemanticConvergence.Functional` | `SemanticConvergence.prop_goal_dialed` | `1722-1736` | `yes` | `substantive` |
+| `SemanticConvergence.Functional` | `SemanticConvergence.prop_two_observer_minimizer_legacy` | `1737-1801` | `no` | `substantive` |
+| `SemanticConvergence.Functional` | `SemanticConvergence.prop_kernel_functional_minimizer_legacy` | `1802-1889` | `no` | `substantive` |
+| `SemanticConvergence.Functional` | `SemanticConvergence.prop_kernel_functional_minimizer_compact_legacy` | `1890-1910` | `no` | `substantive` |
+| `SemanticConvergence.Functional` | `SemanticConvergence.prop_belief_illtyped_below` | `1911-1919` | `yes` | `substantive` |
+| `SemanticConvergence.Functional` | `SemanticConvergence.prop_action_cap_legacy` | `1920-1952` | `no` | `substantive` |
+| `SemanticConvergence.Functional` | `SemanticConvergence.KernelReferenceLawAdmissible.toMassAdmissible` | `1971-1979` | `no` | `substantive` |
+| `SemanticConvergence.Functional` | `SemanticConvergence.kernelReferenceWeight_ne_top` | `2076-2113` | `no` | `substantive` |
+| `SemanticConvergence.Functional` | `SemanticConvergence.kernelReferenceWeight_ne_zero_of_prior_ne_zero_fullSupport` | `2368-2386` | `no` | `substantive` |
+| `SemanticConvergence.Functional` | `SemanticConvergence.kernelGibbsLaw_eq_zero_of_kernelReferenceWeight_eq_zero` | `2387-2400` | `no` | `substantive` |
+| `SemanticConvergence.Functional` | `SemanticConvergence.kernelGibbsLaw_eq_zero_of_refLaw_mass_eq_zero` | `2401-2415` | `no` | `substantive` |
+| `SemanticConvergence.Functional` | `SemanticConvergence.kernelGibbsLaw_ne_zero_refLaw_mass_ne_zero` | `2416-2435` | `no` | `substantive` |
+| `SemanticConvergence.Functional` | `SemanticConvergence.kernelGibbsLaw_support_subset_refLaw_action_property` | `2436-2452` | `no` | `substantive` |
+| `SemanticConvergence.Functional` | `SemanticConvergence.kernelLawActionMarginal_eq_kernelGibbsActionMarginal_of_eq` | `2473-2491` | `no` | `substantive` |
+| `SemanticConvergence.Functional` | `SemanticConvergence.kernelGibbsActionMarginal_eq_zero_of_refLaw_mass_eq_zero` | `2492-2507` | `no` | `substantive` |
+| `SemanticConvergence.Functional` | `SemanticConvergence.kernelGibbsActionMarginal_ne_zero_refLaw_mass_ne_zero` | `2508-2528` | `no` | `substantive` |
+| `SemanticConvergence.Functional` | `SemanticConvergence.kernelGibbsActionMarginal_support_subset_refLaw_action_property` | `2529-2550` | `no` | `substantive` |
+| `SemanticConvergence.Functional` | `SemanticConvergence.kernelLawActionMarginal_support_subset_refLaw_action_property_of_eq_gibbs` | `2551-2577` | `no` | `substantive` |
+| `SemanticConvergence.Functional` | `SemanticConvergence.kernelGibbsActionMarginal_tsum_eq_one` | `2578-2607` | `no` | `substantive` |
+| `SemanticConvergence.Functional` | `SemanticConvergence.kernelGibbsLaw_ne_zero_of_kernelReferenceWeight_ne_zero` | `2608-2639` | `no` | `substantive` |
+| `SemanticConvergence.Functional` | `SemanticConvergence.kernelGibbsLaw_ne_zero_of_prior_ne_zero_fullSupport` | `2640-2670` | `no` | `substantive` |
+| `SemanticConvergence.Functional` | `SemanticConvergence.kernelGibbs_fullSupport_forces_action_property` | `2671-2701` | `no` | `substantive` |
+| `SemanticConvergence.Functional` | `SemanticConvergence.kernelGibbs_fullSupport_no_go_of_unsafe_action` | `2702-2770` | `no` | `substantive` |
+| `SemanticConvergence.Functional` | `SemanticConvergence.kernelGibbsIGap_eq_zero_iff` | `2771-2949` | `no` | `substantive` |
+| `SemanticConvergence.Functional` | `SemanticConvergence.kernelGibbs_variational_igap` | `2950-3122` | `no` | `substantive` |
+| `SemanticConvergence.Functional` | `SemanticConvergence.kernelGibbsIGap_ne_top` | `3123-3193` | `no` | `substantive` |
+| `SemanticConvergence.Functional` | `SemanticConvergence.prop_action_cap` | `3244-3266` | `yes` | `substantive` |
+| `SemanticConvergence.Functional` | `SemanticConvergence.thm_meeting_point` | `3267-3274` | `yes` | `substantive` |
+| `SemanticConvergence.HellingerContraction` | `SemanticConvergence.ConcretePrefixMachine.softClassResidualLikelihoodRatio_nonneg` | `17-36` | `no` | `substantive` |
+| `SemanticConvergence.HellingerContraction` | `SemanticConvergence.ConcretePrefixMachine.softObserverFiberResidualLikelihoodRatio_nonneg` | `37-66` | `no` | `single-lemma-application` |
+| `SemanticConvergence.HellingerContraction` | `SemanticConvergence.ConcretePrefixMachine.sqrt_softOneStepClassResidualOdds_eq_sqrt_mul_sqrt_likelihoodRatio` | `67-102` | `no` | `substantive` |
+| `SemanticConvergence.HellingerContraction` | `SemanticConvergence.ConcretePrefixMachine.sqrt_softOneStepObserverFiberResidualOdds_eq_sqrt_mul_sqrt_likelihoodRatio` | `103-130` | `no` | `substantive` |
+| `SemanticConvergence.HellingerContraction` | `SemanticConvergence.ConcretePrefixMachine.sqrt_softOneStepObserverFiberResidualOdds_le_sqrt_decayFactor_mul_sqrt_residual` | `131-169` | `no` | `substantive` |
 | `SemanticConvergence.Hierarchy` | `SemanticConvergence.intSemClass_self` | `99-103` | `no` | `substantive` |
 | `SemanticConvergence.Hierarchy` | `SemanticConvergence.intSemClass_subset_policyPred` | `104-110` | `no` | `substantive` |
 | `SemanticConvergence.Hierarchy` | `SemanticConvergence.policyPred_subset_historyCompat` | `111-119` | `no` | `substantive` |
@@ -353,62 +796,102 @@ tautology / placeholder patterns quickly.
 | `SemanticConvergence.Hierarchy` | `SemanticConvergence.thm_policy_gap` | `215-224` | `yes` | `substantive` |
 | `SemanticConvergence.Hierarchy` | `SemanticConvergence.lem_syntactic_gap` | `225-239` | `yes` | `substantive` |
 | `SemanticConvergence.Hierarchy` | `SemanticConvergence.thm_strict_hierarchy` | `240-261` | `yes` | `substantive` |
-| `SemanticConvergence.Manifest` | `SemanticConvergence.manifestEntryCount_eq` | `1767-1768` | `no` | `definitional-unfold` |
-| `SemanticConvergence.Manifest` | `SemanticConvergence.derivedEntryCount_eq` | `1878-1880` | `no` | `substantive` |
-| `SemanticConvergence.Manifest` | `SemanticConvergence.wrappedEntryCount_eq` | `1881-1883` | `no` | `substantive` |
-| `SemanticConvergence.Manifest` | `SemanticConvergence.declaredEntryCount_eq` | `1884-1886` | `no` | `substantive` |
-| `SemanticConvergence.Manifest` | `SemanticConvergence.concreteStackEntryCount_eq` | `1887-1889` | `no` | `substantive` |
-| `SemanticConvergence.Manifest` | `SemanticConvergence.abstractInterfaceEntryCount_eq` | `1890-1892` | `no` | `substantive` |
-| `SemanticConvergence.Manifest` | `SemanticConvergence.migratedToConcreteEntryCount_eq` | `1893-1895` | `no` | `substantive` |
-| `SemanticConvergence.Manifest` | `SemanticConvergence.pendingConcreteMigrationEntryCount_eq` | `1896-1898` | `no` | `substantive` |
-| `SemanticConvergence.Manifest` | `SemanticConvergence.substantiveEntryCount_eq` | `1899-1901` | `no` | `substantive` |
-| `SemanticConvergence.Manifest` | `SemanticConvergence.definitionProofEntryCount_eq` | `1902-1904` | `no` | `substantive` |
-| `SemanticConvergence.Manifest` | `SemanticConvergence.constructiveExistentialEntryCount_eq` | `1905-1907` | `no` | `substantive` |
-| `SemanticConvergence.Manifest` | `SemanticConvergence.rateCompositionEntryCount_eq` | `1908-1910` | `no` | `substantive` |
-| `SemanticConvergence.Manifest` | `SemanticConvergence.singleLemmaApplicationEntryCount_eq` | `1911-1913` | `no` | `substantive` |
-| `SemanticConvergence.Manifest` | `SemanticConvergence.definitionalUnfoldEntryCount_eq` | `1914-1916` | `no` | `substantive` |
-| `SemanticConvergence.Manifest` | `SemanticConvergence.fieldProjectionEntryCount_eq` | `1917-1919` | `no` | `substantive` |
-| `SemanticConvergence.Manifest` | `SemanticConvergence.placeholderTruthEntryCount_eq` | `1920-1922` | `no` | `substantive` |
-| `SemanticConvergence.Manifest` | `SemanticConvergence.heuristicOtherEntryCount_eq` | `1923-1925` | `no` | `substantive` |
-| `SemanticConvergence.Manifest` | `SemanticConvergence.manifestDefinitionEntryCount_eq` | `1926-1928` | `no` | `substantive` |
-| `SemanticConvergence.Manifest` | `SemanticConvergence.manifestDefinitionEntriesTaggedAsDefinitionCount_eq` | `1929-1931` | `no` | `substantive` |
-| `SemanticConvergence.Manifest` | `SemanticConvergence.manifestTheoremLikeEntryCount_eq` | `1932-1934` | `no` | `substantive` |
-| `SemanticConvergence.Manifest` | `SemanticConvergence.manifestTheoremLikeSemanticallyAuditedEntryCount_eq` | `1935-1937` | `no` | `substantive` |
-| `SemanticConvergence.Manifest` | `SemanticConvergence.suspiciousManifestEntryCount_eq` | `1938-1940` | `no` | `substantive` |
-| `SemanticConvergence.Manifest` | `SemanticConvergence.publicProbabilisticBridgeEntryCount_eq` | `1941-1943` | `no` | `substantive` |
-| `SemanticConvergence.Manifest` | `SemanticConvergence.publicProbabilisticBridgeWitnessHypEntryCount_eq` | `1944-1946` | `no` | `substantive` |
-| `SemanticConvergence.Manifest` | `SemanticConvergence.publicProbabilisticBridgeEquationHypEntryCount_eq` | `1947-1949` | `no` | `substantive` |
-| `SemanticConvergence.Manifest` | `SemanticConvergence.publicProbabilisticBridgeConcreteRootEntryCount_eq` | `1950-1952` | `no` | `substantive` |
-| `SemanticConvergence.Manifest` | `SemanticConvergence.concreteSubstrateModuleCount_eq` | `1953-1954` | `no` | `definitional-unfold` |
-| `SemanticConvergence.Manifest` | `SemanticConvergence.bridgeReadyAbstractEntryCount_eq` | `1955-1957` | `no` | `substantive` |
-| `SemanticConvergence.Manifest` | `SemanticConvergence.unlabeledEntryCount_eq` | `1971-1973` | `no` | `substantive` |
-| `SemanticConvergence.Manifest` | `SemanticConvergence.paperFullyCovered_eq` | `2000-2002` | `no` | `substantive` |
-| `SemanticConvergence.Manifest` | `SemanticConvergence.paperFullyDerived_eq` | `2003-2005` | `no` | `substantive` |
-| `SemanticConvergence.Manifest` | `SemanticConvergence.semanticAuditClosed_eq` | `2006-2008` | `no` | `substantive` |
-| `SemanticConvergence.Manifest` | `SemanticConvergence.publicProbabilisticBridgeSurfaceClosed_eq` | `2009-2011` | `no` | `substantive` |
-| `SemanticConvergence.Manifest` | `SemanticConvergence.fullyCovered_eq` | `2012-2013` | `no` | `definitional-unfold` |
-| `SemanticConvergence.Manifest` | `SemanticConvergence.fullyDerived_eq` | `2014-2015` | `no` | `definitional-unfold` |
-| `SemanticConvergence.Manifest` | `SemanticConvergence.fullyFirstPrinciples_eq` | `2016-2019` | `no` | `substantive` |
+| `SemanticConvergence.Manifest` | `SemanticConvergence.manifestEntryCount_eq` | `2510-2511` | `no` | `definitional-unfold` |
+| `SemanticConvergence.Manifest` | `SemanticConvergence.derivedEntryCount_eq` | `2637-2639` | `no` | `substantive` |
+| `SemanticConvergence.Manifest` | `SemanticConvergence.wrappedEntryCount_eq` | `2640-2642` | `no` | `substantive` |
+| `SemanticConvergence.Manifest` | `SemanticConvergence.declaredEntryCount_eq` | `2643-2645` | `no` | `substantive` |
+| `SemanticConvergence.Manifest` | `SemanticConvergence.concreteStackEntryCount_eq` | `2646-2648` | `no` | `substantive` |
+| `SemanticConvergence.Manifest` | `SemanticConvergence.abstractInterfaceEntryCount_eq` | `2649-2651` | `no` | `substantive` |
+| `SemanticConvergence.Manifest` | `SemanticConvergence.migratedToConcreteEntryCount_eq` | `2652-2654` | `no` | `substantive` |
+| `SemanticConvergence.Manifest` | `SemanticConvergence.pendingConcreteMigrationEntryCount_eq` | `2655-2657` | `no` | `substantive` |
+| `SemanticConvergence.Manifest` | `SemanticConvergence.substantiveEntryCount_eq` | `2658-2660` | `no` | `substantive` |
+| `SemanticConvergence.Manifest` | `SemanticConvergence.definitionProofEntryCount_eq` | `2661-2663` | `no` | `substantive` |
+| `SemanticConvergence.Manifest` | `SemanticConvergence.constructiveExistentialEntryCount_eq` | `2664-2666` | `no` | `substantive` |
+| `SemanticConvergence.Manifest` | `SemanticConvergence.rateCompositionEntryCount_eq` | `2667-2669` | `no` | `substantive` |
+| `SemanticConvergence.Manifest` | `SemanticConvergence.singleLemmaApplicationEntryCount_eq` | `2670-2672` | `no` | `substantive` |
+| `SemanticConvergence.Manifest` | `SemanticConvergence.definitionalUnfoldEntryCount_eq` | `2673-2675` | `no` | `substantive` |
+| `SemanticConvergence.Manifest` | `SemanticConvergence.fieldProjectionEntryCount_eq` | `2676-2678` | `no` | `substantive` |
+| `SemanticConvergence.Manifest` | `SemanticConvergence.placeholderTruthEntryCount_eq` | `2679-2681` | `no` | `substantive` |
+| `SemanticConvergence.Manifest` | `SemanticConvergence.heuristicOtherEntryCount_eq` | `2682-2684` | `no` | `substantive` |
+| `SemanticConvergence.Manifest` | `SemanticConvergence.manifestDefinitionEntryCount_eq` | `2685-2687` | `no` | `substantive` |
+| `SemanticConvergence.Manifest` | `SemanticConvergence.manifestDefinitionEntriesTaggedAsDefinitionCount_eq` | `2688-2690` | `no` | `substantive` |
+| `SemanticConvergence.Manifest` | `SemanticConvergence.manifestTheoremLikeEntryCount_eq` | `2691-2693` | `no` | `substantive` |
+| `SemanticConvergence.Manifest` | `SemanticConvergence.manifestTheoremLikeSemanticallyAuditedEntryCount_eq` | `2694-2696` | `no` | `substantive` |
+| `SemanticConvergence.Manifest` | `SemanticConvergence.suspiciousManifestEntryCount_eq` | `2697-2699` | `no` | `substantive` |
+| `SemanticConvergence.Manifest` | `SemanticConvergence.exactnessLockPendingEntryCount_eq` | `2700-2702` | `no` | `substantive` |
+| `SemanticConvergence.Manifest` | `SemanticConvergence.missingLeanDeclarationEntryCount_eq` | `2703-2705` | `no` | `substantive` |
+| `SemanticConvergence.Manifest` | `SemanticConvergence.manuscriptProofEntryCount_eq` | `2706-2708` | `no` | `substantive` |
+| `SemanticConvergence.Manifest` | `SemanticConvergence.manuscriptProofCitationEntryCount_eq` | `2709-2711` | `no` | `substantive` |
+| `SemanticConvergence.Manifest` | `SemanticConvergence.missingManuscriptProofCitationEntryCount_eq` | `2712-2714` | `no` | `substantive` |
+| `SemanticConvergence.Manifest` | `SemanticConvergence.publicProbabilisticBridgeEntryCount_eq` | `2715-2717` | `no` | `substantive` |
+| `SemanticConvergence.Manifest` | `SemanticConvergence.publicProbabilisticBridgeWitnessHypEntryCount_eq` | `2718-2720` | `no` | `substantive` |
+| `SemanticConvergence.Manifest` | `SemanticConvergence.publicProbabilisticBridgeEquationHypEntryCount_eq` | `2721-2723` | `no` | `substantive` |
+| `SemanticConvergence.Manifest` | `SemanticConvergence.publicProbabilisticBridgeConcreteRootEntryCount_eq` | `2724-2726` | `no` | `substantive` |
+| `SemanticConvergence.Manifest` | `SemanticConvergence.concreteSubstrateModuleCount_eq` | `2727-2728` | `no` | `definitional-unfold` |
+| `SemanticConvergence.Manifest` | `SemanticConvergence.bridgeReadyAbstractEntryCount_eq` | `2729-2731` | `no` | `substantive` |
+| `SemanticConvergence.Manifest` | `SemanticConvergence.unlabeledEntryCount_eq` | `2745-2747` | `no` | `substantive` |
+| `SemanticConvergence.Manifest` | `SemanticConvergence.paperFullyCovered_eq` | `2785-2787` | `no` | `substantive` |
+| `SemanticConvergence.Manifest` | `SemanticConvergence.paperFullyDerived_eq` | `2788-2790` | `no` | `substantive` |
+| `SemanticConvergence.Manifest` | `SemanticConvergence.semanticAuditClosed_eq` | `2791-2793` | `no` | `substantive` |
+| `SemanticConvergence.Manifest` | `SemanticConvergence.semanticExactnessClosed_eq` | `2794-2796` | `no` | `substantive` |
+| `SemanticConvergence.Manifest` | `SemanticConvergence.h10CorrespondenceLedgerComplete_eq` | `2797-2799` | `no` | `substantive` |
+| `SemanticConvergence.Manifest` | `SemanticConvergence.manuscriptProofCitationSurfaceClosed_eq` | `2800-2802` | `no` | `substantive` |
+| `SemanticConvergence.Manifest` | `SemanticConvergence.publicProbabilisticBridgeSurfaceClosed_eq` | `2803-2805` | `no` | `substantive` |
+| `SemanticConvergence.Manifest` | `SemanticConvergence.fullyCovered_eq` | `2806-2807` | `no` | `definitional-unfold` |
+| `SemanticConvergence.Manifest` | `SemanticConvergence.fullyDerived_eq` | `2808-2809` | `no` | `definitional-unfold` |
+| `SemanticConvergence.Manifest` | `SemanticConvergence.fullyFirstPrinciples_eq` | `2810-2813` | `no` | `substantive` |
+| `SemanticConvergence.MartingaleContraction` | `SemanticConvergence.residualOdds_tendsto_zero_of_exponential_martingale_spine` | `22-45` | `no` | `substantive` |
+| `SemanticConvergence.MartingaleContraction` | `SemanticConvergence.posteriorShare_tendsto_one_of_residualOdds_tendsto_zero` | `46-59` | `no` | `substantive` |
+| `SemanticConvergence.MartingaleContraction` | `SemanticConvergence.posteriorShare_tendsto_one_of_exponential_martingale_spine` | `60-78` | `no` | `single-lemma-application` |
+| `SemanticConvergence.MartingaleContraction` | `SemanticConvergence.ae_posteriorShare_tendsto_one_of_exponential_martingale_spine` | `79-101` | `no` | `constructive-existential` |
+| `SemanticConvergence.MartingaleContraction` | `SemanticConvergence.ae_posteriorShare_tendsto_one_of_martingale_exponential_spine` | `102-130` | `no` | `substantive` |
+| `SemanticConvergence.MartingaleContraction` | `SemanticConvergence.cumulativeSeparationProcess_ge_linear_of_step_lower_bound` | `152-170` | `no` | `substantive` |
+| `SemanticConvergence.MartingaleContraction` | `SemanticConvergence.cumulativeSeparationProcess_tendsto_atTop_of_uniform_step_lower_bound` | `171-189` | `no` | `substantive` |
+| `SemanticConvergence.MartingaleContraction` | `SemanticConvergence.ae_cumulativeSeparationProcess_tendsto_atTop_of_uniform_step_lower_bound` | `190-199` | `no` | `substantive` |
+| `SemanticConvergence.MartingaleContraction` | `SemanticConvergence.hellingerEnvelopeProcess_mul_exp_neg` | `205-228` | `no` | `substantive` |
+| `SemanticConvergence.MartingaleContraction` | `SemanticConvergence.HellingerConvergenceSpine` | `229-264` | `yes` | `substantive` |
+| `SemanticConvergence.MartingaleContraction` | `SemanticConvergence.HellingerConvergenceSpine` | `265-278` | `yes` | `single-lemma-application` |
 | `SemanticConvergence.Noise` | `SemanticConvergence.prop_noise_immunity` | `25-39` | `yes` | `substantive` |
 | `SemanticConvergence.Noise` | `SemanticConvergence.prop_noise_left_invertible` | `40-47` | `yes` | `constructive-existential` |
 | `SemanticConvergence.Noise` | `SemanticConvergence.prop_noise_decoding` | `48-55` | `yes` | `substantive` |
 | `SemanticConvergence.Noise` | `SemanticConvergence.cor_noise_transfer_deterministic` | `56-90` | `no` | `substantive` |
 | `SemanticConvergence.Noise` | `SemanticConvergence.cor_noise_transfer_of_witness` | `91-113` | `no` | `substantive` |
-| `SemanticConvergence.Noise` | `SemanticConvergence.cor_noise_transfer` | `114-160` | `yes` | `substantive` |
+| `SemanticConvergence.Noise` | `SemanticConvergence.cor_noise_transfer` | `114-150` | `no` | `substantive` |
+| `SemanticConvergence.Noise` | `SemanticConvergence.zeroOutRatePackage_decodableNoiseTransfer` | `151-181` | `yes` | `rate-composition` |
+| `SemanticConvergence.Ontology` | `SemanticConvergence.Ontology.Observer.refines_refl` | `48-50` | `no` | `single-lemma-application` |
+| `SemanticConvergence.Ontology` | `SemanticConvergence.Ontology.Observer.refines_trans` | `51-61` | `no` | `single-lemma-application` |
+| `SemanticConvergence.Ontology` | `SemanticConvergence.Ontology.Observer.semanticClass_eq_behavioralFiber` | `85-109` | `no` | `substantive` |
+| `SemanticConvergence.Ontology` | `SemanticConvergence.Ontology.Agent.kernelFunctional_decomposition` | `166-200` | `no` | `substantive` |
+| `SemanticConvergence.Ontology` | `SemanticConvergence.Ontology.Coupling.h10_verified_semantic_learning_package_converges` | `332-369` | `yes` | `substantive` |
+| `SemanticConvergence.Ontology` | `SemanticConvergence.Ontology.Coupling.h10_infinite_affinity_hellinger_bridge` | `370-387` | `yes` | `substantive` |
+| `SemanticConvergence.Ontology` | `SemanticConvergence.Ontology.Coupling.h10_exploration_floor_behavioral` | `388-405` | `yes` | `substantive` |
+| `SemanticConvergence.Ontology` | `SemanticConvergence.Ontology.Coupling.h10_semantic_convergence` | `406-423` | `yes` | `substantive` |
+| `SemanticConvergence.Ontology` | `SemanticConvergence.Ontology.Coupling.h10_kernel_semantic_convergence` | `424-441` | `yes` | `substantive` |
+| `SemanticConvergence.Ontology` | `SemanticConvergence.Ontology.Coupling.h10_compact_action_kernel` | `442-459` | `yes` | `substantive` |
+| `SemanticConvergence.Ontology` | `SemanticConvergence.Ontology.Coupling.h10_finite_maximin` | `460-477` | `yes` | `substantive` |
+| `SemanticConvergence.Ontology` | `SemanticConvergence.Ontology.Coupling.h10_goal_dialed_payoff` | `478-495` | `yes` | `substantive` |
+| `SemanticConvergence.Ontology` | `SemanticConvergence.Ontology.Coupling.h10_amortized_surrogate` | `496-517` | `yes` | `substantive` |
+| `SemanticConvergence.Ontology` | `SemanticConvergence.Ontology.Coupling.h10_support_left_invertible_noisy_transfer` | `518-565` | `yes` | `substantive` |
 | `SemanticConvergence.Rates` | `SemanticConvergence.lem_one_step_drift_deterministic` | `16-33` | `no` | `rate-composition` |
 | `SemanticConvergence.Rates` | `SemanticConvergence.prop_exp_rate_deterministic` | `34-52` | `no` | `rate-composition` |
 | `SemanticConvergence.Rates` | `SemanticConvergence.lem_one_step_drift_kernel_deterministic` | `53-78` | `no` | `substantive` |
 | `SemanticConvergence.Rates` | `SemanticConvergence.prop_kernel_exp_rate_deterministic` | `79-103` | `no` | `substantive` |
-| `SemanticConvergence.Rates` | `SemanticConvergence.thm_exp_rate_concentration_deterministic` | `104-132` | `no` | `substantive` |
-| `SemanticConvergence.Rates` | `SemanticConvergence.lem_one_step_drift_of_witness` | `133-151` | `no` | `substantive` |
-| `SemanticConvergence.Rates` | `SemanticConvergence.lem_one_step_drift` | `152-199` | `yes` | `substantive` |
-| `SemanticConvergence.Rates` | `SemanticConvergence.prop_exp_rate_of_witness` | `200-219` | `no` | `substantive` |
-| `SemanticConvergence.Rates` | `SemanticConvergence.lem_one_step_drift_kernel` | `220-232` | `yes` | `substantive` |
-| `SemanticConvergence.Rates` | `SemanticConvergence.prop_exp_rate` | `233-280` | `yes` | `rate-composition` |
-| `SemanticConvergence.Rates` | `SemanticConvergence.prop_kernel_exp_rate_of_witness` | `281-298` | `no` | `substantive` |
-| `SemanticConvergence.Rates` | `SemanticConvergence.prop_kernel_exp_rate` | `299-348` | `yes` | `rate-composition` |
-| `SemanticConvergence.Rates` | `SemanticConvergence.thm_exp_rate_concentration_of_witness` | `349-370` | `no` | `substantive` |
-| `SemanticConvergence.Rates` | `SemanticConvergence.thm_exp_rate_concentration` | `371-431` | `yes` | `rate-composition` |
+| `SemanticConvergence.Rates` | `SemanticConvergence.thm_exp_rate_concentration_deterministic` | `104-139` | `no` | `substantive` |
+| `SemanticConvergence.Rates` | `SemanticConvergence.lem_one_step_drift_of_witness` | `158-176` | `no` | `substantive` |
+| `SemanticConvergence.Rates` | `SemanticConvergence.lem_one_step_drift` | `177-227` | `no` | `substantive` |
+| `SemanticConvergence.Rates` | `SemanticConvergence.prop_exp_rate_of_witness` | `228-247` | `no` | `substantive` |
+| `SemanticConvergence.Rates` | `SemanticConvergence.lem_one_step_drift_kernel` | `248-260` | `yes` | `substantive` |
+| `SemanticConvergence.Rates` | `SemanticConvergence.prop_exp_rate` | `261-311` | `no` | `rate-composition` |
+| `SemanticConvergence.Rates` | `SemanticConvergence.prop_kernel_exp_rate_of_witness` | `312-329` | `no` | `substantive` |
+| `SemanticConvergence.Rates` | `SemanticConvergence.prop_kernel_exp_rate` | `330-382` | `no` | `rate-composition` |
+| `SemanticConvergence.Rates` | `SemanticConvergence.thm_exp_rate_concentration_of_witness` | `383-404` | `no` | `substantive` |
+| `SemanticConvergence.Rates` | `SemanticConvergence.thm_exp_rate_concentration` | `405-466` | `no` | `rate-composition` |
+| `SemanticConvergence.Rates` | `SemanticConvergence.zeroOutRatePackage_oneStepResidual` | `467-489` | `yes` | `rate-composition` |
+| `SemanticConvergence.Rates` | `SemanticConvergence.zeroOutRatePackage_residualRate` | `490-512` | `yes` | `rate-composition` |
+| `SemanticConvergence.Rates` | `SemanticConvergence.zeroOutRatePackage_posteriorShareFiniteTime` | `513-536` | `yes` | `rate-composition` |
+| `SemanticConvergence.Rates` | `SemanticConvergence.zeroOutRatePackage_expRate` | `537-558` | `yes` | `rate-composition` |
+| `SemanticConvergence.Rates` | `SemanticConvergence.zeroOutRatePackage_sameViewResidualRate` | `559-583` | `yes` | `rate-composition` |
+| `SemanticConvergence.Rates` | `SemanticConvergence.zeroOutRatePackage_sameViewPosteriorShareFiniteTime` | `584-611` | `yes` | `rate-composition` |
 | `SemanticConvergence.SelfReference` | `SemanticConvergence.lem_monotone_refinement` | `90-98` | `yes` | `substantive` |
 | `SemanticConvergence.SelfReference` | `SemanticConvergence.lem_exploration_reachability` | `99-109` | `yes` | `constructive-existential` |
 | `SemanticConvergence.SelfReference` | `SemanticConvergence.prop_observer_promotion_sr` | `110-118` | `yes` | `substantive` |
@@ -418,47 +901,124 @@ tautology / placeholder patterns quickly.
 | `SemanticConvergence.SelfReference` | `SemanticConvergence.thm_self_ref_exploratory_rate` | `149-160` | `yes` | `substantive` |
 | `SemanticConvergence.SelfReference` | `SemanticConvergence.prop_self_ref_one_step_split` | `161-171` | `yes` | `constructive-existential` |
 | `SemanticConvergence.SelfReference` | `SemanticConvergence.thm_self_ref_sharp` | `172-194` | `yes` | `substantive` |
-| `SemanticConvergence.Semantic` | `SemanticConvergence.lem_odds_identity` | `85-94` | `yes` | `definition` |
-| `SemanticConvergence.Semantic` | `SemanticConvergence.lem_zero_criterion` | `95-104` | `yes` | `definition` |
-| `SemanticConvergence.Semantic` | `SemanticConvergence.prop_chernoff_correspondence` | `105-116` | `yes` | `definition` |
-| `SemanticConvergence.Semantic` | `SemanticConvergence.prop_semantic_is_promotion_supporting` | `117-124` | `yes` | `substantive` |
-| `SemanticConvergence.Semantic` | `SemanticConvergence.prop_kernel_promotion_support` | `125-132` | `yes` | `substantive` |
-| `SemanticConvergence.Semantic` | `SemanticConvergence.prop_kernel_promotion_support_compact` | `133-140` | `yes` | `substantive` |
-| `SemanticConvergence.Semantic` | `SemanticConvergence.prop_uniform_history_independent_implies_semantic` | `141-152` | `yes` | `substantive` |
-| `SemanticConvergence.Semantic` | `SemanticConvergence.cor_kl_implies_semantic_separation` | `153-163` | `yes` | `substantive` |
-| `SemanticConvergence.Semantic` | `SemanticConvergence.cor_event_witness_implies_semantic_separation` | `164-174` | `yes` | `substantive` |
-| `SemanticConvergence.Semantic` | `SemanticConvergence.prop_finite_action_kernel_separation` | `175-188` | `yes` | `substantive` |
-| `SemanticConvergence.Semantic` | `SemanticConvergence.prop_compact_action_kernel_separation` | `189-202` | `yes` | `substantive` |
-| `SemanticConvergence.Semantic` | `SemanticConvergence.cor_noise_left_invertible_history_independent` | `203-207` | `yes` | `substantive` |
-| `SemanticConvergence.Semantic` | `SemanticConvergence.lem_conditional_bc` | `208-219` | `yes` | `substantive` |
-| `SemanticConvergence.Semantic` | `SemanticConvergence.lem_contraction` | `220-230` | `yes` | `constructive-existential` |
-| `SemanticConvergence.Semantic` | `SemanticConvergence.prop_full_support_behavioral` | `231-246` | `yes` | `substantive` |
-| `SemanticConvergence.Semantic` | `SemanticConvergence.thm_separating_support_convergence_deterministic` | `319-375` | `no` | `constructive-existential` |
-| `SemanticConvergence.Semantic` | `SemanticConvergence.thm_exploration_floor_behavioral` | `376-388` | `yes` | `constructive-existential` |
-| `SemanticConvergence.Semantic` | `SemanticConvergence.thm_separating_support_rate_deterministic` | `389-418` | `no` | `constructive-existential` |
-| `SemanticConvergence.Semantic` | `SemanticConvergence.cor_separating_support_finite_time_deterministic` | `419-461` | `no` | `constructive-existential` |
-| `SemanticConvergence.Semantic` | `SemanticConvergence.thm_separating_support_convergence_of_witness` | `462-491` | `no` | `substantive` |
-| `SemanticConvergence.Semantic` | `SemanticConvergence.thm_separating_support_convergence` | `492-537` | `yes` | `substantive` |
-| `SemanticConvergence.Semantic` | `SemanticConvergence.thm_separating_support_rate_of_witness` | `538-562` | `no` | `substantive` |
-| `SemanticConvergence.Semantic` | `SemanticConvergence.thm_separating_support_rate` | `563-608` | `yes` | `substantive` |
-| `SemanticConvergence.Semantic` | `SemanticConvergence.cor_separating_support_finite_time_of_witness` | `609-649` | `no` | `substantive` |
-| `SemanticConvergence.Semantic` | `SemanticConvergence.cor_separating_support_finite_time` | `650-700` | `yes` | `substantive` |
-| `SemanticConvergence.Semantic` | `SemanticConvergence.thm_semantic_convergence` | `701-714` | `yes` | `substantive` |
-| `SemanticConvergence.Semantic` | `SemanticConvergence.thm_kernel_semantic_convergence` | `715-728` | `yes` | `substantive` |
-| `SemanticConvergence.Semantic` | `SemanticConvergence.cor_compact_action_kernel` | `729-742` | `yes` | `substantive` |
-| `SemanticConvergence.Semantic` | `SemanticConvergence.cor_finite_maximin` | `743-756` | `yes` | `substantive` |
-| `SemanticConvergence.Semantic` | `SemanticConvergence.cor_support_necessary` | `757-775` | `yes` | `constructive-existential` |
-| `SemanticConvergence.Semantic` | `SemanticConvergence.SummableSupportCounterexample.true_mem_actions` | `816-818` | `no` | `substantive` |
-| `SemanticConvergence.Semantic` | `SemanticConvergence.SummableSupportCounterexample.zeroSchedule_summable` | `819-824` | `no` | `substantive` |
-| `SemanticConvergence.Semantic` | `SemanticConvergence.SummableSupportCounterexample.schedule_realized_on_true` | `825-830` | `no` | `substantive` |
-| `SemanticConvergence.Semantic` | `SemanticConvergence.SummableSupportCounterexample.no_oneStepPosteriorConcentrates` | `831-858` | `no` | `substantive` |
-| `SemanticConvergence.Semantic` | `SemanticConvergence.SummableSupportCounterexample.no_oneStepResidualPosteriorConcentrates` | `859-916` | `no` | `substantive` |
-| `SemanticConvergence.Semantic` | `SemanticConvergence.thm_summable_support_insufficient` | `917-939` | `yes` | `constructive-existential` |
-| `SemanticConvergence.Semantic` | `SemanticConvergence.cor_goal_dialed_payoff` | `940-954` | `yes` | `substantive` |
-| `SemanticConvergence.Surrogate` | `SemanticConvergence.prop_amortized_surrogate_minimizer` | `64-85` | `yes` | `substantive` |
-| `SemanticConvergence.Surrogate` | `SemanticConvergence.helper_amortized_surrogate_selector_existence_of_positiveSeparation` | `95-109` | `no` | `constructive-existential` |
-| `SemanticConvergence.Surrogate` | `SemanticConvergence.helper_amortized_surrogate_selector_support` | `110-128` | `no` | `substantive` |
-| `SemanticConvergence.Surrogate` | `SemanticConvergence.thm_amortized_surrogate_selector_existence` | `129-196` | `no` | `constructive-existential` |
-| `SemanticConvergence.Surrogate` | `SemanticConvergence.cor_amortized_surrogate_selector_support` | `197-235` | `no` | `constructive-existential` |
-| `SemanticConvergence.Surrogate` | `SemanticConvergence.thm_amortized_surrogate` | `257-302` | `yes` | `substantive` |
-| `SemanticConvergence.Surrogate` | `SemanticConvergence.cor_amortized_surrogate_finite_time` | `303-373` | `yes` | `substantive` |
+| `SemanticConvergence.Semantic` | `SemanticConvergence.lem_odds_identity` | `89-98` | `yes` | `definition` |
+| `SemanticConvergence.Semantic` | `SemanticConvergence.lem_zero_criterion` | `99-108` | `yes` | `definition` |
+| `SemanticConvergence.Semantic` | `SemanticConvergence.prop_chernoff_correspondence` | `109-120` | `yes` | `definition` |
+| `SemanticConvergence.Semantic` | `SemanticConvergence.prop_semantic_is_promotion_supporting` | `121-128` | `yes` | `substantive` |
+| `SemanticConvergence.Semantic` | `SemanticConvergence.prop_kernel_promotion_support` | `129-136` | `yes` | `substantive` |
+| `SemanticConvergence.Semantic` | `SemanticConvergence.prop_kernel_promotion_support_compact` | `137-157` | `yes` | `substantive` |
+| `SemanticConvergence.Semantic` | `SemanticConvergence.prop_uniform_history_independent_implies_semantic` | `158-169` | `yes` | `substantive` |
+| `SemanticConvergence.Semantic` | `SemanticConvergence.cor_kl_implies_semantic_separation` | `170-180` | `yes` | `substantive` |
+| `SemanticConvergence.Semantic` | `SemanticConvergence.cor_event_witness_implies_semantic_separation` | `181-191` | `yes` | `substantive` |
+| `SemanticConvergence.Semantic` | `SemanticConvergence.prop_finite_action_kernel_separation` | `192-205` | `yes` | `substantive` |
+| `SemanticConvergence.Semantic` | `SemanticConvergence.prop_compact_action_kernel_separation` | `206-248` | `yes` | `substantive` |
+| `SemanticConvergence.Semantic` | `SemanticConvergence.cor_noise_left_invertible_history_independent` | `249-253` | `no` | `substantive` |
+| `SemanticConvergence.Semantic` | `SemanticConvergence.lem_conditional_bc` | `254-265` | `yes` | `substantive` |
+| `SemanticConvergence.Semantic` | `SemanticConvergence.lem_contraction_pointwise` | `266-288` | `no` | `substantive` |
+| `SemanticConvergence.Semantic` | `SemanticConvergence.lem_contraction` | `289-320` | `yes` | `substantive` |
+| `SemanticConvergence.Semantic` | `SemanticConvergence.thm_separating_support_convergence_hellinger_spine` | `321-343` | `no` | `substantive` |
+| `SemanticConvergence.Semantic` | `SemanticConvergence.thm_constructed_infinite_bayes_gibbs_hellinger_spine_convergence` | `344-395` | `no` | `substantive` |
+| `SemanticConvergence.Semantic` | `SemanticConvergence.thm_constructed_infinite_bayes_gibbs_hellinger_spine_convergence_of_condExp` | `396-447` | `no` | `substantive` |
+| `SemanticConvergence.Semantic` | `SemanticConvergence.thm_constructed_infinite_bayes_gibbs_trueLaw_hellinger_spine_convergence` | `448-492` | `no` | `substantive` |
+| `SemanticConvergence.Semantic` | `SemanticConvergence.thm_constructed_infinite_bayes_gibbs_trueLaw_hellinger_spine_convergence_of_prefix_kernel_integral` | `493-568` | `no` | `substantive` |
+| `SemanticConvergence.Semantic` | `SemanticConvergence.thm_constructed_infinite_bayes_gibbs_trueLaw_hellinger_spine_convergence_of_prefix_kernel_obligations` | `569-625` | `no` | `substantive` |
+| `SemanticConvergence.Semantic` | `SemanticConvergence.thm_constructed_infinite_bayes_gibbs_trueLaw_hellinger_spine_convergence_of_action_rule` | `626-665` | `no` | `substantive` |
+| `SemanticConvergence.Semantic` | `SemanticConvergence.countablePredictiveKernelObserver_predictivelyExtensional` | `749-759` | `no` | `substantive` |
+| `SemanticConvergence.Semantic` | `SemanticConvergence.countablePredictiveKernelObserver_kernel_eq_of_extensional` | `760-779` | `no` | `substantive` |
+| `SemanticConvergence.Semantic` | `SemanticConvergence.PosteriorSupportedObserverFiberSemanticsCoherentAt_of_predictivelyExtensional` | `872-912` | `no` | `substantive` |
+| `SemanticConvergence.Semantic` | `SemanticConvergence.KernelReferenceLawPosteriorSupportedObserverFiberSemanticsCoherentAt_of_predictivelyExtensional` | `913-934` | `no` | `substantive` |
+| `SemanticConvergence.Semantic` | `SemanticConvergence.observerFiber_predictiveKernelObserver_true` | `935-949` | `no` | `substantive` |
+| `SemanticConvergence.Semantic` | `SemanticConvergence.KernelReferenceLawPosteriorSupportedObserverFiberSemanticsCoherentAt_predictiveKernelObserver` | `950-973` | `no` | `substantive` |
+| `SemanticConvergence.Semantic` | `SemanticConvergence.TrueEnvironmentClassPredictiveCalibratedAt_of_posteriorSupportedFiberSemantics` | `993-1019` | `no` | `substantive` |
+| `SemanticConvergence.Semantic` | `SemanticConvergence.KernelReferenceLawClassPredictiveCalibratedAt_of_posteriorSupportedFiberSemantics` | `1020-1047` | `no` | `substantive` |
+| `SemanticConvergence.Semantic` | `SemanticConvergence.KernelReferenceLawClassPredictiveCalibratedAt_of_predictivelyExtensional` | `1048-1072` | `no` | `substantive` |
+| `SemanticConvergence.Semantic` | `SemanticConvergence.KernelReferenceLawClassPredictiveCalibratedAt_predictiveKernelObserver` | `1073-1104` | `no` | `substantive` |
+| `SemanticConvergence.Semantic` | `SemanticConvergence.TrueLawHellingerSemanticSeparationAt_of_classPredictive_calibrated` | `1105-1136` | `no` | `substantive` |
+| `SemanticConvergence.Semantic` | `SemanticConvergence.KernelReferenceLawTrueLawHellingerSemanticallySeparatedAt_of_classPredictive_calibrated` | `1137-1163` | `no` | `substantive` |
+| `SemanticConvergence.Semantic` | `SemanticConvergence.KernelReferenceLawTrueLawHellingerSemanticallySeparatedAt_of_classPredictive_fiberSemantics` | `1164-1196` | `no` | `single-lemma-application` |
+| `SemanticConvergence.Semantic` | `SemanticConvergence.KernelReferenceLawTrueLawHellingerSemanticallySeparatedAt_of_classPredictive_predictivelyExtensional` | `1197-1228` | `no` | `substantive` |
+| `SemanticConvergence.Semantic` | `SemanticConvergence.KernelReferenceLawTrueLawHellingerSemanticallySeparatedAt_of_classPredictive_predictiveKernelObserver` | `1229-1268` | `no` | `substantive` |
+| `SemanticConvergence.Semantic` | `SemanticConvergence.KernelReferenceLawTrueLawHellingerSafeAt_of_semanticSeparation` | `1269-1293` | `no` | `substantive` |
+| `SemanticConvergence.Semantic` | `SemanticConvergence.KernelReferenceLawTrueLawHellingerSafeAt_of_classPredictive_calibrated` | `1294-1320` | `no` | `single-lemma-application` |
+| `SemanticConvergence.Semantic` | `SemanticConvergence.KernelReferenceLawTrueLawHellingerSafeAt_of_classPredictive_fiberSemantics` | `1321-1351` | `no` | `single-lemma-application` |
+| `SemanticConvergence.Semantic` | `SemanticConvergence.KernelReferenceLawTrueLawHellingerSafeAt_of_classPredictive_predictivelyExtensional` | `1352-1380` | `no` | `substantive` |
+| `SemanticConvergence.Semantic` | `SemanticConvergence.KernelReferenceLawTrueLawHellingerSafeAt_of_classPredictive_predictiveKernelObserver` | `1381-1423` | `no` | `substantive` |
+| `SemanticConvergence.Semantic` | `SemanticConvergence.trueLawHellingerAffinityCeilingActionRule_of_kernelGibbsActionMarginal` | `1424-1468` | `no` | `substantive` |
+| `SemanticConvergence.Semantic` | `SemanticConvergence.trueLawHellingerAffinityCeilingActionRule_of_kernelGibbsActionMarginal_semanticSeparation` | `1469-1505` | `no` | `substantive` |
+| `SemanticConvergence.Semantic` | `SemanticConvergence.trueLawHellingerAffinityCeilingActionRule_of_kernelGibbsActionMarginal_classPredictive` | `1506-1546` | `no` | `substantive` |
+| `SemanticConvergence.Semantic` | `SemanticConvergence.trueLawHellingerAffinityCeilingActionRule_of_kernelGibbsActionMarginal_classPredictive_predictivelyExtensional` | `1547-1593` | `no` | `substantive` |
+| `SemanticConvergence.Semantic` | `SemanticConvergence.trueLawHellingerAffinityCeilingActionRule_of_kernelGibbsActionMarginal_classPredictive_predictiveKernelObserver` | `1594-1652` | `no` | `substantive` |
+| `SemanticConvergence.Semantic` | `SemanticConvergence.trueLawHellingerAffinityCeilingActionRule_of_kernelFunctionalMinimizers` | `1653-1732` | `no` | `substantive` |
+| `SemanticConvergence.Semantic` | `SemanticConvergence.trueLawHellingerAffinityCeilingActionRule_of_kernelFunctionalMinimizers_semanticSeparation` | `1733-1794` | `no` | `substantive` |
+| `SemanticConvergence.Semantic` | `SemanticConvergence.trueLawHellingerAffinityCeilingActionRule_of_kernelFunctionalMinimizers_classPredictive` | `1795-1860` | `no` | `substantive` |
+| `SemanticConvergence.Semantic` | `SemanticConvergence.trueLawHellingerAffinityCeilingActionRule_of_kernelFunctionalMinimizers_classPredictive_predictivelyExtensional` | `1861-1932` | `no` | `substantive` |
+| `SemanticConvergence.Semantic` | `SemanticConvergence.trueLawHellingerAffinityCeilingActionRule_of_kernelFunctionalMinimizers_classPredictive_predictiveKernelObserver` | `1933-2015` | `no` | `substantive` |
+| `SemanticConvergence.Semantic` | `SemanticConvergence.thm_constructed_infinite_bayes_gibbs_trueLaw_hellinger_spine_convergence_of_constrained_kernel_gibbs_rule` | `2016-2068` | `no` | `substantive` |
+| `SemanticConvergence.Semantic` | `SemanticConvergence.thm_constructed_infinite_bayes_gibbs_trueLaw_hellinger_spine_convergence_of_constrained_kernel_gibbs_rule_semanticSeparation` | `2069-2122` | `no` | `substantive` |
+| `SemanticConvergence.Semantic` | `SemanticConvergence.thm_constructed_infinite_bayes_gibbs_trueLaw_hellinger_spine_convergence_of_constrained_kernel_gibbs_rule_classPredictive` | `2123-2181` | `no` | `substantive` |
+| `SemanticConvergence.Semantic` | `SemanticConvergence.thm_constructed_infinite_bayes_gibbs_trueLaw_hellinger_spine_convergence_of_constrained_kernel_gibbs_rule_classPredictive_fiberSemantics` | `2182-2252` | `no` | `substantive` |
+| `SemanticConvergence.Semantic` | `SemanticConvergence.thm_constructed_infinite_bayes_gibbs_trueLaw_hellinger_spine_convergence_of_constrained_kernel_gibbs_rule_classPredictive_predictivelyExtensional` | `2253-2320` | `no` | `substantive` |
+| `SemanticConvergence.Semantic` | `SemanticConvergence.thm_constructed_infinite_bayes_gibbs_trueLaw_hellinger_spine_convergence_of_constrained_kernel_gibbs_rule_classPredictive_predictiveKernelObserver` | `2321-2401` | `no` | `substantive` |
+| `SemanticConvergence.Semantic` | `SemanticConvergence.thm_constructed_infinite_bayes_gibbs_trueLaw_hellinger_spine_convergence_of_constrained_kernel_functional_minimizers` | `2402-2480` | `no` | `substantive` |
+| `SemanticConvergence.Semantic` | `SemanticConvergence.thm_constructed_infinite_bayes_gibbs_trueLaw_hellinger_spine_convergence_of_constrained_kernel_functional_minimizers_semanticSeparation` | `2481-2560` | `no` | `substantive` |
+| `SemanticConvergence.Semantic` | `SemanticConvergence.thm_constructed_infinite_bayes_gibbs_trueLaw_hellinger_spine_convergence_of_constrained_kernel_functional_minimizers_classPredictive` | `2561-2644` | `no` | `substantive` |
+| `SemanticConvergence.Semantic` | `SemanticConvergence.thm_constructed_infinite_bayes_gibbs_trueLaw_hellinger_spine_convergence_of_constrained_kernel_functional_minimizers_classPredictive_fiberSemantics` | `2645-2737` | `no` | `substantive` |
+| `SemanticConvergence.Semantic` | `SemanticConvergence.thm_constructed_infinite_bayes_gibbs_trueLaw_hellinger_spine_convergence_of_constrained_kernel_functional_minimizers_classPredictive_predictivelyExtensional` | `2738-2827` | `no` | `substantive` |
+| `SemanticConvergence.Semantic` | `SemanticConvergence.thm_constructed_infinite_bayes_gibbs_trueLaw_hellinger_spine_convergence_of_constrained_kernel_functional_minimizers_classPredictive_predictiveKernelObserver` | `2828-2928` | `no` | `substantive` |
+| `SemanticConvergence.Semantic` | `SemanticConvergence.thm_constructed_infinite_bayes_gibbs_trueLaw_hellinger_spine_convergence_of_martingale` | `2929-2973` | `no` | `substantive` |
+| `SemanticConvergence.Semantic` | `SemanticConvergence.thm_constructed_infinite_bayes_gibbs_trueLaw_hellinger_spine_convergence_of_condExp` | `2974-3032` | `no` | `substantive` |
+| `SemanticConvergence.Semantic` | `SemanticConvergence.thm_kernel_functional_minimizer_convergence_of_hellinger_spine` | `3033-3069` | `no` | `substantive` |
+| `SemanticConvergence.Semantic` | `SemanticConvergence.lem_contraction_separator_witness` | `3070-3080` | `no` | `constructive-existential` |
+| `SemanticConvergence.Semantic` | `SemanticConvergence.prop_full_support_behavioral` | `3081-3096` | `yes` | `substantive` |
+| `SemanticConvergence.Semantic` | `SemanticConvergence.oneStepHellingerResidualPosteriorConcentrates_of_concentrates` | `3199-3240` | `no` | `substantive` |
+| `SemanticConvergence.Semantic` | `SemanticConvergence.thm_separating_support_convergence_deterministic` | `3264-3327` | `no` | `constructive-existential` |
+| `SemanticConvergence.Semantic` | `SemanticConvergence.thm_separating_support_convergence_deterministic_hellinger` | `3328-3351` | `no` | `constructive-existential` |
+| `SemanticConvergence.Semantic` | `SemanticConvergence.historyPrefix_succ_eq_appendEvent_get` | `3352-3362` | `no` | `substantive` |
+| `SemanticConvergence.Semantic` | `SemanticConvergence.exists_historyPrefix_succ_eq_appendEvent` | `3363-3379` | `no` | `constructive-existential` |
+| `SemanticConvergence.Semantic` | `SemanticConvergence.realizedPrefixPosteriorMassUpdateStep_of_positiveSplit` | `3475-3551` | `no` | `substantive` |
+| `SemanticConvergence.Semantic` | `SemanticConvergence.hasRealizedPrefixPosteriorMassUpdates_of_positiveSplit` | `3552-3571` | `no` | `substantive` |
+| `SemanticConvergence.Semantic` | `SemanticConvergence.hasRealizedPrefixResidualNonneg_of_concrete` | `3587-3607` | `no` | `substantive` |
+| `SemanticConvergence.Semantic` | `SemanticConvergence.ConcretePrefixMachine` | `3677-3721` | `no` | `substantive` |
+| `SemanticConvergence.Semantic` | `SemanticConvergence.hasTrueEnvironmentConcreteSupportOutsideZeroOuts_of_observerFiberSupportSeparation` | `3745-3764` | `no` | `substantive` |
+| `SemanticConvergence.Semantic` | `SemanticConvergence.hasTrueEnvironmentSupportOutsideZeroOuts_of_concreteSupport` | `3765-3795` | `no` | `substantive` |
+| `SemanticConvergence.Semantic` | `SemanticConvergence.hasTrueEnvironmentSupportOutsideZeroOuts_of_observerFiberSupportSeparation` | `3796-3815` | `no` | `definitional-unfold` |
+| `SemanticConvergence.Semantic` | `SemanticConvergence.hasRealizedPrefixOutsideZeroOuts_of_trueEnvironmentSupport` | `3816-3842` | `no` | `substantive` |
+| `SemanticConvergence.Semantic` | `SemanticConvergence.hasRealizedPrefixOutsideZeroOuts_of_observerFiberSupportSeparation` | `3843-3862` | `no` | `definitional-unfold` |
+| `SemanticConvergence.Semantic` | `SemanticConvergence.realizedPrefixResidualUpdateStep_of_posteriorMassUpdate` | `3863-3899` | `no` | `constructive-existential` |
+| `SemanticConvergence.Semantic` | `SemanticConvergence.hasRealizedPrefixResidualUpdates_of_posteriorMassUpdates` | `3900-3934` | `no` | `substantive` |
+| `SemanticConvergence.Semantic` | `SemanticConvergence.hasRealizedPrefixResidualUpdates_of_posteriorMassUpdates_zeroOuts` | `3935-3960` | `no` | `definitional-unfold` |
+| `SemanticConvergence.Semantic` | `SemanticConvergence.hasRealizedPrefixResidualUpdates_of_posteriorMassUpdates_trueEnvironmentSupport` | `3961-3984` | `no` | `definitional-unfold` |
+| `SemanticConvergence.Semantic` | `SemanticConvergence.hasRealizedPrefixResidualUpdates_of_posteriorMassUpdates_concreteEnvironmentSupport` | `3985-4010` | `no` | `definitional-unfold` |
+| `SemanticConvergence.Semantic` | `SemanticConvergence.hasRealizedPrefixResidualUpdates_of_posteriorMassUpdates_observerFiberSupportSeparation` | `4011-4034` | `no` | `definitional-unfold` |
+| `SemanticConvergence.Semantic` | `SemanticConvergence.prefixwiseResidualDecay_of_realizedPrefixResidualUpdates` | `4035-4059` | `no` | `substantive` |
+| `SemanticConvergence.Semantic` | `SemanticConvergence.thm_exploration_floor_behavioral` | `4060-4072` | `no` | `constructive-existential` |
+| `SemanticConvergence.Semantic` | `SemanticConvergence.thm_separating_support_rate_deterministic` | `4073-4102` | `no` | `constructive-existential` |
+| `SemanticConvergence.Semantic` | `SemanticConvergence.cor_separating_support_finite_time_deterministic` | `4103-4145` | `no` | `constructive-existential` |
+| `SemanticConvergence.Semantic` | `SemanticConvergence.thm_separating_support_convergence_of_witness` | `4146-4182` | `no` | `substantive` |
+| `SemanticConvergence.Semantic` | `SemanticConvergence.thm_separating_support_convergence` | `4183-4236` | `no` | `substantive` |
+| `SemanticConvergence.Semantic` | `SemanticConvergence.thm_separating_support_convergence_of_observerFiberSupportSeparation` | `4237-4269` | `no` | `single-lemma-application` |
+| `SemanticConvergence.Semantic` | `SemanticConvergence.thm_separating_support_rate_of_witness` | `4270-4294` | `no` | `substantive` |
+| `SemanticConvergence.Semantic` | `SemanticConvergence.thm_separating_support_rate` | `4295-4346` | `no` | `substantive` |
+| `SemanticConvergence.Semantic` | `SemanticConvergence.thm_separating_support_rate_of_observerFiberSupportSeparation` | `4347-4379` | `no` | `single-lemma-application` |
+| `SemanticConvergence.Semantic` | `SemanticConvergence.cor_separating_support_finite_time_of_witness` | `4380-4420` | `no` | `substantive` |
+| `SemanticConvergence.Semantic` | `SemanticConvergence.cor_separating_support_finite_time` | `4421-4474` | `no` | `substantive` |
+| `SemanticConvergence.Semantic` | `SemanticConvergence.thm_semantic_convergence` | `4475-4488` | `no` | `substantive` |
+| `SemanticConvergence.Semantic` | `SemanticConvergence.thm_kernel_semantic_convergence` | `4489-4502` | `no` | `substantive` |
+| `SemanticConvergence.Semantic` | `SemanticConvergence.cor_compact_action_kernel` | `4503-4555` | `no` | `substantive` |
+| `SemanticConvergence.Semantic` | `SemanticConvergence.cor_finite_maximin` | `4556-4569` | `no` | `substantive` |
+| `SemanticConvergence.Semantic` | `SemanticConvergence.cor_support_necessary` | `4570-4588` | `yes` | `constructive-existential` |
+| `SemanticConvergence.Semantic` | `SemanticConvergence.SummableSupportCounterexample.true_mem_actions` | `4629-4631` | `no` | `substantive` |
+| `SemanticConvergence.Semantic` | `SemanticConvergence.SummableSupportCounterexample.zeroSchedule_summable` | `4632-4637` | `no` | `substantive` |
+| `SemanticConvergence.Semantic` | `SemanticConvergence.SummableSupportCounterexample.schedule_realized_on_true` | `4638-4643` | `no` | `substantive` |
+| `SemanticConvergence.Semantic` | `SemanticConvergence.SummableSupportCounterexample.no_oneStepPosteriorConcentrates` | `4644-4671` | `no` | `substantive` |
+| `SemanticConvergence.Semantic` | `SemanticConvergence.SummableSupportCounterexample.no_oneStepResidualPosteriorConcentrates` | `4672-4729` | `no` | `substantive` |
+| `SemanticConvergence.Semantic` | `SemanticConvergence.thm_summable_support_insufficient` | `4730-4752` | `yes` | `constructive-existential` |
+| `SemanticConvergence.Semantic` | `SemanticConvergence.cor_goal_dialed_payoff` | `4753-4767` | `no` | `substantive` |
+| `SemanticConvergence.Surrogate` | `SemanticConvergence.prop_amortized_surrogate_minimizer` | `65-86` | `yes` | `substantive` |
+| `SemanticConvergence.Surrogate` | `SemanticConvergence.helper_amortized_surrogate_selector_existence_of_positiveSeparation` | `96-110` | `no` | `constructive-existential` |
+| `SemanticConvergence.Surrogate` | `SemanticConvergence.helper_amortized_surrogate_selector_support` | `111-129` | `no` | `substantive` |
+| `SemanticConvergence.Surrogate` | `SemanticConvergence.thm_amortized_surrogate_selector_existence` | `130-197` | `no` | `constructive-existential` |
+| `SemanticConvergence.Surrogate` | `SemanticConvergence.cor_amortized_surrogate_selector_support` | `198-236` | `no` | `constructive-existential` |
+| `SemanticConvergence.Surrogate` | `SemanticConvergence.thm_amortized_surrogate` | `258-303` | `no` | `substantive` |
+| `SemanticConvergence.Surrogate` | `SemanticConvergence.cor_amortized_surrogate_finite_time` | `304-379` | `no` | `substantive` |
+| `SemanticConvergence.Surrogate` | `SemanticConvergence.cor_amortized_surrogate_finite_time_zeroOutPackage` | `380-443` | `yes` | `substantive` |

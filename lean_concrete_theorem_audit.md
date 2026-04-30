@@ -8,26 +8,26 @@ Scope:
 - every manifest-tracked paper-facing theorem declaration
 
 ## Summary
-- Concrete substrate theorem declarations audited: `241`
-- Paper-facing theorem declarations audited: `78`
-- Unresolved concrete theorem audit items: `12`
-- Unresolved paper-facing theorem audit items: `0`
+- Concrete substrate theorem declarations audited: `498`
+- Paper-facing theorem declarations audited: `81`
+- Unresolved concrete theorem audit items: `22`
+- Unresolved paper-facing theorem audit items: `1`
 
 Concrete proof-shape counts:
-- `substantive`: `203`
-- `constructive-existential`: `7`
+- `substantive`: `433`
+- `constructive-existential`: `9`
 - `rate-composition`: `5`
-- `single-lemma-application`: `12`
-- `definitional-unfold`: `12`
+- `single-lemma-application`: `22`
+- `definitional-unfold`: `27`
 - `field-projection`: `0`
 - `placeholder-truth`: `0`
 - `heuristic-other`: `0`
 
 Paper-facing proof-shape counts:
-- `substantive`: `59`
-- `constructive-existential`: `8`
-- `rate-composition`: `3`
-- `single-lemma-application`: `0`
+- `substantive`: `60`
+- `constructive-existential`: `6`
+- `rate-composition`: `7`
+- `single-lemma-application`: `1`
 - `definitional-unfold`: `0`
 - `field-projection`: `0`
 - `placeholder-truth`: `0`
@@ -47,18 +47,30 @@ Acceptance rule used here:
 | `SemanticConvergence.ConcreteBoundary` | `SemanticConvergence.ConcretePrefixMachine.riskMinusInformationGain_of_rfl` | `177-186` | `single-lemma-application` | single helper application |
 | `SemanticConvergence.ConcreteCore` | `SemanticConvergence.reachableHist_mem_support` | `250-255` | `single-lemma-application` | single helper application |
 | `SemanticConvergence.ConcreteCore` | `SemanticConvergence.reachableFullHist_mem_support` | `256-261` | `single-lemma-application` | single helper application |
-| `SemanticConvergence.ConcreteFunctional` | `SemanticConvergence.argminOnList_spec` | `456-464` | `single-lemma-application` | single helper application |
+| `SemanticConvergence.ConcreteFunctional` | `SemanticConvergence.argminOnList_spec` | `849-857` | `single-lemma-application` | single helper application |
+| `SemanticConvergence.ConcretePosteriorDecay` | `SemanticConvergence.ConcretePrefixMachine.residualObserverFiberPosteriorOdds_eq_oneStepObserverFiberResidualOdds_of_posteriorMass_eq` | `243-260` | `single-lemma-application` | single helper application |
 | `SemanticConvergence.ConcretePrior` | `SemanticConvergence.pow2_ne_zero` | `51-53` | `single-lemma-application` | single helper application |
-| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.ae_residualObserverFiberRecurrence_of_witness` | `338-356` | `single-lemma-application` | single helper application |
-| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.ae_residualObserverFiberRateBound_of_witness` | `357-372` | `single-lemma-application` | single helper application |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.posteriorWeight_ne_zero_of_likelihood_ne_zero` | `1641-1656` | `single-lemma-application` | single helper application |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.trueLawHellingerNormalizer` | `2633-2644` | `single-lemma-application` | single helper application |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.hellingerConvergenceSpine_of_realized_processes` | `3504-3537` | `single-lemma-application` | single helper application |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.hellingerConvergenceSpine_of_observerFiberBhattacharyya_processes` | `3538-3573` | `single-lemma-application` | single helper application |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.hellingerConvergenceSpine_of_realized_processes_uniform_separation_floor` | `3844-3872` | `single-lemma-application` | single helper application |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.hasObserverFiberBhattacharyyaUniformSeparationFloor_of_affinityCeiling_policySupport` | `3978-3999` | `single-lemma-application` | single helper application |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.infiniteHasObserverFiberBhattacharyyaUniformSeparationFloor_of_affinityCeiling_policySupport` | `4252-4272` | `single-lemma-application` | single helper application |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.hellingerConvergenceSpine_of_infiniteObserverFiberBhattacharyya_affinityCeiling_policySupport` | `4382-4416` | `single-lemma-application` | single helper application |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.hellingerConvergenceSpine_of_observerFiberBhattacharyya_uniform_separation_floor` | `4548-4574` | `single-lemma-application` | single helper application |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.ae_residualObserverFiberRecurrence_of_witness` | `6058-6076` | `single-lemma-application` | single helper application |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.ae_residualObserverFiberRateBound_of_witness` | `6077-6092` | `single-lemma-application` | single helper application |
 | `SemanticConvergence.ConcreteSemantic` | `SemanticConvergence.ConcretePrefixMachine.softPredictiveLawInClass_mass_pos_of_reference` | `384-394` | `single-lemma-application` | single helper application |
 | `SemanticConvergence.ConcreteSemantic` | `SemanticConvergence.ConcretePrefixMachine.softPredictiveLawOutsideClass_mass_pos_of_reference` | `395-406` | `single-lemma-application` | single helper application |
-| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.toCountablePolicy_apply` | `729-735` | `single-lemma-application` | single helper application |
+| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.toCountablePolicy_apply` | `1160-1166` | `single-lemma-application` | single helper application |
 | `SemanticConvergence.ConcreteSurrogate` | `SemanticConvergence.ConcretePrefixMachine.amortizedSurrogate_from_witness` | `122-146` | `single-lemma-application` | single helper application |
 
 ## Unresolved Paper-Facing Theorem Audit Items
 
-None.
+| Label | Module | Decl | Lines | Proof kind | Resolution |
+| --- | --- | --- | --- | --- | --- |
+| `def:hellinger-spine` | `SemanticConvergence.MartingaleContraction` | `SemanticConvergence.HellingerConvergenceSpine` | `265-278` | `single-lemma-application` | single helper application |
 
 ## Concrete Substrate Theorem Table
 
@@ -97,11 +109,18 @@ None.
 | `SemanticConvergence.ConcreteCore` | `SemanticConvergence.kernelEqOnReachablePairs_trans` | `297-305` | `substantive` | substantive theorem proof |
 | `SemanticConvergence.ConcreteCore` | `SemanticConvergence.CountableConcrete.appendEvent_length` | `330-335` | `substantive` | substantive theorem proof |
 | `SemanticConvergence.ConcreteCore` | `SemanticConvergence.CountableConcrete.reachableHist_iff_ne_zero` | `364-374` | `substantive` | substantive theorem proof |
-| `SemanticConvergence.ConcreteFunctional` | `SemanticConvergence.ConcreteLaw.restrict_mass_of_pos` | `42-46` | `substantive` | substantive theorem proof |
-| `SemanticConvergence.ConcreteFunctional` | `SemanticConvergence.ConcreteLaw.restrict_mass_of_neg` | `47-54` | `substantive` | substantive theorem proof |
-| `SemanticConvergence.ConcreteFunctional` | `SemanticConvergence.lawL1_self` | `385-409` | `substantive` | substantive theorem proof |
-| `SemanticConvergence.ConcreteFunctional` | `SemanticConvergence.exists_minimizerOnList` | `413-452` | `constructive-existential` | substantive theorem proof |
-| `SemanticConvergence.ConcreteFunctional` | `SemanticConvergence.argminOnList_spec` | `456-464` | `single-lemma-application` | single helper application |
+| `SemanticConvergence.ConcreteFunctional` | `SemanticConvergence.ConcreteLaw.restrict_mass_of_pos` | `52-56` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteFunctional` | `SemanticConvergence.ConcreteLaw.restrict_mass_of_neg` | `57-64` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteFunctional` | `SemanticConvergence.listWeightedSumReal_eq_finset_sum` | `408-422` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteFunctional` | `SemanticConvergence.actionExpectationReal_eq_support_sum_toPMF` | `449-480` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteFunctional` | `SemanticConvergence.encodedProgramPriorWeight_pos` | `501-510` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteFunctional` | `SemanticConvergence.concreteKLDivergenceTerm_eq_exactKL_of_positiveRef` | `511-544` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteFunctional` | `SemanticConvergence.beliefRegularizer_eq_support_sum_toPMF` | `554-579` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteFunctional` | `SemanticConvergence.classLawRegularizer_eq_support_sum_toPMF` | `616-642` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteFunctional` | `SemanticConvergence.kernelLawRegularizer_eq_support_sum_toPMF` | `694-725` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteFunctional` | `SemanticConvergence.lawL1_self` | `778-802` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteFunctional` | `SemanticConvergence.exists_minimizerOnList` | `806-845` | `constructive-existential` | substantive theorem proof |
+| `SemanticConvergence.ConcreteFunctional` | `SemanticConvergence.argminOnList_spec` | `849-857` | `single-lemma-application` | single helper application |
 | `SemanticConvergence.ConcreteHierarchy` | `SemanticConvergence.EncodedProgram.intSemClass_self` | `104-110` | `substantive` | substantive theorem proof |
 | `SemanticConvergence.ConcreteHierarchy` | `SemanticConvergence.EncodedProgram.intSemClass_subset_policyPred` | `111-117` | `substantive` | substantive theorem proof |
 | `SemanticConvergence.ConcreteHierarchy` | `SemanticConvergence.EncodedProgram.policyPred_subset_historyCompat` | `118-125` | `substantive` | substantive theorem proof |
@@ -120,6 +139,10 @@ None.
 | `SemanticConvergence.ConcreteNoise` | `SemanticConvergence.ConcretePrefixMachine.noisySemanticSeparation_eq_of_sameView` | `110-122` | `substantive` | substantive theorem proof |
 | `SemanticConvergence.ConcreteNoise` | `SemanticConvergence.ConcretePrefixMachine.identityChannel_is_decodable` | `123-126` | `substantive` | substantive theorem proof |
 | `SemanticConvergence.ConcreteNoise` | `SemanticConvergence.ConcretePrefixMachine.identityChannel_is_supportLeftInvertible` | `127-135` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcretePMF` | `SemanticConvergence.ConcreteLaw.mass_eq_zero_of_not_mem_support` | `27-32` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcretePMF` | `SemanticConvergence.ConcreteLaw.toENNRealMass_eq_zero_of_not_mem_support` | `33-38` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcretePMF` | `SemanticConvergence.ConcreteLaw.toPMF_apply` | `44-47` | `definitional-unfold` | explicit definitional helper |
+| `SemanticConvergence.ConcretePMF` | `SemanticConvergence.ConcreteLaw.mem_support_toPMF_iff` | `48-75` | `substantive` | substantive theorem proof |
 | `SemanticConvergence.ConcretePosteriorDecay` | `SemanticConvergence.ConcretePrefixMachine.posteriorDecayRate_pos_of_pos` | `33-42` | `substantive` | substantive theorem proof |
 | `SemanticConvergence.ConcretePosteriorDecay` | `SemanticConvergence.ConcretePrefixMachine.posteriorDecayRate_eq_of_pos` | `43-46` | `substantive` | substantive theorem proof |
 | `SemanticConvergence.ConcretePosteriorDecay` | `SemanticConvergence.ConcretePrefixMachine.posteriorDecayRate_lt_one_of_pos` | `47-55` | `substantive` | substantive theorem proof |
@@ -129,29 +152,33 @@ None.
 | `SemanticConvergence.ConcretePosteriorDecay` | `SemanticConvergence.ConcretePrefixMachine.posteriorDecayFactor_le_half_of_pos` | `82-88` | `substantive` | substantive theorem proof |
 | `SemanticConvergence.ConcretePosteriorDecay` | `SemanticConvergence.ConcretePrefixMachine.posteriorDecayFactor_pos_of_pos` | `89-98` | `substantive` | substantive theorem proof |
 | `SemanticConvergence.ConcretePosteriorDecay` | `SemanticConvergence.ConcretePrefixMachine.nStepPosteriorDecayBound_of_stepBound` | `99-122` | `substantive` | substantive theorem proof |
-| `SemanticConvergence.ConcretePosteriorDecay` | `SemanticConvergence.ConcretePrefixMachine.residualObserverFiberPosteriorOdds_eq_of_sameView` | `242-257` | `substantive` | substantive theorem proof |
-| `SemanticConvergence.ConcretePosteriorDecay` | `SemanticConvergence.ConcretePrefixMachine.softOneStepObserverFiberResidualOdds_eq_of_sameView` | `258-279` | `substantive` | substantive theorem proof |
-| `SemanticConvergence.ConcretePosteriorDecay` | `SemanticConvergence.ConcretePrefixMachine.exists_supported_action_of_positiveSeparatingSupportFloor` | `280-295` | `constructive-existential` | substantive theorem proof |
-| `SemanticConvergence.ConcretePosteriorDecay` | `SemanticConvergence.ConcretePrefixMachine.oneStepComplementObservationMass_eq_zero_of_predictiveLawOutsideClass_zero` | `296-303` | `substantive` | substantive theorem proof |
-| `SemanticConvergence.ConcretePosteriorDecay` | `SemanticConvergence.ConcretePrefixMachine.oneStepComplementPosteriorMass_eq_zero_of_predictiveLawOutsideClass_zero` | `304-312` | `substantive` | substantive theorem proof |
-| `SemanticConvergence.ConcretePosteriorDecay` | `SemanticConvergence.ConcretePrefixMachine.oneStepObservationOddsRaw_eq_classPosteriorOdds_mul_likelihoodRatio` | `313-326` | `substantive` | substantive theorem proof |
-| `SemanticConvergence.ConcretePosteriorDecay` | `SemanticConvergence.ConcretePrefixMachine.oneStepClassPosteriorOdds_eq_oneStepObservationOddsRaw` | `327-340` | `substantive` | substantive theorem proof |
-| `SemanticConvergence.ConcretePosteriorDecay` | `SemanticConvergence.ConcretePrefixMachine.oneStepObserverFiberPosteriorOdds_eq_mul_likelihoodRatio` | `341-355` | `substantive` | substantive theorem proof |
-| `SemanticConvergence.ConcretePosteriorDecay` | `SemanticConvergence.ConcretePrefixMachine.softOneStepClassResidualOdds_eq_mul_likelihoodRatio` | `356-373` | `substantive` | substantive theorem proof |
-| `SemanticConvergence.ConcretePosteriorDecay` | `SemanticConvergence.ConcretePrefixMachine.softOneStepObserverFiberResidualOdds_eq_mul_likelihoodRatio` | `374-389` | `substantive` | substantive theorem proof |
-| `SemanticConvergence.ConcretePosteriorDecay` | `SemanticConvergence.ConcretePrefixMachine.softOneStepObserverFiberResidualOdds_pos_of_positive` | `390-422` | `substantive` | substantive theorem proof |
-| `SemanticConvergence.ConcretePosteriorDecay` | `SemanticConvergence.ConcretePrefixMachine.softPredictiveResidualLikelihoodRatio_lt_one_of_zeroOut` | `423-451` | `substantive` | substantive theorem proof |
-| `SemanticConvergence.ConcretePosteriorDecay` | `SemanticConvergence.ConcretePrefixMachine.softPredictiveResidualLikelihoodRatio_lt_one_of_zeroOut_supportUnion` | `452-495` | `substantive` | substantive theorem proof |
-| `SemanticConvergence.ConcretePosteriorDecay` | `SemanticConvergence.ConcretePrefixMachine.softPredictiveResidualLikelihoodRatio_le_decayFactor_of_zeroOut_supportUnion` | `496-557` | `substantive` | substantive theorem proof |
-| `SemanticConvergence.ConcretePosteriorDecay` | `SemanticConvergence.ConcretePrefixMachine.softObserverFiberResidualWitness_of_zeroOut` | `558-612` | `substantive` | substantive theorem proof |
-| `SemanticConvergence.ConcretePosteriorDecay` | `SemanticConvergence.ConcretePrefixMachine.exists_softObserverFiberResidualWitness_of_positiveFloor` | `613-661` | `constructive-existential` | substantive theorem proof |
-| `SemanticConvergence.ConcretePosteriorDecay` | `SemanticConvergence.ConcretePrefixMachine.softOneStepObserverFiberResidualOdds_le_decayBound_of_zeroOut_supportUnion` | `662-728` | `substantive` | substantive theorem proof |
-| `SemanticConvergence.ConcretePosteriorDecay` | `SemanticConvergence.ConcretePrefixMachine.exists_softOneStepObserverFiberResidualOdds_le_decayBound_of_positiveFloor` | `729-775` | `constructive-existential` | substantive theorem proof |
-| `SemanticConvergence.ConcretePosteriorDecay` | `SemanticConvergence.ConcretePrefixMachine.oneStepClassPosteriorOdds_eq_zero_of_complementPosteriorMass_eq_zero` | `776-785` | `substantive` | substantive theorem proof |
-| `SemanticConvergence.ConcretePosteriorDecay` | `SemanticConvergence.ConcretePrefixMachine.oneStepObserverFiberComplementPosteriorMass_eq_zero_of_outside_zero` | `786-799` | `substantive` | substantive theorem proof |
-| `SemanticConvergence.ConcretePosteriorDecay` | `SemanticConvergence.ConcretePrefixMachine.oneStepObserverFiberPosteriorOdds_eq_zero_of_outside_zero` | `800-824` | `substantive` | substantive theorem proof |
-| `SemanticConvergence.ConcretePosteriorDecay` | `SemanticConvergence.ConcretePrefixMachine.oneStepObserverFiberPosteriorOdds_le_decayBound_of_outside_zero` | `825-852` | `substantive` | substantive theorem proof |
-| `SemanticConvergence.ConcretePosteriorDecay` | `SemanticConvergence.ConcretePrefixMachine.oneStepObserverFiberPosteriorOdds_le_decayBound_of_positiveFloor` | `853-885` | `constructive-existential` | substantive theorem proof |
+| `SemanticConvergence.ConcretePosteriorDecay` | `SemanticConvergence.ConcretePrefixMachine.residualClassPosteriorOdds_eq_oneStepClassResidualOdds_of_posteriorMass_eq` | `228-242` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcretePosteriorDecay` | `SemanticConvergence.ConcretePrefixMachine.residualObserverFiberPosteriorOdds_eq_oneStepObserverFiberResidualOdds_of_posteriorMass_eq` | `243-260` | `single-lemma-application` | single helper application |
+| `SemanticConvergence.ConcretePosteriorDecay` | `SemanticConvergence.ConcretePrefixMachine.residualObserverFiberPosteriorOdds_eq_of_sameView` | `296-311` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcretePosteriorDecay` | `SemanticConvergence.ConcretePrefixMachine.softOneStepObserverFiberResidualOdds_eq_of_sameView` | `312-333` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcretePosteriorDecay` | `SemanticConvergence.ConcretePrefixMachine.exists_supported_action_of_positiveSeparatingSupportFloor` | `334-349` | `constructive-existential` | substantive theorem proof |
+| `SemanticConvergence.ConcretePosteriorDecay` | `SemanticConvergence.ConcretePrefixMachine.oneStepComplementObservationMass_eq_zero_of_predictiveLawOutsideClass_zero` | `350-357` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcretePosteriorDecay` | `SemanticConvergence.ConcretePrefixMachine.oneStepComplementPosteriorMass_eq_zero_of_predictiveLawOutsideClass_zero` | `358-366` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcretePosteriorDecay` | `SemanticConvergence.ConcretePrefixMachine.oneStepObservationOddsRaw_eq_classPosteriorOdds_mul_likelihoodRatio` | `367-380` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcretePosteriorDecay` | `SemanticConvergence.ConcretePrefixMachine.oneStepClassPosteriorOdds_eq_oneStepObservationOddsRaw` | `381-394` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcretePosteriorDecay` | `SemanticConvergence.ConcretePrefixMachine.oneStepObserverFiberPosteriorOdds_eq_mul_likelihoodRatio` | `395-409` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcretePosteriorDecay` | `SemanticConvergence.ConcretePrefixMachine.softOneStepClassResidualOdds_eq_mul_likelihoodRatio` | `410-427` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcretePosteriorDecay` | `SemanticConvergence.ConcretePrefixMachine.softOneStepObserverFiberResidualOdds_eq_mul_likelihoodRatio` | `428-443` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcretePosteriorDecay` | `SemanticConvergence.ConcretePrefixMachine.softOneStepObserverFiberResidualOdds_pos_of_positive` | `444-476` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcretePosteriorDecay` | `SemanticConvergence.ConcretePrefixMachine.softPredictiveResidualLikelihoodRatio_lt_one_of_zeroOut` | `477-505` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcretePosteriorDecay` | `SemanticConvergence.ConcretePrefixMachine.softPredictiveResidualLikelihoodRatio_lt_one_of_zeroOut_supportUnion` | `506-549` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcretePosteriorDecay` | `SemanticConvergence.ConcretePrefixMachine.softPredictiveResidualLikelihoodRatio_le_decayFactor_of_zeroOut_supportUnion` | `550-611` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcretePosteriorDecay` | `SemanticConvergence.ConcretePrefixMachine.softObserverFiberResidualWitness_of_zeroOut` | `612-666` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcretePosteriorDecay` | `SemanticConvergence.ConcretePrefixMachine.exists_softObserverFiberResidualWitness_of_positiveFloor` | `667-715` | `constructive-existential` | substantive theorem proof |
+| `SemanticConvergence.ConcretePosteriorDecay` | `SemanticConvergence.ConcretePrefixMachine.softOneStepObserverFiberResidualOdds_le_decayBound_of_zeroOut_supportUnion` | `716-782` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcretePosteriorDecay` | `SemanticConvergence.ConcretePrefixMachine.exists_softOneStepObserverFiberResidualOdds_le_decayBound_of_positiveFloor` | `783-829` | `constructive-existential` | substantive theorem proof |
+| `SemanticConvergence.ConcretePosteriorDecay` | `SemanticConvergence.ConcretePrefixMachine.oneStepClassPosteriorOdds_eq_zero_of_complementPosteriorMass_eq_zero` | `830-839` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcretePosteriorDecay` | `SemanticConvergence.ConcretePrefixMachine.oneStepObserverFiberComplementPosteriorMass_eq_zero_of_outside_zero` | `840-853` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcretePosteriorDecay` | `SemanticConvergence.ConcretePrefixMachine.oneStepObserverFiberPosteriorOdds_eq_zero_of_outside_zero` | `854-868` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcretePosteriorDecay` | `SemanticConvergence.ConcretePrefixMachine.oneStepObserverFiberResidualOdds_eq_zero_of_outside_zero` | `869-887` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcretePosteriorDecay` | `SemanticConvergence.ConcretePrefixMachine.oneStepObserverFiberResidualOdds_le_decayBound_of_outside_zero` | `888-916` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcretePosteriorDecay` | `SemanticConvergence.ConcretePrefixMachine.oneStepObserverFiberPosteriorOdds_le_decayBound_of_outside_zero` | `917-944` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcretePosteriorDecay` | `SemanticConvergence.ConcretePrefixMachine.oneStepObserverFiberPosteriorOdds_le_decayBound_of_positiveFloor` | `945-977` | `constructive-existential` | substantive theorem proof |
 | `SemanticConvergence.ConcretePrior` | `SemanticConvergence.codeIsPrefix_refl` | `16-19` | `substantive` | substantive theorem proof |
 | `SemanticConvergence.ConcretePrior` | `SemanticConvergence.codeIsPrefix_trans` | `20-31` | `substantive` | substantive theorem proof |
 | `SemanticConvergence.ConcretePrior` | `SemanticConvergence.pow2_pos` | `44-50` | `substantive` | substantive theorem proof |
@@ -161,22 +188,226 @@ None.
 | `SemanticConvergence.ConcretePrior` | `SemanticConvergence.ConcretePrefixMachine.PrefixExtension` | `163-167` | `substantive` | substantive theorem proof |
 | `SemanticConvergence.ConcretePrior` | `SemanticConvergence.ConcretePrefixMachine.PrefixExtension` | `168-182` | `substantive` | substantive theorem proof |
 | `SemanticConvergence.ConcretePrior` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.toEncodedProgram_code` | `252-262` | `substantive` | substantive theorem proof |
-| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.residualObserverFiberPosteriorOdds_eq_of_sameView` | `101-112` | `substantive` | substantive theorem proof |
-| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.residualObserverFiberProcess_zero_eq_initial` | `113-122` | `substantive` | substantive theorem proof |
-| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.initialResidualObserverFiberOdds_eq_of_sameView` | `123-133` | `substantive` | substantive theorem proof |
-| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.residualObserverFiberProcess_eq_of_sameView` | `134-146` | `substantive` | substantive theorem proof |
-| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.residualObserverFiberProcess_adapted` | `147-163` | `substantive` | substantive theorem proof |
-| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.observerFiberPosteriorShareProcess_adapted` | `164-181` | `substantive` | substantive theorem proof |
-| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.observerFiberPosteriorShare_eq_one_of_residual_eq_zero` | `182-191` | `substantive` | substantive theorem proof |
-| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.hasSupportwiseResidualContractionWitness_of_sameView` | `226-242` | `substantive` | substantive theorem proof |
-| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.hasSupportwiseResidualRecurrence_of_witness` | `243-259` | `substantive` | substantive theorem proof |
-| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.supportwise_residualObserverFiberRateBound_of_recurrence` | `260-292` | `substantive` | substantive theorem proof |
-| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.ae_residualObserverFiberRecurrence_of_supportwise` | `293-314` | `substantive` | substantive theorem proof |
-| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.ae_residualObserverFiberRateBound_of_supportwise` | `315-337` | `substantive` | substantive theorem proof |
-| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.ae_residualObserverFiberRecurrence_of_witness` | `338-356` | `single-lemma-application` | single helper application |
-| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.ae_residualObserverFiberRateBound_of_witness` | `357-372` | `single-lemma-application` | single helper application |
-| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.posteriorShareFromResidual_lowerBound_of_le` | `373-386` | `substantive` | substantive theorem proof |
-| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.ae_observerFiberPosteriorShareLowerBound_of_witness` | `387-423` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.infiniteHistoryPrefix_length` | `102-106` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.infiniteHistoryPrefix_ofPrefixWithTail_of_le` | `107-120` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.infiniteHistoryPrefix_ofPrefixWithTail` | `121-130` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.infiniteHistoryPrefix_ofPrefixWithTail_appendEvent_current` | `131-150` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.infiniteHistoryPrefix_take_of_le` | `151-163` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.infiniteHistoryPrefix_eq_of_le_eq` | `164-173` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.infiniteHistoryPrefix_succ_eq_appendEvent` | `174-185` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.infiniteHistoryPrefix_succ_eq_appendEvent_realized` | `186-195` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.appendEvent_eq_appendEvent_iff` | `196-214` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.histPMF_appendEvent` | `215-388` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.infiniteHistoryPrefix_eq_of_succ_eq` | `389-404` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.infiniteRealizedEvent_eq_of_prefix_succ_eq` | `405-421` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.infiniteRealizedAction_eq_of_prefix_succ_eq` | `422-430` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.infiniteRealizedAction_eq_of_prefix_eq_of_lt` | `431-441` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.infiniteRealizedObservation_eq_of_prefix_succ_eq` | `442-450` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.infiniteRealizedObservation_eq_of_prefix_eq_of_lt` | `451-460` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.InfiniteTrajectoryLaw` | `499-507` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.InfiniteTrajectoryLaw` | `508-516` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.InfiniteBayesGibbsTrajectoryLaw` | `517-531` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.ionescuIicPrefix_frestrictLe` | `580-586` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.ionescuIicPrefix_length` | `587-592` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.ionescuStreamPrefix_length` | `593-598` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.ionescuStreamPrefix_succ_eq_appendEvent` | `599-605` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.measurable_eventStreamPrefix` | `606-620` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.measurable_infiniteTrajectory_event` | `621-626` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.measurable_infiniteHistoryPrefix` | `627-633` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.measurableSet_infinitePrefixCylinderAt` | `634-641` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.measurable_ionescuStreamPrefix` | `642-659` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.pmf_tsum_toReal_eq_one` | `668-677` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.pmf_summable_toReal_mul_of_integrable` | `678-705` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.ionescuNextEventPMF_apply` | `706-743` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.integral_ionescuStepKernel_eq_tsum_action_observation` | `772-832` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.integral_ionescuStepKernel_eq_tsum_action_observation_of_integrable` | `833-876` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.condExp_ionescuTrajectory_traj` | `909-937` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.martingale_ionescuTrajectory_of_kernel_integral` | `938-975` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.ionescuIicSuccExtend_last` | `996-1004` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.ionescuIicPrefix_succ_eq_appendEvent` | `1005-1018` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.ionescuIicPrefix_succExtend` | `1019-1030` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.ionescuIicSuccExtend_frestrictLe` | `1031-1054` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.martingale_ionescuTrajectoryMeasure_of_prefix_kernel_integral` | `1055-1156` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.infiniteHistoryPrefix_ionescuStreamToInfiniteTrajectory` | `1164-1170` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.measurable_ionescuStreamPrefix_piLE` | `1171-1194` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.measurable_ionescuStreamToInfiniteTrajectory` | `1195-1209` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.ionescuInfiniteTrajectoryMeasure_isProbabilityMeasure` | `1216-1227` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.infinitePrefixMeasurableSpace_le` | `1240-1245` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.measurable_infiniteHistoryPrefix_prefixMeasurableSpace` | `1246-1251` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.infinitePrefixMeasurableSpace_mono` | `1252-1280` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.measurable_ionescuStreamToInfiniteTrajectory_prefix` | `1287-1298` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.stronglyAdapted_ionescuPullbackInfiniteProcess` | `1308-1321` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.integrable_infiniteTrajectory_of_ionescuPullback` | `1322-1345` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.setIntegral_infiniteTrajectory_eq_of_ionescuPullback_martingale` | `1346-1393` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.martingale_infiniteTrajectory_of_ionescuPullback_martingale` | `1394-1421` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.martingale_eLpNorm_one_bounded_of_nonneg_initial_integral_le` | `1422-1457` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.eq_of_adaptedToInfinitePrefixFiltration` | `1465-1475` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.eq_of_infinitePrefixFiltration_levelsets` | `1476-1486` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.infinitePrefixFactor_comp_eq` | `1497-1512` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.infinitePrefixFactor_eq_of_prefix` | `1513-1523` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.measurable_of_infinitePrefixFiltration_levelsets_real` | `1524-1545` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.stronglyMeasurable_of_infinitePrefixFiltration_levelsets_real` | `1546-1552` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.stronglyAdapted_of_adaptedToInfinitePrefixFiltration_real` | `1553-1562` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.infinitePrefixCylinderAt_mem_infinitePrefixFiltration` | `1563-1571` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.infiniteHistoryPrefix_adapted` | `1572-1580` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.infiniteRealizedAction_mem_infinitePrefixFiltration_succ` | `1581-1593` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.infiniteRealizedObservation_mem_infinitePrefixFiltration_succ` | `1594-1609` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.universalWeight_ne_zero` | `1620-1640` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.posteriorWeight_ne_zero_of_likelihood_ne_zero` | `1641-1656` | `single-lemma-application` | single helper application |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.posteriorTotalWeight_le_universalWeightMass` | `1661-1679` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.posteriorTotalWeight_ne_top_of_universalWeightMass_ne_top` | `1680-1691` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.observerFiberPosteriorWeight_le_posteriorTotalWeight` | `1692-1704` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.observerFiberComplementWeight_le_posteriorTotalWeight` | `1705-1717` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.observerFiberPosteriorWeight_ne_top_of_posteriorTotalWeight_ne_top` | `1718-1732` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.observerFiberComplementWeight_ne_top_of_posteriorTotalWeight_ne_top` | `1733-1751` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.likelihood_appendEvent` | `1752-1763` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.posteriorWeight_appendEvent` | `1764-1777` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.observerFiberPosteriorWeight_ne_zero_of_program_likelihood_ne_zero` | `1778-1807` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.observerFiberComplementWeight_ne_zero_of_program_likelihood_ne_zero` | `1808-1834` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.observerFiberPredictiveWeight_ne_zero_of_program_support` | `1927-1969` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.observerFiberPosteriorWeight_appendEvent` | `1970-2018` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.observerFiberComplementWeight_appendEvent` | `2019-2068` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.residualObserverFiberPosteriorOdds_appendEvent_eq_predictiveWeight_ratio` | `2069-2098` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.ennreal_residual_mul_predictiveRatio_eq_predictiveWeightRatio` | `2099-2127` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.residualObserverFiberPosteriorOdds_appendEvent_eq_residual_mul_predictiveRatio` | `2151-2184` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.sqrt_residualObserverFiberPosteriorOdds_appendEvent_eq` | `2185-2210` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.observerFiberPredictiveWeight_tsum_eq_posteriorWeight` | `2211-2225` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.observerFiberPredictiveWeight_le_posteriorWeight` | `2226-2239` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.observerFiberPredictiveWeight_ne_top_of_posteriorWeight_ne_top` | `2240-2259` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.observerFiberPredictiveWeight_eq_posteriorWeight_mul_programSemantics_of_fiber_semantics` | `2260-2303` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.observerFiberPredictiveLawInClass_eq_programSemantics_of_fiber_semantics` | `2304-2326` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.observerFiberComplementPredictiveWeight_tsum_eq_complementWeight` | `2327-2341` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.observerFiberComplementPredictiveWeight_le_complementWeight` | `2342-2356` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.observerFiberComplementPredictiveWeight_ne_top_of_complementWeight_ne_top` | `2357-2371` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.observerFiberPredictiveLawInClass_tsum_eq_one` | `2372-2394` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.observerFiberPredictiveLawOutsideClass_tsum_eq_one` | `2395-2419` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.real_mul_sqrt_div_eq_sqrt_mul_of_nonneg` | `2432-2458` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.predictiveLawBhattacharyyaAffinity_eq_expect_sqrt_likelihoodRatio` | `2459-2476` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.predictiveLawBhattacharyyaSeparation_eq_zero_of_nonpos` | `2483-2489` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.predictiveLawBhattacharyyaSeparation_eq_neg_log_of_pos` | `2490-2500` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.exp_predictiveLawBhattacharyyaSeparation_mul_affinity` | `2501-2515` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.classPredictiveHellingerNormalizer` | `2516-2532` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.conditionalLawHellingerNormalizer_of_eq_classPredictive` | `2533-2551` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.predictiveLawTrueHellingerAffinity_eq_bhattacharyyaAffinity_of_eq_classPredictive` | `2566-2580` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.predictiveLawTrueHellingerSeparation_eq_neg_log_of_pos` | `2587-2598` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.predictiveLawTrueHellingerSeparation_eq_bhattacharyyaSeparation_of_eq_classPredictive` | `2599-2617` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.exp_predictiveLawTrueHellingerSeparation_mul_affinity` | `2618-2632` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.trueLawHellingerNormalizer` | `2633-2644` | `single-lemma-application` | single helper application |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.predictiveLawTrueHellingerSeparation_ge_of_affinity_le_exp_neg` | `2645-2663` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.predictiveLawTrueHellingerAffinity_le_exp_neg_of_separation_ge` | `2664-2682` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.predictiveLawBhattacharyyaSeparation_ge_of_affinity_le_exp_neg` | `2683-2701` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.predictiveLawBhattacharyyaAffinity_le_exp_neg_of_separation_ge` | `2702-2713` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.observerFiberBhattacharyyaScore_eq_predictiveLawSeparation` | `2743-2753` | `definitional-unfold` | explicit definitional helper |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.observerFiberStepBhattacharyyaScore_eq` | `2754-2769` | `definitional-unfold` | explicit definitional helper |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.observerFiberClassPredictiveHellingerNormalizer` | `2770-2793` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.observerFiberProgramLawHellingerNormalizer_of_eq_classPredictive` | `2794-2822` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.observerFiberTrueLawHellingerAffinity_eq_predictiveLawAffinity_of_calibrated` | `2850-2872` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.observerFiberTrueLawHellingerScore_eq_bhattacharyyaScore_of_calibrated` | `2873-2894` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.observerFiberTrueLawHellingerScore_eq` | `2906-2923` | `definitional-unfold` | explicit definitional helper |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.observerFiberTrueLawHellingerNormalizer` | `2924-2952` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.observerFiberTrueLawHellinger_oneStep_sqrtResidual_normalized` | `2953-3057` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.observerFiberTrueLawHellinger_actionObservation_tsum_normalized` | `3058-3162` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.observerFiberTrueLawHellingerScore_ge_of_affinity_ceiling` | `3163-3186` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.observerFiberTrueLawHellingerAffinity_le_exp_neg_of_score_ge` | `3187-3207` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.observerFiberBhattacharyyaScore_ge_of_affinity_ceiling` | `3208-3228` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.observerFiberPredictiveLawAffinity_le_exp_neg_of_score_ge` | `3229-3243` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.observerFiberPredictiveWeight_eq_of_sameView` | `3244-3256` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.observerFiberComplementPredictiveWeight_eq_of_sameView` | `3257-3269` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.observerFiberPredictiveLawInClass_eq_of_sameView` | `3270-3282` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.observerFiberPredictiveLawOutsideClass_eq_of_sameView` | `3283-3295` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.observerFiberBhattacharyyaScore_eq_of_sameView` | `3296-3308` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.realizedResidualOddsProcess_nonneg` | `3380-3387` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.ae_realizedResidualOddsProcess_nonneg` | `3388-3397` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.realizedBhattacharyyaSeparationProcess_of_lt` | `3398-3405` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.realizedBhattacharyyaSeparationProcess_of_not_lt` | `3406-3411` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.realizedObserverFiberBhattacharyyaSeparationProcess_of_lt` | `3412-3423` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.realizedObserverFiberBhattacharyyaSeparationProcess_of_not_lt` | `3424-3434` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.realizedCumulativeSeparationProcess_eq_sum` | `3435-3440` | `definitional-unfold` | explicit definitional helper |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.realizedHellingerEnvelopeProcess_eq` | `3441-3451` | `definitional-unfold` | explicit definitional helper |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.realizedObserverFiberCumulativeBhattacharyyaSeparationProcess_eq_sum` | `3452-3462` | `definitional-unfold` | explicit definitional helper |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.realizedObserverFiberCumulativeBhattacharyyaSeparationProcess_eq_realizedCumulative` | `3463-3472` | `definitional-unfold` | explicit definitional helper |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.realizedObserverFiberHellingerEnvelopeProcess_eq` | `3473-3485` | `definitional-unfold` | explicit definitional helper |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.realizedObserverFiberHellingerEnvelopeProcess_eq_realizedHellingerEnvelope` | `3486-3503` | `definitional-unfold` | explicit definitional helper |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.hellingerConvergenceSpine_of_realized_processes` | `3504-3537` | `single-lemma-application` | single helper application |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.hellingerConvergenceSpine_of_observerFiberBhattacharyya_processes` | `3538-3573` | `single-lemma-application` | single helper application |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.infiniteRealizedResidualOddsProcess_nonneg` | `3692-3700` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.ae_infiniteRealizedResidualOddsProcess_nonneg` | `3701-3710` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.infiniteRealizedHellingerEnvelopeProcess_nonneg` | `3711-3720` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.infiniteRealizedObserverFiberTrueLawHellingerEnvelopeProcess_nonneg` | `3721-3738` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.infiniteRealizedBhattacharyyaSeparationProcess_eq` | `3739-3744` | `definitional-unfold` | explicit definitional helper |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.infiniteRealizedObserverFiberBhattacharyyaSeparationProcess_eq` | `3745-3756` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.infiniteRealizedCumulativeSeparationProcess_eq_sum` | `3757-3762` | `definitional-unfold` | explicit definitional helper |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.infiniteRealizedObserverFiberCumulativeBhattacharyyaSeparationProcess_eq_sum` | `3763-3773` | `definitional-unfold` | explicit definitional helper |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.infiniteRealizedObserverFiberCumulativeBhattacharyyaSeparationProcess_eq_realizedCumulative` | `3774-3783` | `definitional-unfold` | explicit definitional helper |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.infiniteRealizedObserverFiberHellingerEnvelopeProcess_eq` | `3784-3796` | `definitional-unfold` | explicit definitional helper |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.infiniteRealizedObserverFiberHellingerEnvelopeProcess_eq_realizedHellingerEnvelope` | `3797-3816` | `definitional-unfold` | explicit definitional helper |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.ae_realizedCumulativeSeparationProcess_tendsto_atTop_of_uniform_floor` | `3827-3843` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.hellingerConvergenceSpine_of_realized_processes_uniform_separation_floor` | `3844-3872` | `single-lemma-application` | single helper application |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.hasObserverFiberBhattacharyyaFloorOnPolicySupport_of_affinityCeiling` | `3937-3956` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.hasObserverFiberBhattacharyyaUniformSeparationFloor_of_policySupportFloor` | `3957-3977` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.hasObserverFiberBhattacharyyaUniformSeparationFloor_of_affinityCeiling_policySupport` | `3978-3999` | `single-lemma-application` | single helper application |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.infiniteHasObserverFiberTrueLawHellingerAffinityCeilingOnPolicySupport_of_actionRule` | `4122-4145` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.ae_infiniteRealizedCumulativeSeparationProcess_tendsto_atTop_of_uniform_floor` | `4160-4175` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.hellingerConvergenceSpine_of_infinite_realized_processes_uniform_separation_floor` | `4176-4207` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.infiniteHasObserverFiberBhattacharyyaFloorOnPolicySupport_of_affinityCeiling` | `4208-4228` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.infiniteHasObserverFiberBhattacharyyaUniformSeparationFloor_of_policySupportFloor` | `4229-4251` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.infiniteHasObserverFiberBhattacharyyaUniformSeparationFloor_of_affinityCeiling_policySupport` | `4252-4272` | `single-lemma-application` | single helper application |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.infiniteHasObserverFiberTrueLawHellingerUniformSeparationFloor_of_affinityCeiling_policySupport` | `4273-4297` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.ae_infiniteRealizedObserverFiberTrueLawCumulativeHellingerSeparation_tendsto_atTop_of_uniform_floor` | `4298-4323` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.ae_infiniteRealizedObserverFiberCumulativeBhattacharyyaSeparation_tendsto_atTop_of_uniform_floor` | `4324-4346` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.hellingerConvergenceSpine_of_infiniteObserverFiberBhattacharyya_uniform_separation_floor` | `4347-4381` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.hellingerConvergenceSpine_of_infiniteObserverFiberBhattacharyya_affinityCeiling_policySupport` | `4382-4416` | `single-lemma-application` | single helper application |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.hellingerConvergenceSpine_of_infiniteObserverFiberTrueLawHellinger_affinityCeiling_policySupport` | `4417-4464` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.hellingerConvergenceSpine_of_infiniteObserverFiberTrueLawHellinger_affinityCeiling_policySupport_of_martingale` | `4465-4520` | `constructive-existential` | substantive theorem proof |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.ae_realizedObserverFiberCumulativeBhattacharyyaSeparation_tendsto_atTop_of_uniform_floor` | `4521-4547` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.hellingerConvergenceSpine_of_observerFiberBhattacharyya_uniform_separation_floor` | `4548-4574` | `single-lemma-application` | single helper application |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.residualObserverFiberPosteriorOdds_eq_of_sameView` | `4582-4593` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.residualObserverFiberProcess_zero_eq_initial` | `4594-4603` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.initialResidualObserverFiberOdds_eq_of_sameView` | `4604-4614` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.residualObserverFiberProcess_eq_of_sameView` | `4615-4627` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.residualObserverFiberProcess_adapted` | `4628-4644` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.observerFiberPosteriorShareProcess_adapted` | `4645-4662` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.infiniteResidualObserverFiberProcess_adapted` | `4663-4679` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.infiniteRealizedResidualOddsProcess_adapted` | `4680-4700` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.infiniteRealizedBhattacharyyaSeparationProcess_mem_infinitePrefixFiltration_succ` | `4701-4723` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.infiniteRealizedObserverFiberBhattacharyyaSeparationProcess_mem_infinitePrefixFiltration_succ` | `4724-4739` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.infiniteRealizedBhattacharyyaSeparationProcess_eq_of_prefix_eq_of_lt` | `4740-4755` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.infiniteRealizedCumulativeSeparationProcess_adapted` | `4756-4777` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.infiniteRealizedObserverFiberCumulativeBhattacharyyaSeparationProcess_adapted` | `4778-4791` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.infiniteRealizedHellingerEnvelopeProcess_adapted` | `4792-4822` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.infiniteRealizedObserverFiberHellingerEnvelopeProcess_adapted` | `4823-4839` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.infiniteRealizedHellingerEnvelopeProcess_stronglyAdapted_prefixFiltration` | `4840-4854` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.infiniteRealizedObserverFiberHellingerEnvelopeProcess_stronglyAdapted_prefixFiltration` | `4855-4864` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.infiniteRealizedObserverFiberTrueLawHellingerEnvelopeProcess_stronglyAdapted_prefixFiltration` | `4865-4881` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.infiniteRealizedCumulativeSeparationProcess_succ` | `4882-4895` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.infiniteRealizedHellingerEnvelopeProcess_prefixFactor_shape` | `4896-4942` | `constructive-existential` | substantive theorem proof |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.infiniteRealizedObserverFiberTrueLawHellingerEnvelopeProcess_prefixFactor_shape` | `4943-4974` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.infiniteRealizedHellingerEnvelopeProcess_prefixFactor_succ_shape` | `4975-5072` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.infiniteRealizedObserverFiberTrueLawHellingerEnvelopeProcess_prefixFactor_succ_shape` | `5073-5115` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.infiniteRealizedObserverFiberTrueLawHellinger_prefix_kernel_integral_of_step_shape` | `5116-5279` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.infiniteRealizedObserverFiberTrueLawHellinger_prefix_kernel_integral` | `5280-5402` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.infiniteRealizedObserverFiberTrueLawHellinger_prefix_kernel_integral_of_obligations` | `5457-5533` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.infiniteRealizedObserverFiberTrueLawHellinger_rawIonescuMartingale_of_prefix_kernel_integral` | `5534-5616` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.infiniteRealizedObserverFiberTrueLawHellinger_rawIonescuMartingale_of_prefix_kernel_obligations` | `5617-5641` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.infiniteRealizedHellingerEnvelopeProcess_martingale_of_condExp_succ` | `5642-5661` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.infiniteRealizedObserverFiberHellingerEnvelopeProcess_martingale_of_condExp_succ` | `5662-5680` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.infiniteRealizedHellingerEnvelopeProcess_integrable_of_ae_enorm_bound` | `5681-5704` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.infiniteRealizedObserverFiberHellingerEnvelopeProcess_integrable_of_ae_enorm_bound` | `5705-5727` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.infiniteRealizedObserverFiberHellingerEnvelopeProcess_martingale_of_condExp_succ_of_bound` | `5728-5751` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.infiniteRealizedHellingerEnvelopeProcess_l1_bounded_of_ae_enorm_bound` | `5752-5769` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.infiniteRealizedObserverFiberHellingerEnvelopeProcess_l1_bounded_of_ae_enorm_bound` | `5770-5786` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.infiniteRealizedObserverFiberHellingerConvergenceSpine_of_condExp_succ` | `5787-5828` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.infiniteRealizedObserverFiberTrueLawHellingerConvergenceSpine_of_condExp_affinityCeiling` | `5829-5901` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.observerFiberPosteriorShare_eq_one_of_residual_eq_zero` | `5902-5911` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.hasSupportwiseResidualContractionWitness_of_sameView` | `5946-5962` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.hasSupportwiseResidualRecurrence_of_witness` | `5963-5979` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.supportwise_residualObserverFiberRateBound_of_recurrence` | `5980-6012` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.ae_residualObserverFiberRecurrence_of_supportwise` | `6013-6034` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.ae_residualObserverFiberRateBound_of_supportwise` | `6035-6057` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.ae_residualObserverFiberRecurrence_of_witness` | `6058-6076` | `single-lemma-application` | single helper application |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.ae_residualObserverFiberRateBound_of_witness` | `6077-6092` | `single-lemma-application` | single helper application |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.posteriorShareFromResidual_lowerBound_of_le` | `6093-6106` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteProbabilisticConvergence` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.ae_observerFiberPosteriorShareLowerBound_of_witness` | `6107-6143` | `substantive` | substantive theorem proof |
 | `SemanticConvergence.ConcreteRates` | `SemanticConvergence.ConcretePrefixMachine.posteriorRateFactorFromFloor_succ_lt` | `66-91` | `rate-composition` | substantive theorem proof |
 | `SemanticConvergence.ConcreteRates` | `SemanticConvergence.ConcretePrefixMachine.posteriorRateBound_of_positiveDecay` | `92-125` | `rate-composition` | substantive theorem proof |
 | `SemanticConvergence.ConcreteRates` | `SemanticConvergence.ConcretePrefixMachine.observerFiberLogOdds_eq_of_sameView` | `141-151` | `substantive` | substantive theorem proof |
@@ -228,70 +459,108 @@ None.
 | `SemanticConvergence.ConcreteSemantic` | `SemanticConvergence.ConcretePrefixMachine.fullSupportActionLaw_hasSeparatingSupportOn` | `506-538` | `substantive` | substantive theorem proof |
 | `SemanticConvergence.ConcreteSemantic` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.semanticSeparation_eq_of_sameView` | `554-565` | `substantive` | substantive theorem proof |
 | `SemanticConvergence.ConcreteSemantic` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.semanticGain_eq_of_sameView` | `566-584` | `substantive` | substantive theorem proof |
-| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcreteLaw.mass_eq_zero_of_not_mem_support` | `27-32` | `substantive` | substantive theorem proof |
-| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcreteLaw.toENNRealMass_eq_zero_of_not_mem_support` | `33-38` | `substantive` | substantive theorem proof |
-| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcreteLaw.toPMF_apply` | `44-47` | `definitional-unfold` | explicit definitional helper |
-| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcreteLaw.mem_support_toPMF_iff` | `48-77` | `substantive` | substantive theorem proof |
-| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcreteBridge.appendEvent_eq_appendEvent_iff` | `78-98` | `substantive` | substantive theorem proof |
-| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcreteBridge.countHistOfHist_length` | `103-107` | `substantive` | substantive theorem proof |
-| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcreteBridge.countHistOfHist_histOfCountHist` | `112-119` | `substantive` | substantive theorem proof |
-| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcreteBridge.histOfCountHist_countHistOfHist_apply` | `120-125` | `substantive` | substantive theorem proof |
-| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcreteBridge.countHistOfHist_snoc` | `126-138` | `substantive` | substantive theorem proof |
-| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcreteBridge.countHistOfHist_injective` | `139-145` | `substantive` | substantive theorem proof |
-| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcreteBridge.hist_cast_apply` | `146-151` | `substantive` | substantive theorem proof |
-| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcreteBridge.snoc_eq_snoc_iff` | `152-166` | `substantive` | substantive theorem proof |
-| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcreteBridge.hist_snoc_decompose` | `167-179` | `substantive` | substantive theorem proof |
-| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.listWeightedSum_eq_if_mem` | `180-205` | `substantive` | substantive theorem proof |
-| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.CountableConcrete.histPMF_appendEvent` | `206-385` | `substantive` | substantive theorem proof |
-| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.mass_eq_if_mem_support` | `405-413` | `substantive` | substantive theorem proof |
-| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.allPrograms_nodup` | `414-426` | `substantive` | substantive theorem proof |
-| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.eraseDups_nodup` | `427-444` | `substantive` | substantive theorem proof |
-| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.listWeightedSum_div_right` | `445-454` | `substantive` | substantive theorem proof |
-| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.listWeightedSum_filter_eq` | `455-466` | `substantive` | substantive theorem proof |
-| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.listWeightedSum_filter_cond_eq` | `467-478` | `substantive` | substantive theorem proof |
-| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.finset_sum_toFinset_eq_listWeightedSum` | `479-489` | `substantive` | substantive theorem proof |
-| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.sum_programFintype_eq_listWeightedSum` | `490-500` | `substantive` | substantive theorem proof |
-| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.histLaw_support_nodup` | `501-515` | `substantive` | substantive theorem proof |
-| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.map_snoc_mass` | `516-551` | `substantive` | substantive theorem proof |
-| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.actionStep_snoc_mass` | `552-626` | `substantive` | substantive theorem proof |
-| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.histLaw_snoc_mass` | `627-693` | `substantive` | substantive theorem proof |
-| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.histLaw_mass_nonneg` | `694-718` | `substantive` | substantive theorem proof |
-| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.toCountablePolicy_apply` | `729-735` | `single-lemma-application` | single helper application |
-| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.toCountableKernel_apply` | `736-741` | `definitional-unfold` | explicit definitional helper |
-| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.mem_support_toCountablePolicy_iff` | `742-749` | `substantive` | substantive theorem proof |
-| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.mem_support_toCountableKernel_iff` | `750-759` | `substantive` | substantive theorem proof |
-| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.policy_cast_mass` | `763-770` | `substantive` | substantive theorem proof |
-| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.kernel_cast_mass` | `771-778` | `substantive` | substantive theorem proof |
-| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.histPMF_countHistOfHist_eq_histLaw` | `779-925` | `substantive` | substantive theorem proof |
-| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.codeList_nodup` | `929-932` | `substantive` | substantive theorem proof |
-| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.mem_codeList` | `933-936` | `substantive` | substantive theorem proof |
-| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.semantics_eq_of_proof_irrel` | `937-943` | `substantive` | substantive theorem proof |
-| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.toCountableEncodedProgram_code` | `953-959` | `definitional-unfold` | explicit definitional helper |
-| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.toCountableProgram_programCode` | `1018-1033` | `substantive` | substantive theorem proof |
-| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.toConcreteProgram_code` | `1034-1040` | `substantive` | substantive theorem proof |
-| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.toConcreteProgram_toCountableProgram` | `1041-1048` | `substantive` | substantive theorem proof |
-| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.toCountableProgram_toConcreteProgram` | `1049-1060` | `substantive` | substantive theorem proof |
-| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.liftObserver_view_toCountableEncodedProgram` | `1084-1093` | `substantive` | substantive theorem proof |
-| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.liftObserver_sameView_toCountableEncodedProgram_iff` | `1094-1112` | `substantive` | substantive theorem proof |
-| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.observerFiber_toCountableProgram_iff` | `1113-1143` | `substantive` | substantive theorem proof |
-| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.programSemantics_toCountableProgram_eq` | `1144-1161` | `substantive` | substantive theorem proof |
-| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.likelihood_toCountableProgram_eq` | `1162-1184` | `substantive` | substantive theorem proof |
-| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.posteriorWeight_toCountableProgram_eq` | `1185-1213` | `substantive` | substantive theorem proof |
-| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.bayesNumeratorLaw_mass_nonneg` | `1214-1236` | `substantive` | substantive theorem proof |
-| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.classMass_normalizeOnPrograms_eq` | `1237-1252` | `substantive` | substantive theorem proof |
-| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.posteriorClassMass_eq_bayesNumeratorClassMass_div_evidence` | `1253-1271` | `substantive` | substantive theorem proof |
-| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.observerFiberBayesNumeratorMass_toCountable_eq` | `1272-1383` | `substantive` | substantive theorem proof |
-| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.bayesNumeratorClassMass_nonneg` | `1384-1415` | `substantive` | substantive theorem proof |
-| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.bayesNumeratorClassMass_le_evidence` | `1416-1447` | `substantive` | substantive theorem proof |
-| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.evidence_ne_zero_of_bayesNumeratorClassMass_ne_zero` | `1448-1468` | `substantive` | substantive theorem proof |
-| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.observerFiberComplementBayesNumeratorMass_toCountable_eq` | `1469-1615` | `substantive` | substantive theorem proof |
-| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.residualObserverFiberPosteriorOdds_toCountable_eq` | `1616-1724` | `substantive` | substantive theorem proof |
-| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.histPMF_mem_support_length` | `1725-1746` | `substantive` | substantive theorem proof |
-| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.trajectoryLaw_mem_support_length` | `1747-1756` | `substantive` | substantive theorem proof |
-| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.residualObserverFiberProcess_toCountable_eq_of_prefix_length` | `1757-1783` | `substantive` | substantive theorem proof |
-| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.prefixFullHist_hist_length` | `1789-1798` | `definition` | explicit definitional theorem |
-| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.prefixwiseResidualDecayENNReal_of_rat` | `1799-1853` | `substantive` | substantive theorem proof |
-| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.hasSupportwiseResidualContractionWitness_of_prefixwiseResidualDecay` | `1854-1905` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcreteBridge.appendEvent_eq_appendEvent_iff` | `19-39` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcreteBridge.countHistOfHist_length` | `44-48` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcreteBridge.countHistOfHist_histOfCountHist` | `53-60` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcreteBridge.histOfCountHist_countHistOfHist_apply` | `61-65` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcreteBridge.asFullHist_histOfCountHist_countHistOfHist` | `66-75` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcreteBridge.countHistOfHist_snoc` | `76-88` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcreteBridge.countHistOfHist_injective` | `89-95` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcreteBridge.hist_cast_apply` | `96-101` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcreteBridge.snoc_eq_snoc_iff` | `102-116` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcreteBridge.hist_snoc_decompose` | `117-129` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.listWeightedSum_eq_if_mem` | `130-156` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.CountableConcrete.histPMF_appendEvent` | `157-330` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.CountableConcrete.histPMF_mem_support_length_countable` | `331-352` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.CountableConcrete.histPMF_eq_zero_of_length_ne` | `353-365` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.ionescuNextEventPMF_apply` | `366-402` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.ionescuStepKernel_singleton_apply` | `403-438` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.ionescuTrajectoryMeasure_streamPrefix_appendEvent` | `439-563` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.CountableConcrete.CountablePrefixMachine.ionescuTrajectoryMeasure_streamPrefix_eq_histPMF` | `564-618` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.mass_eq_if_mem_support` | `674-682` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.allPrograms_nodup` | `683-695` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.eraseDups_nodup` | `696-713` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.listWeightedSum_div_right` | `714-723` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.listWeightedSum_nonneg` | `724-737` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.listWeightedSum_eq_zero_of_nonneg_of_mem` | `738-760` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.listWeightedSum_const_mul` | `761-770` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.listWeightedSum_filter_eq` | `771-782` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.listWeightedSum_filter_cond_eq` | `783-794` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.listWeightedSum_filter_not_cond_eq` | `795-803` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.listWeightedSum_filter_add_filter_not` | `804-818` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.finset_sum_toFinset_eq_listWeightedSum` | `819-829` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.sum_programFintype_eq_listWeightedSum` | `830-840` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.histLaw_support_nodup` | `841-855` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.map_snoc_mass` | `856-891` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.actionStep_snoc_mass` | `892-966` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.histLaw_snoc_mass` | `967-1033` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.bayesNumeratorLaw_snoc_mass` | `1034-1053` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.bayesNumeratorClassMass_snoc_eq` | `1054-1090` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.evidence_snoc_eq` | `1091-1124` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.histLaw_mass_nonneg` | `1125-1149` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.toCountablePolicy_apply` | `1160-1166` | `single-lemma-application` | single helper application |
+| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.toCountableKernel_apply` | `1167-1172` | `definitional-unfold` | explicit definitional helper |
+| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.mem_support_toCountablePolicy_iff` | `1173-1180` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.mem_support_toCountableKernel_iff` | `1181-1190` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.policy_cast_mass` | `1194-1201` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.kernel_cast_mass` | `1202-1209` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.histPMF_countHistOfHist_eq_histLaw` | `1210-1356` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.codeList_nodup` | `1360-1363` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.mem_codeList` | `1364-1367` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.semantics_eq_of_proof_irrel` | `1368-1374` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.toCountableEncodedProgram_code` | `1384-1390` | `definitional-unfold` | explicit definitional helper |
+| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.toCountableProgram_programCode` | `1449-1464` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.toConcreteProgram_code` | `1465-1471` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.toConcreteProgram_toCountableProgram` | `1472-1479` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.toCountableProgram_toConcreteProgram` | `1480-1491` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.liftObserver_view_toCountableEncodedProgram` | `1515-1524` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.liftObserver_sameView_toCountableEncodedProgram_iff` | `1525-1543` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.observerFiber_toCountableProgram_iff` | `1544-1574` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.programSemantics_toCountableProgram_eq` | `1575-1592` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.likelihood_toCountableProgram_eq` | `1593-1615` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.posteriorWeight_toCountableProgram_eq` | `1616-1644` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.bayesNumeratorLaw_mass_nonneg` | `1645-1667` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.classMass_normalizeOnPrograms_eq` | `1668-1683` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.posteriorClassMass_eq_bayesNumeratorClassMass_div_evidence` | `1684-1702` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.oneStepClassObservationMass_eq_posterior_weighted_obs_of_class_ne_zero` | `1703-1767` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.oneStepComplementObservationMass_eq_posterior_weighted_obs_of_complement_ne_zero` | `1768-1784` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.oneStepClassObservationMass_eq_bayesNumerator_obs_div_evidence_of_class_ne_zero` | `1785-1810` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.oneStepComplementObservationMass_eq_bayesNumerator_obs_div_evidence_of_complement_ne_zero` | `1811-1829` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.oneStepObservationEvidence_eq_bayesNumerator_obs_div_evidence_of_split_ne_zero` | `1830-1853` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.posteriorClassMass_snoc_eq_oneStepClassPosteriorMass_of_split_ne_zero` | `1854-1927` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.complementPosteriorMass_snoc_eq_oneStepComplementPosteriorMass_of_split_ne_zero` | `1928-2028` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.observerFiberBayesNumeratorMass_toCountable_eq` | `2029-2140` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.bayesNumeratorClassMass_nonneg` | `2141-2172` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.evidence_nonneg` | `2173-2191` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.posteriorClassMass_nonneg` | `2192-2212` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.complementPosteriorMass_nonneg` | `2213-2226` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.residualClassPosteriorOdds_nonneg` | `2227-2246` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.residualObserverFiberPosteriorOdds_nonneg` | `2247-2262` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.bayesNumeratorClassMass_le_evidence` | `2263-2294` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.evidence_ne_zero_of_bayesNumeratorClassMass_ne_zero` | `2295-2315` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.observerFiberComplementBayesNumeratorMass_toCountable_eq` | `2316-2462` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.residualObserverFiberPosteriorOdds_toCountable_eq` | `2463-2571` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.histPMF_mem_support_length` | `2572-2593` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.histPMF_historyPrefix_mem_support` | `2594-2644` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.histPMF_appendEvent_mem_support_observation` | `2645-2668` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.histPMF_appendEvent_mem_support_action` | `2669-2702` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.infiniteTrajectoryLaw_realized_action_mem_support` | `2703-2785` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.infiniteBayesGibbsTrajectoryLaw_realized_action_mem_support` | `2786-2807` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.infiniteBayesGibbsTrajectoryLaw_of_ionescu_hellingerConvergenceSpine_of_affinityCeiling` | `2808-2878` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.infiniteBayesGibbsTrajectoryLaw_of_ionescu_hellingerConvergenceSpine_of_condExp_affinityCeiling` | `2879-2961` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.infiniteBayesGibbsTrajectoryLaw_of_ionescu_trueLawHellingerConvergenceSpine_of_condExp_affinityCeiling` | `2962-3037` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.infiniteBayesGibbsTrajectoryLaw_of_ionescu_trueLawHellingerConvergenceSpine_of_martingale_affinityCeiling` | `3038-3101` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.infiniteBayesGibbsTrajectoryLaw_of_ionescu_trueLawHellingerConvergenceSpine_of_rawIonescuMartingale_affinityCeiling` | `3102-3165` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.trajectoryLaw_historyPrefix_mem_support` | `3166-3179` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.trajectoryLaw_realized_observation_mem_support` | `3180-3203` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.trajectoryLaw_realized_action_mem_support` | `3204-3226` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.trajectoryLaw_mem_support_length` | `3227-3238` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.countable_historyPrefix_succ_eq_appendEvent_get` | `3239-3256` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.finiteHorizon_realizedObserverFiberBhattacharyyaSeparation_floor_of_affinityCeiling` | `3257-3293` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.residualObserverFiberProcess_toCountable_eq_of_prefix_length` | `3294-3320` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.prefixFullHist_hist_length` | `3326-3335` | `definition` | explicit definitional theorem |
+| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.prefixwiseResidualDecayENNReal_of_rat` | `3336-3390` | `substantive` | substantive theorem proof |
+| `SemanticConvergence.ConcreteSubstrateBridge` | `SemanticConvergence.ConcretePrefixMachine.hasSupportwiseResidualContractionWitness_of_prefixwiseResidualDecay` | `3391-3442` | `substantive` | substantive theorem proof |
 | `SemanticConvergence.ConcreteSurrogate` | `SemanticConvergence.ConcretePrefixMachine.surrogateEnergy_eq_of_sameView` | `63-74` | `substantive` | substantive theorem proof |
 | `SemanticConvergence.ConcreteSurrogate` | `SemanticConvergence.ConcretePrefixMachine.surrogateArgmin_spec` | `75-88` | `substantive` | substantive theorem proof |
 | `SemanticConvergence.ConcreteSurrogate` | `SemanticConvergence.ConcretePrefixMachine.surrogateChosenLaw_supportsArgmin` | `89-99` | `substantive` | substantive theorem proof |
@@ -310,11 +579,14 @@ None.
 
 | Label | Module | Decl | Lines | Proof kind | Resolution |
 | --- | --- | --- | --- | --- | --- |
-| `lem:prior-invariance` | `SemanticConvergence.Belief` | `SemanticConvergence.lem_prior_invariance` | `28-34` | `definition` | explicit definitional theorem |
-| `lem:prior-necessity` | `SemanticConvergence.Belief` | `SemanticConvergence.lem_prior_necessity` | `35-42` | `definition` | explicit definitional theorem |
-| `lem:variational` | `SemanticConvergence.Belief` | `SemanticConvergence.lem_variational` | `43-56` | `substantive` | substantive theorem proof |
-| `lem:kl-necessity` | `SemanticConvergence.Belief` | `SemanticConvergence.lem_kl_necessity` | `57-71` | `substantive` | substantive theorem proof |
-| `lem:merging` | `SemanticConvergence.Belief` | `SemanticConvergence.lem_merging` | `72-84` | `substantive` | substantive theorem proof |
+| `lem:prior-invariance` | `SemanticConvergence.Belief` | `SemanticConvergence.lem_prior_invariance` | `37-43` | `definition` | explicit definitional theorem |
+| `lem:prior-necessity` | `SemanticConvergence.Belief` | `SemanticConvergence.lem_prior_necessity` | `44-294` | `substantive` | substantive theorem proof |
+| `lem:variational` | `SemanticConvergence.Belief` | `SemanticConvergence.lem_variational` | `295-431` | `substantive` | substantive theorem proof |
+| `lem:kl-necessity` | `SemanticConvergence.Belief` | `SemanticConvergence.lem_kl_necessity` | `560-587` | `substantive` | substantive theorem proof |
+| `prop:two-observer-minimizer` | `SemanticConvergence.Belief` | `SemanticConvergence.prop_two_observer_minimizer` | `615-735` | `substantive` | substantive theorem proof |
+| `prop:kernel-functional-minimizer` | `SemanticConvergence.Belief` | `SemanticConvergence.prop_kernel_functional_minimizer` | `736-867` | `substantive` | substantive theorem proof |
+| `prop:kernel-functional-minimizer-compact` | `SemanticConvergence.Belief` | `SemanticConvergence.prop_kernel_functional_minimizer_compact` | `1102-1142` | `substantive` | substantive theorem proof |
+| `lem:merging` | `SemanticConvergence.Belief` | `SemanticConvergence.lem_merging` | `1143-1155` | `substantive` | substantive theorem proof |
 | `prop:boundary-identity` | `SemanticConvergence.Boundary` | `SemanticConvergence.prop_boundary_identity` | `75-87` | `substantive` | substantive theorem proof |
 | `lem:risk-ig` | `SemanticConvergence.Boundary` | `SemanticConvergence.lem_risk_ig` | `88-98` | `definition` | explicit definitional theorem |
 | `cor:efe-specialization` | `SemanticConvergence.Boundary` | `SemanticConvergence.cor_efe_specialization` | `99-109` | `definition` | explicit definitional theorem |
@@ -323,16 +595,13 @@ None.
 | `thm:observer-promotion-failure` | `SemanticConvergence.Boundary` | `SemanticConvergence.thm_observer_promotion_failure` | `212-218` | `substantive` | substantive theorem proof |
 | `cor:observer-promotion-universal` | `SemanticConvergence.Boundary` | `SemanticConvergence.cor_observer_promotion_universal` | `219-225` | `substantive` | substantive theorem proof |
 | `cor:promotion-contrast` | `SemanticConvergence.Boundary` | `SemanticConvergence.cor_promotion_contrast` | `226-238` | `substantive` | substantive theorem proof |
-| `prop:belief-invariance-above` | `SemanticConvergence.Functional` | `SemanticConvergence.prop_belief_invariance_above` | `520-530` | `substantive` | substantive theorem proof |
-| `cor:twins-frozen-ratio` | `SemanticConvergence.Functional` | `SemanticConvergence.cor_twins_frozen_ratio` | `531-541` | `substantive` | substantive theorem proof |
-| `cor:canonical-pair` | `SemanticConvergence.Functional` | `SemanticConvergence.cor_canonical_pair` | `542-549` | `substantive` | substantive theorem proof |
-| `prop:goal-dialed` | `SemanticConvergence.Functional` | `SemanticConvergence.prop_goal_dialed` | `550-564` | `substantive` | substantive theorem proof |
-| `prop:two-observer-minimizer` | `SemanticConvergence.Functional` | `SemanticConvergence.prop_two_observer_minimizer` | `565-629` | `substantive` | substantive theorem proof |
-| `prop:kernel-functional-minimizer` | `SemanticConvergence.Functional` | `SemanticConvergence.prop_kernel_functional_minimizer` | `630-717` | `substantive` | substantive theorem proof |
-| `prop:kernel-functional-minimizer-compact` | `SemanticConvergence.Functional` | `SemanticConvergence.prop_kernel_functional_minimizer_compact` | `718-738` | `substantive` | substantive theorem proof |
-| `prop:belief-illtyped-below` | `SemanticConvergence.Functional` | `SemanticConvergence.prop_belief_illtyped_below` | `739-747` | `substantive` | substantive theorem proof |
-| `prop:action-cap` | `SemanticConvergence.Functional` | `SemanticConvergence.prop_action_cap` | `748-770` | `substantive` | substantive theorem proof |
-| `thm:meeting-point` | `SemanticConvergence.Functional` | `SemanticConvergence.thm_meeting_point` | `771-778` | `substantive` | substantive theorem proof |
+| `prop:belief-invariance-above` | `SemanticConvergence.Functional` | `SemanticConvergence.prop_belief_invariance_above` | `1692-1702` | `substantive` | substantive theorem proof |
+| `cor:twins-frozen-ratio` | `SemanticConvergence.Functional` | `SemanticConvergence.cor_twins_frozen_ratio` | `1703-1713` | `substantive` | substantive theorem proof |
+| `cor:canonical-pair` | `SemanticConvergence.Functional` | `SemanticConvergence.cor_canonical_pair` | `1714-1721` | `substantive` | substantive theorem proof |
+| `prop:goal-dialed` | `SemanticConvergence.Functional` | `SemanticConvergence.prop_goal_dialed` | `1722-1736` | `substantive` | substantive theorem proof |
+| `prop:belief-illtyped-below` | `SemanticConvergence.Functional` | `SemanticConvergence.prop_belief_illtyped_below` | `1911-1919` | `substantive` | substantive theorem proof |
+| `prop:action-cap` | `SemanticConvergence.Functional` | `SemanticConvergence.prop_action_cap` | `3244-3266` | `substantive` | substantive theorem proof |
+| `thm:meeting-point` | `SemanticConvergence.Functional` | `SemanticConvergence.thm_meeting_point` | `3267-3274` | `substantive` | substantive theorem proof |
 | `lem:nesting` | `SemanticConvergence.Hierarchy` | `SemanticConvergence.lem_nesting` | `136-156` | `substantive` | substantive theorem proof |
 | `prop:refinement-chain` | `SemanticConvergence.Hierarchy` | `SemanticConvergence.prop_refinement_chain` | `157-175` | `substantive` | substantive theorem proof |
 | `lem:observable-quotient` | `SemanticConvergence.Hierarchy` | `SemanticConvergence.lem_observable_quotient` | `176-182` | `substantive` | substantive theorem proof |
@@ -341,15 +610,29 @@ None.
 | `thm:policy-gap` | `SemanticConvergence.Hierarchy` | `SemanticConvergence.thm_policy_gap` | `215-224` | `substantive` | substantive theorem proof |
 | `lem:syntactic-gap` | `SemanticConvergence.Hierarchy` | `SemanticConvergence.lem_syntactic_gap` | `225-239` | `substantive` | substantive theorem proof |
 | `thm:strict-hierarchy` | `SemanticConvergence.Hierarchy` | `SemanticConvergence.thm_strict_hierarchy` | `240-261` | `substantive` | substantive theorem proof |
+| `def:hellinger-spine` | `SemanticConvergence.MartingaleContraction` | `SemanticConvergence.HellingerConvergenceSpine` | `229-264` | `substantive` | substantive theorem proof |
+| `def:hellinger-spine` | `SemanticConvergence.MartingaleContraction` | `SemanticConvergence.HellingerConvergenceSpine` | `265-278` | `single-lemma-application` | single helper application |
 | `prop:noise-immunity` | `SemanticConvergence.Noise` | `SemanticConvergence.prop_noise_immunity` | `25-39` | `substantive` | substantive theorem proof |
 | `prop:noise-left-invertible` | `SemanticConvergence.Noise` | `SemanticConvergence.prop_noise_left_invertible` | `40-47` | `constructive-existential` | substantive theorem proof |
 | `prop:noise-decoding` | `SemanticConvergence.Noise` | `SemanticConvergence.prop_noise_decoding` | `48-55` | `substantive` | substantive theorem proof |
-| `cor:noise-transfer` | `SemanticConvergence.Noise` | `SemanticConvergence.cor_noise_transfer` | `114-160` | `substantive` | substantive theorem proof |
-| `lem:one-step-drift` | `SemanticConvergence.Rates` | `SemanticConvergence.lem_one_step_drift` | `152-199` | `substantive` | substantive theorem proof |
-| `lem:one-step-drift-kernel` | `SemanticConvergence.Rates` | `SemanticConvergence.lem_one_step_drift_kernel` | `220-232` | `substantive` | substantive theorem proof |
-| `prop:exp-rate` | `SemanticConvergence.Rates` | `SemanticConvergence.prop_exp_rate` | `233-280` | `rate-composition` | substantive theorem proof |
-| `prop:kernel-exp-rate` | `SemanticConvergence.Rates` | `SemanticConvergence.prop_kernel_exp_rate` | `299-348` | `rate-composition` | substantive theorem proof |
-| `thm:exp-rate-concentration` | `SemanticConvergence.Rates` | `SemanticConvergence.thm_exp_rate_concentration` | `371-431` | `rate-composition` | substantive theorem proof |
+| `cor:noise-transfer` | `SemanticConvergence.Noise` | `SemanticConvergence.zeroOutRatePackage_decodableNoiseTransfer` | `151-181` | `rate-composition` | substantive theorem proof |
+| `thm:separating-support-convergence` | `SemanticConvergence.Ontology` | `SemanticConvergence.Ontology.Coupling.h10_verified_semantic_learning_package_converges` | `332-369` | `substantive` | substantive theorem proof |
+| `thm:infinite-affinity-hellinger-bridge` | `SemanticConvergence.Ontology` | `SemanticConvergence.Ontology.Coupling.h10_infinite_affinity_hellinger_bridge` | `370-387` | `substantive` | substantive theorem proof |
+| `thm:exploration-floor-behavioral` | `SemanticConvergence.Ontology` | `SemanticConvergence.Ontology.Coupling.h10_exploration_floor_behavioral` | `388-405` | `substantive` | substantive theorem proof |
+| `thm:semantic-convergence` | `SemanticConvergence.Ontology` | `SemanticConvergence.Ontology.Coupling.h10_semantic_convergence` | `406-423` | `substantive` | substantive theorem proof |
+| `thm:kernel-semantic-convergence` | `SemanticConvergence.Ontology` | `SemanticConvergence.Ontology.Coupling.h10_kernel_semantic_convergence` | `424-441` | `substantive` | substantive theorem proof |
+| `cor:compact-action-kernel` | `SemanticConvergence.Ontology` | `SemanticConvergence.Ontology.Coupling.h10_compact_action_kernel` | `442-459` | `substantive` | substantive theorem proof |
+| `cor:finite-maximin` | `SemanticConvergence.Ontology` | `SemanticConvergence.Ontology.Coupling.h10_finite_maximin` | `460-477` | `substantive` | substantive theorem proof |
+| `cor:goal-dialed-payoff` | `SemanticConvergence.Ontology` | `SemanticConvergence.Ontology.Coupling.h10_goal_dialed_payoff` | `478-495` | `substantive` | substantive theorem proof |
+| `thm:amortized-surrogate` | `SemanticConvergence.Ontology` | `SemanticConvergence.Ontology.Coupling.h10_amortized_surrogate` | `496-517` | `substantive` | substantive theorem proof |
+| `cor:noise-left-invertible-history-independent` | `SemanticConvergence.Ontology` | `SemanticConvergence.Ontology.Coupling.h10_support_left_invertible_noisy_transfer` | `518-565` | `substantive` | substantive theorem proof |
+| `lem:one-step-drift-kernel` | `SemanticConvergence.Rates` | `SemanticConvergence.lem_one_step_drift_kernel` | `248-260` | `substantive` | substantive theorem proof |
+| `lem:one-step-drift` | `SemanticConvergence.Rates` | `SemanticConvergence.zeroOutRatePackage_oneStepResidual` | `467-489` | `rate-composition` | substantive theorem proof |
+| `thm:separating-support-rate` | `SemanticConvergence.Rates` | `SemanticConvergence.zeroOutRatePackage_residualRate` | `490-512` | `rate-composition` | substantive theorem proof |
+| `cor:separating-support-finite-time` | `SemanticConvergence.Rates` | `SemanticConvergence.zeroOutRatePackage_posteriorShareFiniteTime` | `513-536` | `rate-composition` | substantive theorem proof |
+| `prop:exp-rate` | `SemanticConvergence.Rates` | `SemanticConvergence.zeroOutRatePackage_expRate` | `537-558` | `rate-composition` | substantive theorem proof |
+| `prop:kernel-exp-rate` | `SemanticConvergence.Rates` | `SemanticConvergence.zeroOutRatePackage_sameViewResidualRate` | `559-583` | `rate-composition` | substantive theorem proof |
+| `thm:exp-rate-concentration` | `SemanticConvergence.Rates` | `SemanticConvergence.zeroOutRatePackage_sameViewPosteriorShareFiniteTime` | `584-611` | `rate-composition` | substantive theorem proof |
 | `lem:monotone-refinement` | `SemanticConvergence.SelfReference` | `SemanticConvergence.lem_monotone_refinement` | `90-98` | `substantive` | substantive theorem proof |
 | `lem:exploration-reachability` | `SemanticConvergence.SelfReference` | `SemanticConvergence.lem_exploration_reachability` | `99-109` | `constructive-existential` | substantive theorem proof |
 | `prop:observer-promotion-sr` | `SemanticConvergence.SelfReference` | `SemanticConvergence.prop_observer_promotion_sr` | `110-118` | `substantive` | substantive theorem proof |
@@ -359,32 +642,21 @@ None.
 | `thm:self-ref-exploratory-rate` | `SemanticConvergence.SelfReference` | `SemanticConvergence.thm_self_ref_exploratory_rate` | `149-160` | `substantive` | substantive theorem proof |
 | `prop:self-ref-one-step-split` | `SemanticConvergence.SelfReference` | `SemanticConvergence.prop_self_ref_one_step_split` | `161-171` | `constructive-existential` | substantive theorem proof |
 | `thm:self-ref-sharp` | `SemanticConvergence.SelfReference` | `SemanticConvergence.thm_self_ref_sharp` | `172-194` | `substantive` | substantive theorem proof |
-| `lem:odds-identity` | `SemanticConvergence.Semantic` | `SemanticConvergence.lem_odds_identity` | `85-94` | `definition` | explicit definitional theorem |
-| `lem:zero-criterion` | `SemanticConvergence.Semantic` | `SemanticConvergence.lem_zero_criterion` | `95-104` | `definition` | explicit definitional theorem |
-| `prop:chernoff-correspondence` | `SemanticConvergence.Semantic` | `SemanticConvergence.prop_chernoff_correspondence` | `105-116` | `definition` | explicit definitional theorem |
-| `prop:semantic-is-promotion-supporting` | `SemanticConvergence.Semantic` | `SemanticConvergence.prop_semantic_is_promotion_supporting` | `117-124` | `substantive` | substantive theorem proof |
-| `prop:kernel-promotion-support` | `SemanticConvergence.Semantic` | `SemanticConvergence.prop_kernel_promotion_support` | `125-132` | `substantive` | substantive theorem proof |
-| `prop:kernel-promotion-support-compact` | `SemanticConvergence.Semantic` | `SemanticConvergence.prop_kernel_promotion_support_compact` | `133-140` | `substantive` | substantive theorem proof |
-| `prop:uniform-history-independent-implies-semantic` | `SemanticConvergence.Semantic` | `SemanticConvergence.prop_uniform_history_independent_implies_semantic` | `141-152` | `substantive` | substantive theorem proof |
-| `cor:kl-implies-semantic-separation` | `SemanticConvergence.Semantic` | `SemanticConvergence.cor_kl_implies_semantic_separation` | `153-163` | `substantive` | substantive theorem proof |
-| `cor:event-witness-implies-semantic-separation` | `SemanticConvergence.Semantic` | `SemanticConvergence.cor_event_witness_implies_semantic_separation` | `164-174` | `substantive` | substantive theorem proof |
-| `prop:finite-action-kernel-separation` | `SemanticConvergence.Semantic` | `SemanticConvergence.prop_finite_action_kernel_separation` | `175-188` | `substantive` | substantive theorem proof |
-| `prop:compact-action-kernel-separation` | `SemanticConvergence.Semantic` | `SemanticConvergence.prop_compact_action_kernel_separation` | `189-202` | `substantive` | substantive theorem proof |
-| `cor:noise-left-invertible-history-independent` | `SemanticConvergence.Semantic` | `SemanticConvergence.cor_noise_left_invertible_history_independent` | `203-207` | `substantive` | substantive theorem proof |
-| `lem:conditional-bc` | `SemanticConvergence.Semantic` | `SemanticConvergence.lem_conditional_bc` | `208-219` | `substantive` | substantive theorem proof |
-| `lem:contraction` | `SemanticConvergence.Semantic` | `SemanticConvergence.lem_contraction` | `220-230` | `constructive-existential` | substantive theorem proof |
-| `prop:full-support-behavioral` | `SemanticConvergence.Semantic` | `SemanticConvergence.prop_full_support_behavioral` | `231-246` | `substantive` | substantive theorem proof |
-| `thm:exploration-floor-behavioral` | `SemanticConvergence.Semantic` | `SemanticConvergence.thm_exploration_floor_behavioral` | `376-388` | `constructive-existential` | substantive theorem proof |
-| `thm:separating-support-convergence` | `SemanticConvergence.Semantic` | `SemanticConvergence.thm_separating_support_convergence` | `492-537` | `substantive` | substantive theorem proof |
-| `thm:separating-support-rate` | `SemanticConvergence.Semantic` | `SemanticConvergence.thm_separating_support_rate` | `563-608` | `substantive` | substantive theorem proof |
-| `cor:separating-support-finite-time` | `SemanticConvergence.Semantic` | `SemanticConvergence.cor_separating_support_finite_time` | `650-700` | `substantive` | substantive theorem proof |
-| `thm:semantic-convergence` | `SemanticConvergence.Semantic` | `SemanticConvergence.thm_semantic_convergence` | `701-714` | `substantive` | substantive theorem proof |
-| `thm:kernel-semantic-convergence` | `SemanticConvergence.Semantic` | `SemanticConvergence.thm_kernel_semantic_convergence` | `715-728` | `substantive` | substantive theorem proof |
-| `cor:compact-action-kernel` | `SemanticConvergence.Semantic` | `SemanticConvergence.cor_compact_action_kernel` | `729-742` | `substantive` | substantive theorem proof |
-| `cor:finite-maximin` | `SemanticConvergence.Semantic` | `SemanticConvergence.cor_finite_maximin` | `743-756` | `substantive` | substantive theorem proof |
-| `cor:support-necessary` | `SemanticConvergence.Semantic` | `SemanticConvergence.cor_support_necessary` | `757-775` | `constructive-existential` | substantive theorem proof |
-| `thm:summable-support-insufficient` | `SemanticConvergence.Semantic` | `SemanticConvergence.thm_summable_support_insufficient` | `917-939` | `constructive-existential` | substantive theorem proof |
-| `cor:goal-dialed-payoff` | `SemanticConvergence.Semantic` | `SemanticConvergence.cor_goal_dialed_payoff` | `940-954` | `substantive` | substantive theorem proof |
-| `prop:amortized-surrogate-minimizer` | `SemanticConvergence.Surrogate` | `SemanticConvergence.prop_amortized_surrogate_minimizer` | `64-85` | `substantive` | substantive theorem proof |
-| `thm:amortized-surrogate` | `SemanticConvergence.Surrogate` | `SemanticConvergence.thm_amortized_surrogate` | `257-302` | `substantive` | substantive theorem proof |
-| `cor:amortized-surrogate-finite-time` | `SemanticConvergence.Surrogate` | `SemanticConvergence.cor_amortized_surrogate_finite_time` | `303-373` | `substantive` | substantive theorem proof |
+| `lem:odds-identity` | `SemanticConvergence.Semantic` | `SemanticConvergence.lem_odds_identity` | `89-98` | `definition` | explicit definitional theorem |
+| `lem:zero-criterion` | `SemanticConvergence.Semantic` | `SemanticConvergence.lem_zero_criterion` | `99-108` | `definition` | explicit definitional theorem |
+| `prop:chernoff-correspondence` | `SemanticConvergence.Semantic` | `SemanticConvergence.prop_chernoff_correspondence` | `109-120` | `definition` | explicit definitional theorem |
+| `prop:semantic-is-promotion-supporting` | `SemanticConvergence.Semantic` | `SemanticConvergence.prop_semantic_is_promotion_supporting` | `121-128` | `substantive` | substantive theorem proof |
+| `prop:kernel-promotion-support` | `SemanticConvergence.Semantic` | `SemanticConvergence.prop_kernel_promotion_support` | `129-136` | `substantive` | substantive theorem proof |
+| `prop:kernel-promotion-support-compact` | `SemanticConvergence.Semantic` | `SemanticConvergence.prop_kernel_promotion_support_compact` | `137-157` | `substantive` | substantive theorem proof |
+| `prop:uniform-history-independent-implies-semantic` | `SemanticConvergence.Semantic` | `SemanticConvergence.prop_uniform_history_independent_implies_semantic` | `158-169` | `substantive` | substantive theorem proof |
+| `cor:kl-implies-semantic-separation` | `SemanticConvergence.Semantic` | `SemanticConvergence.cor_kl_implies_semantic_separation` | `170-180` | `substantive` | substantive theorem proof |
+| `cor:event-witness-implies-semantic-separation` | `SemanticConvergence.Semantic` | `SemanticConvergence.cor_event_witness_implies_semantic_separation` | `181-191` | `substantive` | substantive theorem proof |
+| `prop:finite-action-kernel-separation` | `SemanticConvergence.Semantic` | `SemanticConvergence.prop_finite_action_kernel_separation` | `192-205` | `substantive` | substantive theorem proof |
+| `prop:compact-action-kernel-separation` | `SemanticConvergence.Semantic` | `SemanticConvergence.prop_compact_action_kernel_separation` | `206-248` | `substantive` | substantive theorem proof |
+| `lem:conditional-bc` | `SemanticConvergence.Semantic` | `SemanticConvergence.lem_conditional_bc` | `254-265` | `substantive` | substantive theorem proof |
+| `lem:contraction` | `SemanticConvergence.Semantic` | `SemanticConvergence.lem_contraction` | `289-320` | `substantive` | substantive theorem proof |
+| `prop:full-support-behavioral` | `SemanticConvergence.Semantic` | `SemanticConvergence.prop_full_support_behavioral` | `3081-3096` | `substantive` | substantive theorem proof |
+| `cor:support-necessary` | `SemanticConvergence.Semantic` | `SemanticConvergence.cor_support_necessary` | `4570-4588` | `constructive-existential` | substantive theorem proof |
+| `thm:summable-support-insufficient` | `SemanticConvergence.Semantic` | `SemanticConvergence.thm_summable_support_insufficient` | `4730-4752` | `constructive-existential` | substantive theorem proof |
+| `prop:amortized-surrogate-minimizer` | `SemanticConvergence.Surrogate` | `SemanticConvergence.prop_amortized_surrogate_minimizer` | `65-86` | `substantive` | substantive theorem proof |
+| `cor:amortized-surrogate-finite-time` | `SemanticConvergence.Surrogate` | `SemanticConvergence.cor_amortized_surrogate_finite_time_zeroOutPackage` | `380-443` | `substantive` | substantive theorem proof |

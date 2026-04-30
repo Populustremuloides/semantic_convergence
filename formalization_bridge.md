@@ -10,9 +10,10 @@ and the concrete first-principles substrate now present in the repo.
 ## Summary
 - Concrete substrate modules present: `11`
 - Abstract-interface declarations in the manuscript manifest: `0`
-- Migrated-to-concrete declarations: `106`
+- Migrated-to-concrete declarations: `112`
 - Pending concrete migration declarations: `0`
 - Abstract-interface declarations whose module already has a concrete bridge in repo: `0`
+- Active H10 correspondence risks outside the bridge axis: `0`
 
 ## Concrete Substrate Modules
 
@@ -34,16 +35,18 @@ and the concrete first-principles substrate now present in the repo.
 
 | Paper-facing module | Migrated decls | Pending decls | Concrete substrate modules | Migration state | Module first-principles closed |
 | --- | --- | --- | --- | --- | --- |
-| `SemanticConvergence.Belief` | `7` | `0` | `SemanticConvergence.ConcreteCore`, `SemanticConvergence.ConcretePrior`, `SemanticConvergence.ConcreteHierarchy`, `SemanticConvergence.ConcreteBelief` | already concrete | `yes` |
+| `SemanticConvergence.Belief` | `8` | `0` | `SemanticConvergence.ConcreteCore`, `SemanticConvergence.ConcretePrior`, `SemanticConvergence.ConcreteHierarchy`, `SemanticConvergence.ConcreteBelief` | already concrete | `yes` |
 | `SemanticConvergence.Boundary` | `10` | `0` | `SemanticConvergence.ConcreteSelfReference`, `SemanticConvergence.ConcreteBoundary` | already concrete | `yes` |
 | `SemanticConvergence.Foundations` | `1` | `0` | `SemanticConvergence.ConcreteCore` | already concrete | `yes` |
-| `SemanticConvergence.Functional` | `15` | `0` | `SemanticConvergence.ConcreteCore`, `SemanticConvergence.ConcretePrior`, `SemanticConvergence.ConcreteHierarchy`, `SemanticConvergence.ConcreteFunctional` | already concrete | `yes` |
-| `SemanticConvergence.Hierarchy` | `12` | `0` | `SemanticConvergence.ConcreteCore`, `SemanticConvergence.ConcretePrior`, `SemanticConvergence.ConcreteHierarchy` | already concrete | `yes` |
+| `SemanticConvergence.Functional` | `14` | `0` | `SemanticConvergence.ConcreteCore`, `SemanticConvergence.ConcretePrior`, `SemanticConvergence.ConcreteHierarchy`, `SemanticConvergence.ConcreteFunctional` | already concrete | `yes` |
+| `SemanticConvergence.Hierarchy` | `13` | `0` | `SemanticConvergence.ConcreteCore`, `SemanticConvergence.ConcretePrior`, `SemanticConvergence.ConcreteHierarchy` | already concrete | `yes` |
+| `SemanticConvergence.MartingaleContraction` | `1` | `0` | — | already concrete | `yes` |
 | `SemanticConvergence.Noise` | `6` | `0` | `SemanticConvergence.ConcreteSemantic`, `SemanticConvergence.ConcreteNoise` | already concrete | `yes` |
-| `SemanticConvergence.Rates` | `5` | `0` | `SemanticConvergence.ConcreteSemantic`, `SemanticConvergence.ConcreteRates` | already concrete | `yes` |
+| `SemanticConvergence.Ontology` | `12` | `0` | — | already concrete | `yes` |
+| `SemanticConvergence.Rates` | `8` | `0` | `SemanticConvergence.ConcreteSemantic`, `SemanticConvergence.ConcreteRates` | already concrete | `yes` |
 | `SemanticConvergence.SelfReference` | `12` | `0` | `SemanticConvergence.ConcreteSemantic`, `SemanticConvergence.ConcreteRates`, `SemanticConvergence.ConcreteSelfReference` | already concrete | `yes` |
-| `SemanticConvergence.Semantic` | `35` | `0` | `SemanticConvergence.ConcreteCore`, `SemanticConvergence.ConcretePrior`, `SemanticConvergence.ConcreteHierarchy`, `SemanticConvergence.ConcreteFunctional`, `SemanticConvergence.ConcreteBelief`, `SemanticConvergence.ConcreteSemantic` | already concrete | `yes` |
-| `SemanticConvergence.Surrogate` | `3` | `0` | `SemanticConvergence.ConcreteBoundary`, `SemanticConvergence.ConcreteSurrogate` | already concrete | `yes` |
+| `SemanticConvergence.Semantic` | `25` | `0` | `SemanticConvergence.ConcreteCore`, `SemanticConvergence.ConcretePrior`, `SemanticConvergence.ConcreteHierarchy`, `SemanticConvergence.ConcreteFunctional`, `SemanticConvergence.ConcreteBelief`, `SemanticConvergence.ConcreteSemantic` | already concrete | `yes` |
+| `SemanticConvergence.Surrogate` | `2` | `0` | `SemanticConvergence.ConcreteBoundary`, `SemanticConvergence.ConcreteSurrogate` | already concrete | `yes` |
 
 ## Trusted Boundary After Phase 10
 
@@ -53,3 +56,6 @@ The paper-facing theorem files no longer carry an abstract
 `...Model` / `...Theory` proof boundary.
 No manifest entry depends on such a layer, so it is no longer part of
 the mathematical trust boundary.
+This bridge closure is separate from H10 correspondence closure; active
+H10 risks are tracked in `formalization_manifest.md`,
+`formalization_audit.md`.

@@ -1,0 +1,112 @@
+% Move 1 draft. Standalone section, intended to slot in as the new Section~3
+% (between Formal Setup and the Knowability Hierarchy). All notation matches
+% \cite{semantic_convergence_interactive_learning_h7}.
+%
+% The section establishes the three-layer ontology --- observers, agents,
+% coupling --- and tells the reader where each existing result lives in that
+% ontology. The mathematical content is unchanged; the section is a
+% reorganization of perspective on material the rest of the paper develops.
+
+\section{Observers, Agents, and Coupling}
+\label{sec:ontology}
+
+The contributions of this paper sort cleanly into three layers, and the rest of the manuscript reads more transparently once the layers are named. An \emph{observer} fixes what is in principle distinguishable. An \emph{agent} fixes the learning machinery that tries to exploit that distinguishability. A \emph{coupling} is a joint property of an observer, an agent, and an environment that determines whether learning actually reaches the observer's ceiling. Each layer answers a different question, and each is the natural home of a different family of results below.
+
+\subsection{Observers}
+\label{sec:ontology-observers}
+
+An \emph{observer} is a measurable function
+\[
+\omega:\Pcal\longrightarrow\Omega^\omega,
+\]
+where $\Omega^\omega$ is a measurable space of \emph{views}. Two programs are \emph{$\omega$-equivalent} if they produce the same view, $p\sim_\omega p'\iff\omega(p)=\omega(p')$, and the \emph{observer fiber} of $p$ is $[p]_\omega:=\{p'\in\Pcal:\omega(p)=\omega(p')\}$. An observer determines an equivalence relation on $\Pcal$, a partition $\Pcal/\!\sim_\omega$, and the pushforward of any prior or posterior to that partition. It is a \emph{lens}: a passive labelling rule. Observers do not act, do not have priors of their own, and do not depend on any environment. The four-observer chain
+\[
+\omega_{h_t}\preceq\omega_\pi\preceq\omega_{\mathrm{behav}}\preceq\omega_{\mathrm{syn}}
+\]
+of Section~\ref{sec:hierarchy} is a refinement lattice: each later observer is a refinement of the previous one in the sense that its fibers are contained in the previous one's fibers. The interventional observer $\omega_{\mathrm{behav}}$ is the most refined view a history-based learner can possibly resolve; finer observers like $\omega_{\mathrm{syn}}$ identify programs that no admissible policy can distinguish.
+
+The kind of question an observer is the answer to is: \emph{what can be told apart, in principle, through this access?} The observer-side results in this paper are exactly the answers to that question:
+\begin{itemize}
+\item The four-set hierarchy and the strict-hierarchy theorem (Section~\ref{sec:hierarchy}) say which inclusions are real.
+\item The observable-quotient theorem (Section~\ref{sec:hierarchy}) says no history-based learner can resolve below~$\omega_{\mathrm{behav}}$, which is why $[p^\star]:=[p^\star]_{\omega_{\mathrm{behav}}}$ is the right semantic target.
+\end{itemize}
+None of these results mention priors, update rules, or actions. They are facts about lenses, not about learners.
+
+\subsection{Agents}
+\label{sec:ontology-agents}
+
+An \emph{agent} is a learning architecture. Formally, an agent is a tuple
+\[
+\Acal=\bigl(w,\,\{q_t\}_{t\ge0},\,\{\pi_t\}_{t\ge1},\,\rho,\,c\bigr)
+\]
+consisting of a prior $w\in\Delta(\Pcal)$, a sequence of belief updates $q_t:\Hcal_t\to\Delta(\Pcal)$, a policy $\pi$ as in Section~\ref{sec:setup}, a preference profile $\rho_t$, and an action-cost profile $c_t$. An agent acts: at each step it consumes a history, produces an action, receives an observation, and revises beliefs. The variational machinery of this paper operates entirely within an agent: the universal prior, the algorithmic free energy $\Fcal_t$, the two-observer functional $\mathcal J_t^{\omega_B,\omega_A}$, and the kernel functional $\mathcal J_t^{\omega_B,\omega_A,\kappa}$ are all components of an agent's belief and action rules.
+
+The kind of question an agent is the answer to is: \emph{what does the learning architecture do at each step, holding everything else fixed?} The agent-side results in this paper are answers to that question:
+\begin{itemize}
+\item The variational identity (Section~\ref{sec:belief}) says the Bayes--Gibbs posterior uniquely minimizes the algorithmic free energy. This is a structural fact about the belief update; it holds in every environment.
+\item The KL-necessity theorem (Section~\ref{sec:belief}) singles out $\KL(q\|w)$ within the natural convex class as the unique divergence forcing the exact Gibbs variational identity. This is a structural fact about the divergence used by the belief update.
+\item The expected-free-energy specialization (Corollary~\ref{cor:efe-specialization} in Section~\ref{sec:near-miss}) says the action term reduces to the information-gain criterion under zero action cost and uniform preferences. This is a structural fact about the action rule.
+\end{itemize}
+None of these results mention an environment $p^\star$. They are facts about the agent in isolation.
+
+\subsection{Coupling}
+\label{sec:ontology-coupling}
+
+A \emph{coupling} is a property of a triple $(\omega,\Acal,p^\star)$ --- an observer, an agent, and an environment --- that none of the three determines on its own. Coupling conditions answer the question: \emph{does the agent's actual operation in this environment, viewed through this observer, reach the observer's ceiling?}
+
+The central coupling object in this paper is the class-predictive Bhattacharyya score
+\[
+\bar B_t^{\omega_A}(c,a;h_t)
+=
+1-\sum_{o\in\Ocal}\sqrt{\Qcal_t^{O,\omega_A}(o\mid c,h_t,a)\,\mu_{p^\star}(o\mid h_t,a)},
+\]
+which is computed at the observer $\omega_A$, against the environment's true law $\mu_{p^\star}$, under the agent's class-predictive law $\Qcal_t^{O,\omega_A}$. Removing any of the three --- observer, environment, agent's law --- leaves the score undefined. Whether the score is bounded below by some $\kappa>0$ on the agent's policy support is the coupling condition that drives Section~\ref{sec:main}'s convergence theorem. Whether the agent's cumulative policy mass on separating actions diverges is a second coupling condition. Whether the agent's reference law is calibrated to the environment's prefix-Hellinger geometry is a third. None is a property of any single layer.
+
+The coupling-layer results are:
+\begin{itemize}
+\item The main convergence theorem (Section~\ref{sec:main}) is a coupling-success theorem: under stated coupling conditions on $(\omega,\Acal,p^\star)$, the agent's posterior on $\omega$'s interventional class converges almost surely to one.
+\item The near-miss theorem (Section~\ref{sec:near-miss}) is a coupling-failure exhibit: it shows that even with $\omega=\omega_{\mathrm{behav}}$ and an agent whose action rule \emph{is} the unifying information-gain criterion, the wrong reference prior can lock the coupling into stagnation.
+\item The matching converses (zero separating support; summable separating support) are further coupling failures, this time of the support-mass kind rather than the score kind.
+\item The three canonical realizations (Section~\ref{sec:semantic-action}) and the differentiable surrogate (Section~\ref{sec:amortized-surrogate}) are constructions that engineer good couplings: each pins a specific agent and shows that its coupling to environments in the realization's scope satisfies the convergence conditions.
+\end{itemize}
+These results live at the coupling layer because each of them is sensitive to a change in any one of the three constituents. A coupling that succeeds with one environment can fail with another; an agent that couples well with one environment can fail with another; an observer too coarse to resolve $p^\star$ can render any agent's coupling vacuous.
+
+\subsection{Locating the paper's contributions}
+\label{sec:ontology-locator}
+
+Table~\ref{tab:ontology} sorts the main results by layer.
+
+\begin{table}[h]
+\centering\small
+\begin{tabular}{p{0.30\linewidth}p{0.62\linewidth}}
+\toprule
+Layer & Results in this paper \\
+\midrule
+Observer & Strict-hierarchy theorem; observable-quotient theorem; the identification of $[p^\star]_{\omega_{\mathrm{behav}}}$ as the right interventional target. \\
+Agent & Variational identity for the algorithmic free energy; KL-necessity within the natural convex class; expected-free-energy specialization to information gain; meeting-point theorem; the two-observer and kernel functionals as agent components. \\
+Coupling & Main convergence theorem; matching converses (zero and summable separating support); near-miss theorem; canonical realizations and the amortized surrogate as engineered couplings; self-referential reduction as a coupling-engineering technique. \\
+\bottomrule
+\end{tabular}
+\caption{The paper's contributions sorted by ontological layer. Observer-side results say what can be distinguished. Agent-side results say what learning machinery does in isolation. Coupling-side results say when an agent in an environment, viewed through an observer, actually converges.}
+\label{tab:ontology}
+\end{table}
+
+\subsection{Diagnostic use}
+\label{sec:ontology-diagnostic}
+
+The three layers also offer a diagnostic vocabulary for failures of an interactive learner. If a learner fails to concentrate on the right semantic class, the failure must lie in at least one of the three layers, and the layer is the right starting place for the diagnosis:
+
+\begin{itemize}
+\item \emph{Observer failure.} The learner's observer is too coarse (or too fine) for the environment of interest. The learner cannot, even in principle, resolve $p^\star$'s class through this lens. The remedy is observer-side: change the access pattern, refine the equivalence relation, or replace the observer entirely. Section~\ref{sec:hierarchy} says this is the only kind of failure that history-only learners cannot avoid below~$\omega_{\mathrm{behav}}$.
+\item \emph{Agent failure.} The learner's belief update or action rule is structurally inadequate, even apart from any environment. A belief rule that does not minimize a divergence at all, or an action rule that does not pursue information gain, may fail to converge for reasons internal to the agent. Section~\ref{sec:belief} characterizes the unique divergence within the natural convex class; agents that pick a different one are doing structural work that this paper rules out as inadequate.
+\item \emph{Coupling failure.} The observer can resolve the right class and the agent has the right architecture, but the agent's policy in this environment, viewed through this observer, does not satisfy the convergence conditions. The near-miss theorem is the canonical example: a structurally good agent in an environment where the wrong reference prior makes the coupling stagnate. The matching converses are the support-mass version of the same phenomenon. The remedy is coupling-side: engineer the policy or the reference law (the canonical realizations and the surrogate are recipes for doing exactly this).
+\end{itemize}
+
+A reader looking to apply this paper's results to a specific learner --- a language model evaluated on a specific task, an active-inference controller, or a Solomonoff-style universal predictor --- can use the layer split as a checklist. Is the observer fine enough to resolve the relevant program class? Is the agent architecture in the natural variational class? Is the coupling between agent and environment, viewed through the observer, separating? The convergence theorem of Section~\ref{sec:main} covers the third question; the answers to the first two are prerequisites for it to apply.
+
+\subsection{What this changes about the rest of the paper}
+\label{sec:ontology-roadmap}
+
+The remaining sections develop one layer at a time. Section~\ref{sec:hierarchy} is observer-only: it establishes the four-set lattice and the strict-hierarchy and observable-quotient theorems. Section~\ref{sec:functional} introduces the two-observer functional, which is the variational shape of an agent's belief and class-action rules; the meeting-point theorem there is an agent-side identification of the joint minimum. Section~\ref{sec:belief} is agent-only: it isolates the belief side of the agent at $\omega_B=\omega_{\mathrm{syn}}$ and proves the variational identity and KL-necessity theorems. Section~\ref{sec:semantic-action} develops the agent's action side at $\omega_A=\omega_{\mathrm{behav}}$ and gives the canonical engineered realizations. Section~\ref{sec:main} is the central coupling section: it states the standing coupling conditions and proves the main convergence theorem from them. The boundary example of Section~\ref{sec:near-miss} is a coupling failure with a structurally good agent. The self-referential reduction of Section~\ref{sec:self-ref} is a coupling-engineering technique: it constructs a coupling with the same convergence guarantee from a more limited observer.
+
+Throughout the rest of the paper, when a result depends on the environment, it is a coupling result; when it does not, it is an observer or agent result. The reader can use this distinction to pick which kind of remedy applies when an instantiation falls short of any specific theorem's hypotheses.

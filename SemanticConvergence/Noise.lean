@@ -126,15 +126,7 @@ theorem cor_noise_transfer
     {p q : U.Program}
     (δ : Rat) (T : Nat)
     (hView : ω.view (U.toEncodedProgram p) = ω.view (U.toEncodedProgram q))
-    (hStep :
-      ∀ ξ, ξ ∈ ((U.toCountablePrefixMachine hSem).trajectoryLaw
-        (toCountablePolicy π hπ) (U.toCountableProgram hSem penv) T).support →
-        ∀ n, n < T →
-          U.residualObserverFiberPosteriorOdds π (prefixFullHist ξ (n + 1)) ω
-              (U.toEncodedProgram p) ≤
-            posteriorDecayFactor δ *
-              U.residualObserverFiberPosteriorOdds π (prefixFullHist ξ n) ω
-                (U.toEncodedProgram p))
+    (hUpdates : HasRealizedPrefixResidualUpdates U π hπ hSem penv p ω T)
     (hInitTop :
       (U.toCountablePrefixMachine hSem).initialResidualObserverFiberOdds
           (toCountablePolicy π hπ) (U.liftObserver ω)
@@ -153,7 +145,36 @@ theorem cor_noise_transfer
   rcases hDec with ⟨decode, hdecode⟩
   refine ⟨⟨decode, hdecode⟩, ?_⟩
   exact thm_exp_rate_concentration
-    U hCodes π hπ hπN hSem hSemN penv ω δ T hView hStep hInitTop
+    U hCodes π hπ hπN hSem hSemN penv ω δ T hView hUpdates hInitTop
+
+/-- H10 package wrapper for decodable-channel transfer on the zero-out/rate stack. -/
+theorem zeroOutRatePackage_decodableNoiseTransfer
+    [DecidableEq A] [DecidableEq O] [BEq A] [LawfulBEq A] [BEq O] [LawfulBEq O]
+    (K : ObsChannel O O')
+    (hDec : def_decodable_channel K)
+    (U : ConcretePrefixMachine A O)
+    (π : ConcretePolicy A O) (hπ : ProbabilisticPolicy π)
+    (hSem : ∀ c hc, ProbabilisticKernel (U.semantics c hc))
+    (penv : U.Program)
+    (ω : Observer (EncodedProgram A O))
+    {p q : U.Program}
+    (δ : Rat) (T : Nat)
+    (hView : ω.view (U.toEncodedProgram p) = ω.view (U.toEncodedProgram q))
+    (h𝒵 : ZeroOutRatePackage U π hπ hSem penv p ω T) :
+    def_left_invertible_channel K ∧
+      ∀ᵐ ξ ∂((U.toCountablePrefixMachine hSem).trajectoryLaw
+          (toCountablePolicy π hπ) (U.toCountableProgram hSem penv) T).toMeasure,
+        ∀ N, N ≤ T →
+          (1 + posteriorDecayFactorENNReal δ ^ N *
+            (U.toCountablePrefixMachine hSem).initialResidualObserverFiberOdds
+              (toCountablePolicy π hπ) (U.liftObserver ω)
+              (U.toCountableEncodedProgram hSem q))⁻¹ ≤
+            (U.toCountablePrefixMachine hSem).observerFiberPosteriorShareProcess
+              (toCountablePolicy π hπ) (U.liftObserver ω)
+              (U.toCountableEncodedProgram hSem q) N ξ :=
+  cor_noise_transfer K hDec U h𝒵.codes_nodup π hπ
+    h𝒵.policy_support_nodup hSem h𝒵.semantics_support_nodup penv ω
+    δ T hView h𝒵.realized_updates h𝒵.initial_residual_finite
 
 end CountablePaperNoise
 
